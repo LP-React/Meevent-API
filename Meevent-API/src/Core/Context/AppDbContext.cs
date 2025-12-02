@@ -1,7 +1,8 @@
 ﻿namespace Meevent_API.src.Core.Context;
 
-using Microsoft.EntityFrameworkCore;
+using Meevent_API.Core.Entities;
 using Meevent_API.src.Core.Entities;
+using Microsoft.EntityFrameworkCore;
 
 public class AppDbContext : DbContext
 {
@@ -21,6 +22,14 @@ public class AppDbContext : DbContext
     public DbSet<EventFollower> EventFollowers { get; set; }
     public DbSet<EventReview> EventReviews { get; set; }
     public DbSet<EventImage> EventImages { get; set; }
+
+    //GABRIEL
+    public DbSet<TicketType> TicketTypes { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderItem> OrderItems { get; set; }
+    public DbSet<Attendee> Attendees { get; set; }
+    public DbSet<Payment> Payments { get; set; }
+    public DbSet<PromoCode> PromoCodes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -222,5 +231,164 @@ public class AppDbContext : DbContext
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
+        // GABRIEL
+        // 🟨 TICKET TYPES
+        modelBuilder.Entity<TicketType>(entity =>
+        {
+            entity.ToTable("TicketTypes");
+            entity.HasKey(e => e.TicketTypeId);
+            entity.Property(e => e.TicketTypeId).HasColumnName("ticket_type_id");
+            entity.Property(e => e.EventId).HasColumnName("event_id");
+            entity.Property(e => e.Name).HasColumnName("name").HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Description).HasColumnName("description").HasMaxLength(500);
+            entity.Property(e => e.Price).HasColumnName("price").HasColumnType("decimal(10,2)");
+            entity.Property(e => e.Quantity).HasColumnName("quantity");
+            entity.Property(e => e.QuantitySold).HasColumnName("quantity_sold");
+            entity.Property(e => e.QuantityAvailable).HasColumnName("quantity_available");
+            entity.Property(e => e.SaleStartDate).HasColumnName("sale_start_date");
+            entity.Property(e => e.SaleEndDate).HasColumnName("sale_end_date");
+            entity.Property(e => e.MinPurchase).HasColumnName("min_purchase");
+            entity.Property(e => e.MaxPurchase).HasColumnName("max_purchase");
+            entity.Property(e => e.IsActive).HasColumnName("is_active");
+
+            // Relationships
+            entity.HasMany(e => e.OrderItems)
+                .WithOne(oi => oi.TicketType)
+                .HasForeignKey(oi => oi.TicketTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasMany(e => e.Attendees)
+                .WithOne(a => a.TicketType)
+                .HasForeignKey(a => a.TicketTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // 🟫 ORDERS
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.ToTable("Orders");
+            entity.HasKey(e => e.OrderId);
+            entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.OrderNumber).HasColumnName("order_number").HasMaxLength(50).IsRequired();
+            entity.Property(e => e.Subtotal).HasColumnName("subtotal").HasColumnType("decimal(10,2)");
+            entity.Property(e => e.Tax).HasColumnName("tax").HasColumnType("decimal(10,2)");
+            entity.Property(e => e.ServiceFee).HasColumnName("service_fee").HasColumnType("decimal(10,2)");
+            entity.Property(e => e.Discount).HasColumnName("discount").HasColumnType("decimal(10,2)");
+            entity.Property(e => e.Total).HasColumnName("total").HasColumnType("decimal(10,2)");
+            entity.Property(e => e.PromoCodeId).HasColumnName("promo_code_id");
+            entity.Property(e => e.Status).HasColumnName("status").HasMaxLength(50);
+            entity.Property(e => e.CustomerEmail).HasColumnName("customer_email").HasMaxLength(255).IsRequired();
+            entity.Property(e => e.CustomerName).HasColumnName("customer_name").HasMaxLength(200).IsRequired();
+            entity.Property(e => e.CustomerPhone).HasColumnName("customer_phone").HasMaxLength(20);
+
+            // Relationships
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.PromoCode)
+                .WithMany(pc => pc.Orders)
+                .HasForeignKey(e => e.PromoCodeId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasMany(e => e.OrderItems)
+                .WithOne(oi => oi.Order)
+                .HasForeignKey(oi => oi.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany(e => e.Attendees)
+                .WithOne(a => a.Order)
+                .HasForeignKey(a => a.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany(e => e.Payments)
+                .WithOne(p => p.Order)
+                .HasForeignKey(p => p.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Indexes
+            entity.HasIndex(e => e.OrderNumber).IsUnique();
+        });
+
+        // 🟥 ORDER ITEMS
+        modelBuilder.Entity<OrderItem>(entity =>
+        {
+            entity.ToTable("OrderItems");
+            entity.HasKey(e => e.OrderItemId);
+            entity.Property(e => e.OrderItemId).HasColumnName("order_item_id");
+            entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.TicketTypeId).HasColumnName("ticket_type_id");
+            entity.Property(e => e.Quantity).HasColumnName("quantity");
+            entity.Property(e => e.UnitPrice).HasColumnName("unit_price").HasColumnType("decimal(10,2)");
+            entity.Property(e => e.Subtotal).HasColumnName("subtotal").HasColumnType("decimal(10,2)");
+        });
+
+        // 🟦 ATTENDEES
+        modelBuilder.Entity<Attendee>(entity =>
+        {
+            entity.ToTable("Attendees");
+            entity.HasKey(e => e.AttendeeId);
+            entity.Property(e => e.AttendeeId).HasColumnName("attendee_id");
+            entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.TicketTypeId).HasColumnName("ticket_type_id");
+            entity.Property(e => e.TicketNumber).HasColumnName("ticket_number").HasMaxLength(50).IsRequired();
+            entity.Property(e => e.FirstName).HasColumnName("first_name").HasMaxLength(100).IsRequired();
+            entity.Property(e => e.LastName).HasColumnName("last_name").HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Email).HasColumnName("email").HasMaxLength(255).IsRequired();
+            entity.Property(e => e.Phone).HasColumnName("phone").HasMaxLength(20);
+            entity.Property(e => e.CheckedIn).HasColumnName("checked_in");
+            entity.Property(e => e.CheckedInAt).HasColumnName("checked_in_at");
+            entity.Property(e => e.QrCode).HasColumnName("qr_code").HasMaxLength(255).IsRequired();
+
+            // Indexes
+            entity.HasIndex(e => e.TicketNumber).IsUnique();
+            entity.HasIndex(e => e.QrCode).IsUnique();
+        });
+
+        // 🟩 PAYMENTS
+        modelBuilder.Entity<Payment>(entity =>
+        {
+            entity.ToTable("Payments");
+            entity.HasKey(e => e.PaymentId);
+            entity.Property(e => e.PaymentId).HasColumnName("payment_id");
+            entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.PaymentMethod).HasColumnName("payment_method").HasMaxLength(50).IsRequired();
+            entity.Property(e => e.Amount).HasColumnName("amount").HasColumnType("decimal(10,2)");
+            entity.Property(e => e.Currency).HasColumnName("currency").HasMaxLength(3);
+            entity.Property(e => e.Status).HasColumnName("status").HasMaxLength(50);
+            entity.Property(e => e.TransactionId).HasColumnName("transaction_id").HasMaxLength(255);
+            entity.Property(e => e.PaymentGateway).HasColumnName("payment_gateway").HasMaxLength(50);
+            entity.Property(e => e.PaymentGatewayResponse).HasColumnName("payment_gateway_response");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.CompletedAt).HasColumnName("completed_at");
+            entity.Property(e => e.RefundedAt).HasColumnName("refunded_at");
+
+            // Indexes
+            entity.HasIndex(e => e.TransactionId);
+        });
+
+        // 🟨 PROMO CODES
+        modelBuilder.Entity<PromoCode>(entity =>
+        {
+            entity.ToTable("PromoCodes");
+            entity.HasKey(e => e.PromoCodeId);
+            entity.Property(e => e.PromoCodeId).HasColumnName("promo_code_id");
+            entity.Property(e => e.Code).HasColumnName("code").HasMaxLength(50).IsRequired();
+            entity.Property(e => e.Description).HasColumnName("description").HasMaxLength(500);
+            entity.Property(e => e.DiscountType).HasColumnName("discount_type").HasMaxLength(50);
+            entity.Property(e => e.DiscountValue).HasColumnName("discount_value").HasColumnType("decimal(10,2)");
+            entity.Property(e => e.MinimumPurchase).HasColumnName("minimum_purchase").HasColumnType("decimal(10,2)");
+            entity.Property(e => e.MaximumDiscount).HasColumnName("maximum_discount").HasColumnType("decimal(10,2)");
+            entity.Property(e => e.UsageLimit).HasColumnName("usage_limit");
+            entity.Property(e => e.UsageCount).HasColumnName("usage_count");
+            entity.Property(e => e.StartDate).HasColumnName("start_date");
+            entity.Property(e => e.EndDate).HasColumnName("end_date");
+            entity.Property(e => e.IsActive).HasColumnName("is_active");
+
+            // Indexes
+            entity.HasIndex(e => e.Code).IsUnique();
+        });
     }
 }
