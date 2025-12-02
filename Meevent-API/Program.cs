@@ -1,4 +1,5 @@
-﻿using Meevent_API.src.Core.Context;
+﻿using Meevent_API.Features.PromoCodes;
+using Meevent_API.src.Core.Context;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")
     )
 );
+
+// Register services
+builder.Services.AddScoped<PromoCodeService>();
 
 // -------------------------------------
 // Controllers y Swagger
