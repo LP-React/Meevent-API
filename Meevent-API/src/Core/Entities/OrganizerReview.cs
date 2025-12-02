@@ -1,6 +1,6 @@
 ﻿namespace Meevent_API.src.Core.Entities
 {
-    public class OrganizerReviewEntity
+    public class OrganizerReview
     {
         public int IdOrganizerReview { get; set; }
 
@@ -8,7 +8,7 @@
         public User User { get; set; }
 
         public int OrganizerProfileId { get; set; }
-        public OrganizerProfileEntity OrganizerProfile { get; set; }
+        public OrganizerProfile OrganizerProfile { get; set; }
 
         public int Rating { get; set; }  // 1–5
         public string Comment { get; set; }
