@@ -2,7 +2,7 @@
 {
     public class User
     {
-        public int IdUser { get; set; }
+        public int Id { get; set; }
 
         public string FullName { get; set; }
         public string Email { get; set; }
@@ -21,7 +21,7 @@
         // Tipo de usuario (normal, artist, organizer)
         public string UserType { get; set; } = "normal";
 
-        // === Relaciones ===
+        // NAVIGATIONS
         public ArtistProfile? ArtistProfile { get; set; }
         public OrganizerProfile? OrganizerProfile { get; set; }
 
@@ -30,5 +30,8 @@
 
         public ICollection<Wishlist> Wishlists { get; set; }
             = new List<Wishlist>();
+
+        public ICollection<EventReview> EventReview { get; set; }
+            = new List<EventReview>();
     }
 }

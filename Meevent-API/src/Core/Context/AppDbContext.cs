@@ -40,7 +40,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<User>(entity =>
         {
             entity.ToTable("Users");
-            entity.HasKey(x => x.IdUser);
+            entity.HasKey(x => x.Id);
 
             entity.Property(x => x.FullName).IsRequired();
             entity.Property(x => x.Email).IsRequired();
@@ -63,7 +63,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<OrganizerProfile>(entity =>
         {
             entity.ToTable("OrganizerProfiles");
-            entity.HasKey(x => x.IdOrganizerProfile);
+            entity.HasKey(x => x.Id);
 
             entity.HasOne(x => x.User)
                   .WithOne(u => u.OrganizerProfile)
@@ -75,7 +75,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<OrganizerReview>(entity =>
         {
             entity.ToTable("OrganizerReviews");
-            entity.HasKey(x => x.IdOrganizerReview);
+            entity.HasKey(x => x.Id);
 
             entity.Property(x => x.Comment).IsRequired();
 
