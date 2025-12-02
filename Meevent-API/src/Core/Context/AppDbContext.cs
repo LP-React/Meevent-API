@@ -23,7 +23,7 @@ public class AppDbContext : DbContext
     public DbSet<EventReview> EventReviews { get; set; }
     public DbSet<EventImage> EventImages { get; set; }
 
-    // DbSets - Tickets and Sales Module
+    //GABRIEL
     public DbSet<TicketType> TicketTypes { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
@@ -231,10 +231,11 @@ public class AppDbContext : DbContext
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
+        // GABRIEL
         // 🟨 TICKET TYPES
         modelBuilder.Entity<TicketType>(entity =>
         {
-            entity.ToTable("ticket_types");
+            entity.ToTable("TicketTypes");
             entity.HasKey(e => e.TicketTypeId);
             entity.Property(e => e.TicketTypeId).HasColumnName("ticket_type_id");
             entity.Property(e => e.EventId).HasColumnName("event_id");
@@ -265,7 +266,7 @@ public class AppDbContext : DbContext
         // 🟫 ORDERS
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.ToTable("orders");
+            entity.ToTable("Orders");
             entity.HasKey(e => e.OrderId);
             entity.Property(e => e.OrderId).HasColumnName("order_id");
             entity.Property(e => e.UserId).HasColumnName("user_id");
@@ -314,7 +315,7 @@ public class AppDbContext : DbContext
         // 🟥 ORDER ITEMS
         modelBuilder.Entity<OrderItem>(entity =>
         {
-            entity.ToTable("order_items");
+            entity.ToTable("OrderItems");
             entity.HasKey(e => e.OrderItemId);
             entity.Property(e => e.OrderItemId).HasColumnName("order_item_id");
             entity.Property(e => e.OrderId).HasColumnName("order_id");
@@ -327,7 +328,7 @@ public class AppDbContext : DbContext
         // 🟦 ATTENDEES
         modelBuilder.Entity<Attendee>(entity =>
         {
-            entity.ToTable("attendees");
+            entity.ToTable("Attendees");
             entity.HasKey(e => e.AttendeeId);
             entity.Property(e => e.AttendeeId).HasColumnName("attendee_id");
             entity.Property(e => e.OrderId).HasColumnName("order_id");
@@ -349,7 +350,7 @@ public class AppDbContext : DbContext
         // 🟩 PAYMENTS
         modelBuilder.Entity<Payment>(entity =>
         {
-            entity.ToTable("payments");
+            entity.ToTable("Payments");
             entity.HasKey(e => e.PaymentId);
             entity.Property(e => e.PaymentId).HasColumnName("payment_id");
             entity.Property(e => e.OrderId).HasColumnName("order_id");
@@ -371,7 +372,7 @@ public class AppDbContext : DbContext
         // 🟨 PROMO CODES
         modelBuilder.Entity<PromoCode>(entity =>
         {
-            entity.ToTable("promo_codes");
+            entity.ToTable("PromoCodes");
             entity.HasKey(e => e.PromoCodeId);
             entity.Property(e => e.PromoCodeId).HasColumnName("promo_code_id");
             entity.Property(e => e.Code).HasColumnName("code").HasMaxLength(50).IsRequired();
