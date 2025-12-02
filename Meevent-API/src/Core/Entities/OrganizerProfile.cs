@@ -1,6 +1,6 @@
 ﻿namespace Meevent_API.src.Core.Entities
 {
-    public class OrganizerProfileEntity
+    public class OrganizerProfile
     {
         public int IdOrganizerProfile { get; set; }
 
@@ -23,7 +23,7 @@
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-        public ICollection<OrganizerReviewEntity> OrganizerReviews { get; set; }
-            = new List<OrganizerReviewEntity>();
+        public ICollection<OrganizerReview> OrganizerReviews { get; set; }
+            = new List<OrganizerReview>();
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Meevent_API.src.Core.Entities
 {
-    public class WishlistEntity
+    public class Wishlist
     {
         public int IdWishlist { get; set; }
 

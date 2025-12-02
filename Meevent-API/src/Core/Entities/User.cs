@@ -22,13 +22,13 @@
         public string UserType { get; set; } = "normal";
 
         // === Relaciones ===
-        public ArtistProfileEntity? ArtistProfile { get; set; }
-        public OrganizerProfileEntity? OrganizerProfile { get; set; }
+        public ArtistProfile? ArtistProfile { get; set; }
+        public OrganizerProfile? OrganizerProfile { get; set; }
 
-        public ICollection<OrganizerReviewEntity> OrganizerReviews { get; set; }
-            = new List<OrganizerReviewEntity>();
+        public ICollection<OrganizerReview> OrganizerReviews { get; set; }
+            = new List<OrganizerReview>();
 
-        public ICollection<WishlistEntity> Wishlists { get; set; }
-            = new List<WishlistEntity>();
+        public ICollection<Wishlist> Wishlists { get; set; }
+            = new List<Wishlist>();
     }
 }

@@ -1,6 +1,6 @@
-﻿namespace Meevent_API.src.Features.Event
+﻿namespace Meevent_API.src.Core.Entities
 {
-    public class EventCategoryEntity
+    public class EventCategory
     {
         public int Id { get; set; }
 
@@ -9,6 +9,6 @@
         public string? IconUrl { get; set; }
 
         // Navigation
-        public ICollection<EventSubCategoryEntity>? SubCategories { get; set; }
+        public ICollection<EventSubCategory>? SubCategories { get; set; }
     }
 }

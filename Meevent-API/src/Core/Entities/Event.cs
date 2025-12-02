@@ -36,13 +36,17 @@
 
         // Navegación
         public EventSubCategory? SubCategory { get; set; }
-        public VenueEntity? Venue { get; set; }
-        public OrganizerProfileEntity? Organizer { get; set; }
+
+        // !TODO: //
+        //public VenueEntity? Venue { get; set; }
+        public OrganizerProfile? Organizer { get; set; }
 
         public ICollection<EventImage>? Images { get; set; }
         public ICollection<EventFollower>? Followers { get; set; }
         public ICollection<EventReview>? Reviews { get; set; }
-        public ICollection<TicketTypeEntity>? TicketTypes { get; set; }
+
+        //TODO ticketTYPE//
+        //public ICollection<TicketTypeEntity>? TicketTypes { get; set; }
     }
 
     public enum EventStatus
