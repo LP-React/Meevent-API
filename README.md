@@ -82,23 +82,31 @@ Implementamos Vertical Slice Architecture, separando la aplicación por features
       /Users
          UsersController.cs
          UserService.cs
-         UserDto.cs
-         UserEntity.cs
+         UserDtos.cs
          UserMapping.cs
          UserValidators.cs
+
       /Events
          EventsController.cs
          EventService.cs
-         EventDto.cs
-         EventEntity.cs
+         EventDtos.cs
          EventMapping.cs
+
    /Core
       /Context
          AppDbContext.cs
+
       /Entities
-         (Entidades compartidas)
+         User.cs
+         Event.cs
+         (más entidades...)
+
       /Interfaces
+         (interfaces opcionales)
+
       /Migrations
+         (migraciones de EF)
+
 ```
 
 
