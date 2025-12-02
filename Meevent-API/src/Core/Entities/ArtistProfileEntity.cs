@@ -1,13 +1,11 @@
-﻿using Meevent_API.src.Features.Users;
-
-namespace Meevent_API.src.Features.ArtistProfiles
+﻿namespace Meevent_API.src.Core.Entities
 {
     public class ArtistProfileEntity
     {
         public int IdArtistProfile { get; set; }
 
         public int UserId { get; set; }
-        public UserEntity User { get; set; }
+        public User User { get; set; }
 
         public string StageName { get; set; }
         public string Biography { get; set; }

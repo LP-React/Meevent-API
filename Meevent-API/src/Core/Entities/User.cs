@@ -1,11 +1,6 @@
-﻿using Meevent_API.src.Features.ArtistProfiles;
-using Meevent_API.src.Features.OrganizerProfiles;
-using Meevent_API.src.Features.OrganizerReviews;
-using Meevent_API.src.Features.Wishlists;
-
-namespace Meevent_API.src.Features.Users
+﻿namespace Meevent_API.src.Core.Entities
 {
-    public class UserEntity
+    public class User
     {
         public int IdUser { get; set; }
 

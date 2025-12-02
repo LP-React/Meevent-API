@@ -1,17 +1,13 @@
 ﻿namespace Meevent_API.src.Core.Context;
 
 using Microsoft.EntityFrameworkCore;
-using Meevent_API.src.Features.Users;
-using Meevent_API.src.Features.ArtistProfiles;
-using Meevent_API.src.Features.OrganizerProfiles;
-using Meevent_API.src.Features.OrganizerReviews;
-using Meevent_API.src.Features.Wishlists;
+using Meevent_API.src.Core.Entities;
 
 public class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-    public DbSet<UserEntity> Users { get; set; }
+    public DbSet<User> Users { get; set; }
     public DbSet<ArtistProfileEntity> ArtistProfiles { get; set; }
     public DbSet<OrganizerProfileEntity> OrganizerProfiles { get; set; }
     public DbSet<OrganizerReviewEntity> OrganizerReviews { get; set; }
@@ -22,7 +18,7 @@ public class AppDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         // 🟦 USERS
-        modelBuilder.Entity<UserEntity>(entity =>
+        modelBuilder.Entity<User>(entity =>
         {
             entity.ToTable("Users");
             entity.HasKey(x => x.IdUser);
