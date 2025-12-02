@@ -1,6 +1,5 @@
 ﻿namespace Meevent_API.src.Core.Context;
 
-using Meevent_API.Core.Entities;
 using Meevent_API.src.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -39,7 +38,7 @@ public class AppDbContext : DbContext
         // 🟦 USERS
         modelBuilder.Entity<User>(entity =>
         {
-            entity.ToTable("Users");
+            entity.ToTable("users");
             entity.HasKey(x => x.Id);
 
             entity.Property(x => x.FullName).IsRequired();
@@ -50,8 +49,8 @@ public class AppDbContext : DbContext
         // 🟩 ARTIST PROFILE (1-1 User → ArtistProfile)
         modelBuilder.Entity<ArtistProfile>(entity =>
         {
-            entity.ToTable("ArtistProfiles");
-            entity.HasKey(x => x.IdArtistProfile);
+            entity.ToTable("artist_profile");
+            entity.HasKey(x => x.Id);
 
             entity.HasOne(x => x.User)
                   .WithOne(u => u.ArtistProfile)
@@ -62,7 +61,7 @@ public class AppDbContext : DbContext
         // 🟧 ORGANIZER PROFILE (1-1 User → OrganizerProfile)
         modelBuilder.Entity<OrganizerProfile>(entity =>
         {
-            entity.ToTable("OrganizerProfiles");
+            entity.ToTable("organizer_profile");
             entity.HasKey(x => x.Id);
 
             entity.HasOne(x => x.User)
@@ -74,7 +73,7 @@ public class AppDbContext : DbContext
         // 🟥 ORGANIZER REVIEWS (1-N User → Reviews y 1-N OrganizerProfile → Reviews)
         modelBuilder.Entity<OrganizerReview>(entity =>
         {
-            entity.ToTable("OrganizerReviews");
+            entity.ToTable("organizer_review");
             entity.HasKey(x => x.Id);
 
             entity.Property(x => x.Comment).IsRequired();
@@ -93,8 +92,8 @@ public class AppDbContext : DbContext
         // 🟪 WISHLIST (1-N User → Wishlist)
         modelBuilder.Entity<Wishlist>(entity =>
         {
-            entity.ToTable("Wishlists");
-            entity.HasKey(x => x.IdWishlist);
+            entity.ToTable("wishlists");
+            entity.HasKey(x => x.Id);
 
             entity.Property(x => x.ItemType).IsRequired();
 
@@ -108,7 +107,7 @@ public class AppDbContext : DbContext
         // 🟦 EVENT CATEGORIES
         modelBuilder.Entity<EventCategory>(entity =>
         {
-            entity.ToTable("EventCategories");
+            entity.ToTable("event_categories");
             entity.HasKey(x => x.Id);
 
             entity.Property(x => x.Name).IsRequired();
@@ -124,7 +123,7 @@ public class AppDbContext : DbContext
         // 🟩 EVENT SUBCATEGORIES
         modelBuilder.Entity<EventSubCategory>(entity =>
         {
-            entity.ToTable("EventSubCategories");
+            entity.ToTable("event_subcategories");
             entity.HasKey(x => x.Id);
 
             entity.Property(x => x.Name).IsRequired();
@@ -140,7 +139,7 @@ public class AppDbContext : DbContext
         // 🟧 EVENTS
         modelBuilder.Entity<Event>(entity =>
         {
-            entity.ToTable("Events");
+            entity.ToTable("events");
             entity.HasKey(x => x.Id);
 
             entity.Property(x => x.Title).IsRequired();
@@ -179,7 +178,7 @@ public class AppDbContext : DbContext
         // 🟪 EVENT FOLLOWERS
         modelBuilder.Entity<EventFollower>(entity =>
         {
-            entity.ToTable("EventFollowers");
+            entity.ToTable("event_followers");
             entity.HasKey(x => x.Id);
 
             entity.Property(x => x.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
@@ -198,7 +197,7 @@ public class AppDbContext : DbContext
         // 🟨 EVENT REVIEWS
         modelBuilder.Entity<EventReview>(entity =>
         {
-            entity.ToTable("EventReviews");
+            entity.ToTable("event_reviews");
             entity.HasKey(x => x.Id);
 
             entity.Property(x => x.Comment).IsRequired();
@@ -210,17 +209,16 @@ public class AppDbContext : DbContext
                   .HasForeignKey(r => r.EventId)
                   .OnDelete(DeleteBehavior.Cascade);
 
-            // Si quieres relacionarlo con User en el futuro:
-            // entity.HasOne(r => r.User)
-            //       .WithMany()
-            //       .HasForeignKey(r => r.UserId)
-            //       .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(r => r.User)
+                  .WithMany()
+                  .HasForeignKey(r => r.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         // 🟧 EVENT IMAGES
         modelBuilder.Entity<EventImage>(entity =>
         {
-            entity.ToTable("EventImages");
+            entity.ToTable("event_images");
             entity.HasKey(x => x.Id);
 
             entity.Property(x => x.Url).IsRequired();
@@ -235,9 +233,9 @@ public class AppDbContext : DbContext
         // 🟨 TICKET TYPES
         modelBuilder.Entity<TicketType>(entity =>
         {
-            entity.ToTable("TicketTypes");
-            entity.HasKey(e => e.TicketTypeId);
-            entity.Property(e => e.TicketTypeId).HasColumnName("ticket_type_id");
+            entity.ToTable("ticket_types");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("ticket_type_id");
             entity.Property(e => e.EventId).HasColumnName("event_id");
             entity.Property(e => e.Name).HasColumnName("name").HasMaxLength(100).IsRequired();
             entity.Property(e => e.Description).HasColumnName("description").HasMaxLength(500);
@@ -266,9 +264,9 @@ public class AppDbContext : DbContext
         // 🟫 ORDERS
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.ToTable("Orders");
-            entity.HasKey(e => e.OrderId);
-            entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.ToTable("orders");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("order_id");
             entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.OrderNumber).HasColumnName("order_number").HasMaxLength(50).IsRequired();
             entity.Property(e => e.Subtotal).HasColumnName("subtotal").HasColumnType("decimal(10,2)");
@@ -303,9 +301,9 @@ public class AppDbContext : DbContext
                 .HasForeignKey(a => a.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            entity.HasMany(e => e.Payments)
+            entity.HasOne(e => e.Payment)
                 .WithOne(p => p.Order)
-                .HasForeignKey(p => p.OrderId)
+                .HasForeignKey<Payment>(p => p.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // Indexes
@@ -316,8 +314,8 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<OrderItem>(entity =>
         {
             entity.ToTable("OrderItems");
-            entity.HasKey(e => e.OrderItemId);
-            entity.Property(e => e.OrderItemId).HasColumnName("order_item_id");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("order_item_id");
             entity.Property(e => e.OrderId).HasColumnName("order_id");
             entity.Property(e => e.TicketTypeId).HasColumnName("ticket_type_id");
             entity.Property(e => e.Quantity).HasColumnName("quantity");
@@ -351,8 +349,8 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Payment>(entity =>
         {
             entity.ToTable("Payments");
-            entity.HasKey(e => e.PaymentId);
-            entity.Property(e => e.PaymentId).HasColumnName("payment_id");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("payment_id");
             entity.Property(e => e.OrderId).HasColumnName("order_id");
             entity.Property(e => e.PaymentMethod).HasColumnName("payment_method").HasMaxLength(50).IsRequired();
             entity.Property(e => e.Amount).HasColumnName("amount").HasColumnType("decimal(10,2)");
@@ -373,8 +371,8 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<PromoCode>(entity =>
         {
             entity.ToTable("PromoCodes");
-            entity.HasKey(e => e.PromoCodeId);
-            entity.Property(e => e.PromoCodeId).HasColumnName("promo_code_id");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("promo_code_id");
             entity.Property(e => e.Code).HasColumnName("code").HasMaxLength(50).IsRequired();
             entity.Property(e => e.Description).HasColumnName("description").HasMaxLength(500);
             entity.Property(e => e.DiscountType).HasColumnName("discount_type").HasMaxLength(50);

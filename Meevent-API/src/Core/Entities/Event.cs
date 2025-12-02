@@ -43,8 +43,7 @@
         // !TODO: //
         //public VenueEntity? Venue { get; set; }
 
-        //TODO ticketTYPE//
-        //public ICollection<TicketTypeEntity>? TicketTypes { get; set; }
+        public ICollection<TicketType>? TicketTypes { get; set; }
     }
 
     public enum EventStatus
