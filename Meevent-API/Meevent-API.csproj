@@ -20,7 +20,6 @@
   <ItemGroup>
     <Folder Include="src\Core\Context\" />
     <Folder Include="src\Core\Migrations\" />
-    <Folder Include="src\Features\" />
   </ItemGroup>
 
 </Project>
