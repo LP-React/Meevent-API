@@ -1,8 +1,8 @@
-﻿namespace Meevent_API.Core.Entities
+﻿namespace Meevent_API.src.Core.Entities
 {
     public class PromoCode
     {
-        public int PromoCodeId { get; set; }
+        public int Id { get; set; }
         public string Code { get; set; } = string.Empty;
         public string? Description { get; set; }
         public string DiscountType { get; set; } = "Percentage"; // Percentage, FixedAmount
@@ -15,7 +15,7 @@
         public DateTime EndDate { get; set; }
         public bool IsActive { get; set; } = true;
 
-        // Navigation properties
+        // NAVIGATION
         public ICollection<Order> Orders { get; set; } = new List<Order>();
 
     }

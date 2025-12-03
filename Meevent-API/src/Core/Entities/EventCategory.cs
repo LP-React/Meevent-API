@@ -8,7 +8,7 @@
         public string Slug { get; set; } = null!;
         public string? IconUrl { get; set; }
 
-        // Navigation
+        // NAVIGATION
         public ICollection<EventSubCategory>? SubCategories { get; set; }
     }
 }

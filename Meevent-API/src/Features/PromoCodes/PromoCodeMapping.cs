@@ -1,4 +1,4 @@
-﻿using Meevent_API.Core.Entities;
+﻿using Meevent_API.src.Core.Entities;
 using static Meevent_API.Features.PromoCodes.PromoCodeDtos;
 
 namespace Meevent_API.Features.PromoCodes
@@ -9,7 +9,7 @@ namespace Meevent_API.Features.PromoCodes
         {
             return new PromoCodeResponse
             {
-                PromoCodeId = promoCode.PromoCodeId,
+                PromoCodeId = promoCode.Id,
                 Code = promoCode.Code,
                 Description = promoCode.Description,
                 DiscountType = promoCode.DiscountType,
@@ -24,20 +24,20 @@ namespace Meevent_API.Features.PromoCodes
             };
         }
 
-        public static PromoCode MapToEntity(this CreatePromoCodeRequest request)
-        {
-            return new PromoCode
-            {
-                Code = request.Code.ToUpper(),
-                Description = request.Description,
-                DiscountType = request.DiscountType,
-                DiscountValue = request.DiscountValue,
-                MinimumPurchase = request.MinimumPurchase,
-                MaximumDiscount = request.MaximumDiscount,
-                UsageLimit = request.UsageLimit,
-                StartDate = request.StartDate,
-                EndDate = request.EndDate,
-            };
-        }
+        //public static PromoCode MapToEntity(this CreatePromoCodeRequest request)
+        //{
+        //    return new PromoCode
+        //    {
+        //        Code = request.Code.ToUpper(),
+        //        Description = request.Description,
+        //        DiscountType = request.DiscountType,
+        //        DiscountValue = request.DiscountValue,
+        //        MinimumPurchase = request.MinimumPurchase,
+        //        MaximumDiscount = request.MaximumDiscount,
+        //        UsageLimit = request.UsageLimit,
+        //        StartDate = request.StartDate,
+        //        EndDate = request.EndDate,
+        //    };
+        //}
     }
 }

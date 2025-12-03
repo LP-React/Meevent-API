@@ -4,12 +4,6 @@
     {
         public int Id { get; set; }
 
-        // Relaciones
-        public int OrganizerId { get; set; }           // OrganizerProfile
-        public int SubCategoryId { get; set; }          // EventSubCategory
-        public int VenueId { get; set; }
-
-
         // Datos principales
         public string Title { get; set; } = null!;
         public string Slug { get; set; } = null!;
@@ -34,19 +28,22 @@
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-        // Navegación
+        // Relaciones
+        public int OrganizerId { get; set; }           // OrganizerProfile
+        public int SubCategoryId { get; set; }          // EventSubCategory
+        public int VenueId { get; set; }
+
+        // NAVIGATION
         public EventSubCategory? SubCategory { get; set; }
-
-        // !TODO: //
-        //public VenueEntity? Venue { get; set; }
         public OrganizerProfile? Organizer { get; set; }
-
         public ICollection<EventImage>? Images { get; set; }
         public ICollection<EventFollower>? Followers { get; set; }
         public ICollection<EventReview>? Reviews { get; set; }
 
-        //TODO ticketTYPE//
-        //public ICollection<TicketTypeEntity>? TicketTypes { get; set; }
+        // !TODO: //
+        //public VenueEntity? Venue { get; set; }
+
+        public ICollection<TicketType>? TicketTypes { get; set; }
     }
 
     public enum EventStatus

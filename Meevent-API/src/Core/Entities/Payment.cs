@@ -1,9 +1,9 @@
-﻿namespace Meevent_API.Core.Entities
+﻿namespace Meevent_API.src.Core.Entities
+
 {
     public class Payment
     {
-        public int PaymentId { get; set; }
-        public int OrderId { get; set; }
+        public int Id { get; set; }
         public string PaymentMethod { get; set; } = string.Empty; // PayPal, MercadoPago, Yape, etc.
         public decimal Amount { get; set; }
         public string Currency { get; set; } = "PEN";
@@ -15,7 +15,10 @@
         public DateTime? CompletedAt { get; set; }
         public DateTime? RefundedAt { get; set; }
 
-        // Navigation properties
+        // RELATIONS
+        public int OrderId { get; set; }
+
+        // NAVIGATIONS
         public Order Order { get; set; } = null!;
     }
 }
