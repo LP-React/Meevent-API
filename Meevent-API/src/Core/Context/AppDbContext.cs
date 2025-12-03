@@ -173,6 +173,12 @@ public class AppDbContext : DbContext
                   .WithOne(r => r.Event)
                   .HasForeignKey(r => r.EventId)
                   .OnDelete(DeleteBehavior.Cascade);
+
+            // Relación 1-N con TicketType
+            entity.HasMany(e => e.TicketTypes)
+                  .WithOne(r => r.Event)
+                  .HasForeignKey(r => r.EventId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         // 🟪 EVENT FOLLOWERS
@@ -210,7 +216,7 @@ public class AppDbContext : DbContext
                   .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(r => r.User)
-                  .WithMany()
+                  .WithMany(u => u.EventReviews)
                   .HasForeignKey(r => r.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
@@ -235,19 +241,9 @@ public class AppDbContext : DbContext
         {
             entity.ToTable("ticket_types");
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id).HasColumnName("ticket_type_id");
-            entity.Property(e => e.EventId).HasColumnName("event_id");
-            entity.Property(e => e.Name).HasColumnName("name").HasMaxLength(100).IsRequired();
-            entity.Property(e => e.Description).HasColumnName("description").HasMaxLength(500);
-            entity.Property(e => e.Price).HasColumnName("price").HasColumnType("decimal(10,2)");
-            entity.Property(e => e.Quantity).HasColumnName("quantity");
-            entity.Property(e => e.QuantitySold).HasColumnName("quantity_sold");
-            entity.Property(e => e.QuantityAvailable).HasColumnName("quantity_available");
-            entity.Property(e => e.SaleStartDate).HasColumnName("sale_start_date");
-            entity.Property(e => e.SaleEndDate).HasColumnName("sale_end_date");
-            entity.Property(e => e.MinPurchase).HasColumnName("min_purchase");
-            entity.Property(e => e.MaxPurchase).HasColumnName("max_purchase");
-            entity.Property(e => e.IsActive).HasColumnName("is_active");
+            entity.Property(e => e.Name).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.Price).HasColumnType("decimal(10,2)");
 
             // Relationships
             entity.HasMany(e => e.OrderItems)
@@ -266,23 +262,19 @@ public class AppDbContext : DbContext
         {
             entity.ToTable("orders");
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id).HasColumnName("order_id");
-            entity.Property(e => e.UserId).HasColumnName("user_id");
-            entity.Property(e => e.OrderNumber).HasColumnName("order_number").HasMaxLength(50).IsRequired();
-            entity.Property(e => e.Subtotal).HasColumnName("subtotal").HasColumnType("decimal(10,2)");
-            entity.Property(e => e.Tax).HasColumnName("tax").HasColumnType("decimal(10,2)");
-            entity.Property(e => e.ServiceFee).HasColumnName("service_fee").HasColumnType("decimal(10,2)");
-            entity.Property(e => e.Discount).HasColumnName("discount").HasColumnType("decimal(10,2)");
-            entity.Property(e => e.Total).HasColumnName("total").HasColumnType("decimal(10,2)");
-            entity.Property(e => e.PromoCodeId).HasColumnName("promo_code_id");
-            entity.Property(e => e.Status).HasColumnName("status").HasMaxLength(50);
-            entity.Property(e => e.CustomerEmail).HasColumnName("customer_email").HasMaxLength(255).IsRequired();
-            entity.Property(e => e.CustomerName).HasColumnName("customer_name").HasMaxLength(200).IsRequired();
-            entity.Property(e => e.CustomerPhone).HasColumnName("customer_phone").HasMaxLength(20);
+            entity.Property(e => e.OrderNumber).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.Subtotal).HasColumnType("decimal(10,2)");
+            entity.Property(e => e.Tax).HasColumnType("decimal(10,2)");
+            entity.Property(e => e.ServiceFee).HasColumnType("decimal(10,2)");
+            entity.Property(e => e.Discount).HasColumnType("decimal(10,2)");
+            entity.Property(e => e.Total).HasColumnType("decimal(10,2)");
+            entity.Property(e => e.CustomerEmail).HasMaxLength(255).IsRequired();
+            entity.Property(e => e.CustomerName).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.CustomerPhone).HasMaxLength(20);
 
             // Relationships
             entity.HasOne(e => e.User)
-                .WithMany()
+                .WithMany(u => u.Orders)
                 .HasForeignKey(e => e.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -315,12 +307,8 @@ public class AppDbContext : DbContext
         {
             entity.ToTable("OrderItems");
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id).HasColumnName("order_item_id");
-            entity.Property(e => e.OrderId).HasColumnName("order_id");
-            entity.Property(e => e.TicketTypeId).HasColumnName("ticket_type_id");
-            entity.Property(e => e.Quantity).HasColumnName("quantity");
-            entity.Property(e => e.UnitPrice).HasColumnName("unit_price").HasColumnType("decimal(10,2)");
-            entity.Property(e => e.Subtotal).HasColumnName("subtotal").HasColumnType("decimal(10,2)");
+            entity.Property(e => e.UnitPrice).HasColumnType("decimal(10,2)");
+            entity.Property(e => e.Subtotal).HasColumnType("decimal(10,2)");
         });
 
         // 🟦 ATTENDEES
@@ -328,17 +316,12 @@ public class AppDbContext : DbContext
         {
             entity.ToTable("Attendees");
             entity.HasKey(e => e.AttendeeId);
-            entity.Property(e => e.AttendeeId).HasColumnName("attendee_id");
-            entity.Property(e => e.OrderId).HasColumnName("order_id");
-            entity.Property(e => e.TicketTypeId).HasColumnName("ticket_type_id");
-            entity.Property(e => e.TicketNumber).HasColumnName("ticket_number").HasMaxLength(50).IsRequired();
-            entity.Property(e => e.FirstName).HasColumnName("first_name").HasMaxLength(100).IsRequired();
-            entity.Property(e => e.LastName).HasColumnName("last_name").HasMaxLength(100).IsRequired();
-            entity.Property(e => e.Email).HasColumnName("email").HasMaxLength(255).IsRequired();
-            entity.Property(e => e.Phone).HasColumnName("phone").HasMaxLength(20);
-            entity.Property(e => e.CheckedIn).HasColumnName("checked_in");
-            entity.Property(e => e.CheckedInAt).HasColumnName("checked_in_at");
-            entity.Property(e => e.QrCode).HasColumnName("qr_code").HasMaxLength(255).IsRequired();
+            entity.Property(e => e.TicketNumber).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.FirstName).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.LastName).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Email).HasMaxLength(255).IsRequired();
+            entity.Property(e => e.Phone).HasMaxLength(20);
+            entity.Property(e => e.QrCode).HasMaxLength(255).IsRequired();
 
             // Indexes
             entity.HasIndex(e => e.TicketNumber).IsUnique();
@@ -350,18 +333,12 @@ public class AppDbContext : DbContext
         {
             entity.ToTable("Payments");
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id).HasColumnName("payment_id");
-            entity.Property(e => e.OrderId).HasColumnName("order_id");
-            entity.Property(e => e.PaymentMethod).HasColumnName("payment_method").HasMaxLength(50).IsRequired();
-            entity.Property(e => e.Amount).HasColumnName("amount").HasColumnType("decimal(10,2)");
-            entity.Property(e => e.Currency).HasColumnName("currency").HasMaxLength(3);
-            entity.Property(e => e.Status).HasColumnName("status").HasMaxLength(50);
-            entity.Property(e => e.TransactionId).HasColumnName("transaction_id").HasMaxLength(255);
-            entity.Property(e => e.PaymentGateway).HasColumnName("payment_gateway").HasMaxLength(50);
-            entity.Property(e => e.PaymentGatewayResponse).HasColumnName("payment_gateway_response");
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
-            entity.Property(e => e.CompletedAt).HasColumnName("completed_at");
-            entity.Property(e => e.RefundedAt).HasColumnName("refunded_at");
+            entity.Property(e => e.PaymentMethod).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.Amount).HasColumnType("decimal(10,2)");
+            entity.Property(e => e.Currency).HasMaxLength(3);
+            entity.Property(e => e.Status).HasMaxLength(50);
+            entity.Property(e => e.TransactionId).HasMaxLength(255);
+            entity.Property(e => e.PaymentGateway).HasMaxLength(50);
 
             // Indexes
             entity.HasIndex(e => e.TransactionId);
@@ -372,18 +349,11 @@ public class AppDbContext : DbContext
         {
             entity.ToTable("PromoCodes");
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id).HasColumnName("promo_code_id");
-            entity.Property(e => e.Code).HasColumnName("code").HasMaxLength(50).IsRequired();
-            entity.Property(e => e.Description).HasColumnName("description").HasMaxLength(500);
-            entity.Property(e => e.DiscountType).HasColumnName("discount_type").HasMaxLength(50);
-            entity.Property(e => e.DiscountValue).HasColumnName("discount_value").HasColumnType("decimal(10,2)");
-            entity.Property(e => e.MinimumPurchase).HasColumnName("minimum_purchase").HasColumnType("decimal(10,2)");
-            entity.Property(e => e.MaximumDiscount).HasColumnName("maximum_discount").HasColumnType("decimal(10,2)");
-            entity.Property(e => e.UsageLimit).HasColumnName("usage_limit");
-            entity.Property(e => e.UsageCount).HasColumnName("usage_count");
-            entity.Property(e => e.StartDate).HasColumnName("start_date");
-            entity.Property(e => e.EndDate).HasColumnName("end_date");
-            entity.Property(e => e.IsActive).HasColumnName("is_active");
+            entity.Property(e => e.Code).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.DiscountType).HasMaxLength(50);
+            entity.Property(e => e.DiscountValue).HasColumnType("decimal(10,2)");
+            entity.Property(e => e.MinimumPurchase).HasColumnType("decimal(10,2)");
+            entity.Property(e => e.MaximumDiscount).HasColumnType("decimal(10,2)");
 
             // Indexes
             entity.HasIndex(e => e.Code).IsUnique();

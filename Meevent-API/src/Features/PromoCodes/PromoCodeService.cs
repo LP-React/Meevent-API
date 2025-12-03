@@ -1,5 +1,5 @@
 ﻿using Meevent_API.src.Core.Context;
-using Meevent_API.Core.Entities;
+using Meevent_API.src.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using static Meevent_API.Features.PromoCodes.PromoCodeDtos;
 
@@ -23,11 +23,11 @@ namespace Meevent_API.Features.PromoCodes
 
         // Obtener un codigo promocional por ID
 
-        public async Task<PromoCodeResponse?> GetPromoCodeByIdAsync(int id)
-        {
-            var promoCode = await _context.PromoCodes.FindAsync(id);
-            return promoCode?.MapToResponse();
-        }
+        //public async Task<PromoCodeResponse?> GetPromoCodeByIdAsync(int id)
+        //{
+        //    var promoCode = await _context.PromoCodes.FindAsync(id);
+        //    return promoCode?.MapToResponse();
+        //}
 
     }
 }

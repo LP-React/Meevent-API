@@ -29,15 +29,15 @@ namespace Meevent_API.Controllers
         }
 
         // GET: api/promo-codes/{id}
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetPromoCodeById(int id)
-        {
-            var promoCode = await _promoCodeService.GetPromoCodeByIdAsync(id);
-            if (promoCode == null)
-            {
-                return NotFound();
-            }
-            return Ok(promoCode);
-        }
+        //[HttpGet("{id}")]
+        //public async Task<IActionResult> GetPromoCodeById(int id)
+        //{
+        //    var promoCode = await _promoCodeService.GetPromoCodeByIdAsync(id);
+        //    if (promoCode == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(promoCode);
+        //}
     }
 }
