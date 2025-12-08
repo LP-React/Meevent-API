@@ -1,7 +1,5 @@
-﻿using Meevent_API.src.Features.Paises.DAO.Implementations;
-using Meevent_API.src.Features.Paises.DAO.Interfaces;
-using Meevent_API.src.Features.Paises.Services.Implementations;
-using Meevent_API.src.Features.Paises.Services.Interfaces;
+﻿using Meevent_API.src.Features.Paises.DAO;
+using Meevent_API.src.Features.Paises.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

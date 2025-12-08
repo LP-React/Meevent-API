@@ -1,9 +1,8 @@
 ﻿using Meevent_API.src.Core.Entities;
-using Meevent_API.src.Features.Paises.DAO.Interfaces;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
-namespace Meevent_API.src.Features.Paises.DAO.Implementations
+namespace Meevent_API.src.Features.Paises.DAO
 {
     public class PaisDAO : IPaisDAO
     {
