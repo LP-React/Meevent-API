@@ -1,7 +1,7 @@
-﻿using Meevent_API.src.Features.Paises.DAO.Interfaces;
+﻿using Meevent_API.src.Features.Paises.DAO;
 using Meevent_API.src.Features.Paises.Services.Interfaces;
 
-namespace Meevent_API.src.Features.Paises.Services.Implementations
+namespace Meevent_API.src.Features.Paises.Services
 {
     public class PaisService : IPaisService
     {
