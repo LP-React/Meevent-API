@@ -1,34 +1,37 @@
-﻿using Meevent_API.Features.PromoCodes;
-using Meevent_API.src.Core.Context;
-using Microsoft.EntityFrameworkCore;
+﻿using Meevent_API.src.Features.Paises.DAO.Implementations;
+using Meevent_API.src.Features.Paises.DAO.Interfaces;
+using Meevent_API.src.Features.Paises.Services.Implementations;
+using Meevent_API.src.Features.Paises.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// -------------------------------------
-// 🔌 1. Registrar DbContext + SQL Server
-// -------------------------------------
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")
-    )
-);
+// Add services to the container.
 
-// Register services
-builder.Services.AddScoped<PromoCodeService>();
-
-// -------------------------------------
-// Controllers y Swagger
-// -------------------------------------
 builder.Services.AddControllers();
-
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
+// ===== INYECCIÓN DE DEPENDENCIAS =====
+// ---- Registrar DAOs ----
+builder.Services.AddScoped<IPaisDAO, PaisDAO>();
+// parte de FRANCO
+// parte de ELTON
+
+
+// ---- Registrar Services ----
+builder.Services.AddScoped<IPaisService, PaisService>();
+// parte de FRANCO
+// parte de ELTON
+
+
+// ====================================
+
+
 var app = builder.Build();
 
-// -------------------------------------
-// Pipeline
-// -------------------------------------
+// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
