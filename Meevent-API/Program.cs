@@ -1,4 +1,5 @@
 ﻿using Meevent_API.src.Features.Eventos.DAO;
+using Meevent_API.src.Features.Eventos.Services;
 using Meevent_API.src.Features.Paises.DAO;
 using Meevent_API.src.Features.Paises.Services;
 using Meevent_API.src.Features.Paises.Services.Interfaces;
@@ -42,6 +43,8 @@ builder.Services.AddScoped<IEventoDAO, EventoDAO>();
 builder.Services.AddScoped<IPaisService, PaisService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 // parte de FRANCO
+builder.Services.AddScoped<IEventoService, EventoService>();
+
 // parte de ELTON
 
 

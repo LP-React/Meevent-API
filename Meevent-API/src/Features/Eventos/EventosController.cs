@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Meevent_API.src.Core.Entities;
 using Meevent_API.src.Features.Eventos.DAO;
+using Meevent_API.src.Features.Eventos.Services;
+using Meevent_API.src.Features.Paises.Services.Interfaces;
+using Meevent_API.src.Features.Paises.Services;
 
 namespace Meevent_API.src.Features.Eventos
 {
@@ -9,10 +12,23 @@ namespace Meevent_API.src.Features.Eventos
     [ApiController]
     public class EventosController : ControllerBase
     {
-        [HttpGet("getEventos")] public async Task<ActionResult<List<Evento>>> GetEventos()
+        private readonly IEventoService _eventoService;
+
+        public EventosController(IEventoService eventoService)
         {
-            var lista=await Task.Run(() => new EventoDAO().GetAllAsync());
-            return Ok(lista);
+            _eventoService = eventoService;
+        }
+
+        [HttpGet("getEventos")] public async Task<ActionResult<EventoListResponseDTO>> GetEventos()
+        {
+            var resultado = await _eventoService.GetAllEventosAsync();
+
+            if (!resultado.Exitoso)
+            {
+                return StatusCode(500, resultado);
+            }
+
+            return Ok(resultado);
         }
         [HttpPost("insertEvento")] public async Task<ActionResult<string>> insertEvento(Evento reg)
         {
