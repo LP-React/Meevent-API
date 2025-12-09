@@ -11,7 +11,7 @@ namespace Meevent_API.src.Features.Eventos
     {
         [HttpGet("getEventos")] public async Task<ActionResult<List<Evento>>> GetEventos()
         {
-            var lista=await Task.Run(() => new EventoDAO().GetEventos());
+            var lista=await Task.Run(() => new EventoDAO().GetAllAsync());
             return Ok(lista);
         }
         [HttpPost("insertEvento")] public async Task<ActionResult<string>> insertEvento(Evento reg)

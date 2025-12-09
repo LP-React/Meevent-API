@@ -4,7 +4,7 @@ namespace Meevent_API.src.Features.Eventos.DAO
 {
     public interface IEventoDAO
     {
-        IEnumerable<Evento> GetEventos();
+        Task<IEnumerable<Evento>> GetAllAsync();
         Evento GetEvento(int id);
         string insertEvento(Evento reg);
         string updateEvento(Evento reg);

@@ -6,13 +6,13 @@ namespace Meevent_API.src.Features.Eventos.DAO
 {
     public class EventoDAO : IEventoDAO
     {
-        private readonly string _cadenaConexion;
+        private readonly string? _cadenaConexion;
         public EventoDAO()
         {
             _cadenaConexion = new ConfigurationBuilder().AddJsonFile("appsettings.json").
                 Build().GetConnectionString("DefaultConnection");
         }
-        public async Task<IEnumerable<Evento>> GetEventos()
+        public async Task<IEnumerable<Evento>> GetAllAsync()
         {
             List<Evento> listaEventos = new List<Evento>();
 
@@ -124,15 +124,12 @@ namespace Meevent_API.src.Features.Eventos.DAO
         }
         public Evento GetEvento(int id)
         {
-            return GetEventos().Result.FirstOrDefault(e => e.IdEvento == id);
+            return GetAllAsync().Result.FirstOrDefault(e => e.IdEvento == id);
         }
         public string deleteEvento(int id)
         {
             throw new NotImplementedException();
         }
-        IEnumerable<Evento> IEventoDAO.GetEventos()
-        {
-            throw new NotImplementedException();
-        }
+
     }
 }
