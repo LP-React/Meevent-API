@@ -1,6 +1,8 @@
 ﻿using Meevent_API.src.Features.Paises.DAO;
 using Meevent_API.src.Features.Paises.Services;
 using Meevent_API.src.Features.Paises.Services.Interfaces;
+using Meevent_API.src.Features.Usuarios.DAO;
+using Meevent_API.src.Features.Usuarios.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,12 +17,14 @@ builder.Services.AddSwaggerGen();
 // ===== INYECCIÓN DE DEPENDENCIAS =====
 // ---- Registrar DAOs ----
 builder.Services.AddScoped<IPaisDAO, PaisDAO>();
+builder.Services.AddScoped<IUsuarioDAO, UsuarioDAO>();
 // parte de FRANCO
 // parte de ELTON
 
 
 // ---- Registrar Services ----
 builder.Services.AddScoped<IPaisService, PaisService>();
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 // parte de FRANCO
 // parte de ELTON
 
