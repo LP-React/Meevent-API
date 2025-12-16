@@ -6,6 +6,20 @@ using Meevent_API.src.Features.Usuarios.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//  CORS básico para Next.js local
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowNextJs",
+        policy =>
+        {
+            policy
+                .WithOrigins("http://localhost:3000")
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+});
+
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -33,6 +47,9 @@ builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 
 
 var app = builder.Build();
+
+// CORS
+app.UseCors("AllowNextJs");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
