@@ -131,5 +131,50 @@ namespace Meevent_API.src.Features.Eventos.DAO
             throw new NotImplementedException();
         }
 
+        public Evento GetEventoPorSlug(string slugEvento)
+        {
+            Evento? evento = null;
+
+            using (SqlConnection cn = new SqlConnection(_cadenaConexion))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_ObtenerEventoPorSlug", cn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@slug_evento", slugEvento);
+
+                    cn.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        if (dr.Read())
+                        {
+                            evento = new Evento
+                            {
+                                IdEvento = dr.GetInt32(0),
+                                TituloEvento = dr.GetString(1),
+                                SlugEvento = dr.GetString(2),
+                                DescripcionEvento = dr.GetString(3),
+                                DescripcionCorta = dr.IsDBNull(4) ? null : dr.GetString(4),
+                                FechaInicio = dr.GetDateTimeOffset(5).ToString("yyyy-MM-dd HH:mm:ss"),
+                                FechaFin = dr.GetDateTimeOffset(6).ToString("yyyy-MM-dd HH:mm:ss"),
+                                ZonaHoraria = dr.GetString(7),
+                                EstadoEvento = dr.GetString(8),
+                                CapacidadEvento = dr.GetInt32(9),
+                                EventoGratuito = dr.GetBoolean(10),
+                                EventoOnline = dr.GetBoolean(11),
+                                ImagenPortadaUrl = dr.IsDBNull(12) ? null : dr.GetString(12),
+                                FechaCreacion = dr.GetDateTime(13).ToString("yyyy-MM-ddTHH:mm:ss"),
+                                FechaActualizacion = dr.GetDateTime(14).ToString("yyyy-MM-ddTHH:mm:ss"),
+                                PerfilOrganizadorId = dr.GetInt32(15),
+                                SubcategoriaEventoId = dr.GetInt32(16),
+                                LocalId = dr.GetInt32(17)
+                            };
+                        }
+                    }
+                }
+            }
+
+            return evento;
+        }
     }
 }

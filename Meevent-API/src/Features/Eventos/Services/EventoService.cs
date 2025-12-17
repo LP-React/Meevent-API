@@ -1,4 +1,5 @@
-﻿using Meevent_API.src.Features.Eventos.DAO;
+﻿using Meevent_API.src.Core.Entities;
+using Meevent_API.src.Features.Eventos.DAO;
 using Meevent_API.src.Features.Paises;
 using Meevent_API.src.Features.Paises.DAO;
 
@@ -12,7 +13,12 @@ namespace Meevent_API.src.Features.Eventos.Services
         {
             _eventoDAO = eventoDAO;
         }
-          public async Task<EventoListResponseDTO> GetAllEventosAsync()
+        public Evento? GetEventoPorSlug(string slug)
+        {
+            return _eventoDAO.GetEventoPorSlug(slug);
+        }
+
+        public async Task<EventoListResponseDTO> GetAllEventosAsync()
         {
             try
             {

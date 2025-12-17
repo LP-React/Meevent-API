@@ -12,16 +12,16 @@ namespace Meevent_API.src.Features.Eventos
     [ApiController]
     public class EventosController : ControllerBase
     {
-        private readonly IEventoService _eventoService;
+        private readonly IEventoService _eventoDAO;
 
         public EventosController(IEventoService eventoService)
         {
-            _eventoService = eventoService;
+            _eventoDAO = eventoService;
         }
 
         [HttpGet("getEventos")] public async Task<ActionResult<EventoListResponseDTO>> GetEventos()
         {
-            var resultado = await _eventoService.GetAllEventosAsync();
+            var resultado = await _eventoDAO.GetAllEventosAsync();
 
             if (!resultado.Exitoso)
             {
@@ -45,5 +45,16 @@ namespace Meevent_API.src.Features.Eventos
             var lista = await Task.Run(() => new EventoDAO().GetEvento(id));
             return Ok(lista);
         }
+        [HttpGet("getslug/{slug}")]
+        public IActionResult GetBySlug(string slug)
+        {
+            var evento = _eventoDAO.GetEventoPorSlug(slug);
+
+            if (evento == null)
+                return NotFound();
+
+            return Ok(evento);
+        }
+
     }
 }
