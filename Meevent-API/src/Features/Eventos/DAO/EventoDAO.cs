@@ -6,17 +6,16 @@ namespace Meevent_API.src.Features.Eventos.DAO
 {
     public class EventoDAO : IEventoDAO
     {
-        private readonly string? _cadenaConexion;
-        public EventoDAO()
+        private readonly string? _cadena;
+        public EventoDAO(IConfiguration configuration)
         {
-            _cadenaConexion = new ConfigurationBuilder().AddJsonFile("appsettings.json").
-                Build().GetConnectionString("DefaultConnection");
+            _cadena = configuration.GetConnectionString("MeeventDB");
         }
         public async Task<IEnumerable<Evento>> GetAllAsync()
         {
             List<Evento> listaEventos = new List<Evento>();
 
-            using (SqlConnection cn = new SqlConnection(_cadenaConexion))
+            using (SqlConnection cn = new SqlConnection(_cadena))
             {
                 using (SqlCommand cmd = new SqlCommand("usp_ListarEventos", cn))
                 {
@@ -58,7 +57,7 @@ namespace Meevent_API.src.Features.Eventos.DAO
         public string insertEvento(Evento reg)
         {
             string mensaje = "";
-            using (SqlConnection cn = new SqlConnection(_cadenaConexion))
+            using (SqlConnection cn = new SqlConnection(_cadena))
             {
                 try
                 {
@@ -91,7 +90,7 @@ namespace Meevent_API.src.Features.Eventos.DAO
         public string updateEvento(Evento reg)
         {
             string mensaje = "";
-            using (SqlConnection cn = new SqlConnection(_cadenaConexion))
+            using (SqlConnection cn = new SqlConnection(_cadena))
             {
                 try
                 {
@@ -135,7 +134,7 @@ namespace Meevent_API.src.Features.Eventos.DAO
         {
             Evento? evento = null;
 
-            using (SqlConnection cn = new SqlConnection(_cadenaConexion))
+            using (SqlConnection cn = new SqlConnection(_cadena))
             {
                 using (SqlCommand cmd = new SqlCommand("usp_ObtenerEventoPorSlug", cn))
                 {
