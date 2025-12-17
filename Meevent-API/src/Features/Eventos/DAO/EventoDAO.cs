@@ -6,16 +6,17 @@ namespace Meevent_API.src.Features.Eventos.DAO
 {
     public class EventoDAO : IEventoDAO
     {
-        private readonly string? _cadena;
-        public EventoDAO(IConfiguration configuration)
+        private readonly string? _cadenaConexion;
+        public EventoDAO()
         {
-            _cadena = configuration.GetConnectionString("MeeventDB");
+            _cadenaConexion = new ConfigurationBuilder().AddJsonFile("appsettings.json").
+                Build().GetConnectionString("MeeventDB");
         }
         public async Task<IEnumerable<Evento>> GetAllAsync()
         {
             List<Evento> listaEventos = new List<Evento>();
 
-            using (SqlConnection cn = new SqlConnection(_cadena))
+            using (SqlConnection cn = new SqlConnection(_cadenaConexion))
             {
                 using (SqlCommand cmd = new SqlCommand("usp_ListarEventos", cn))
                 {
@@ -54,15 +55,17 @@ namespace Meevent_API.src.Features.Eventos.DAO
             }
             return listaEventos;
         }
-        public string insertEvento(Evento reg)
+        public async Task<string> insertEventoAsync(Evento reg)
         {
             string mensaje = "";
-            using (SqlConnection cn = new SqlConnection(_cadena))
+
+            using (SqlConnection cn = new SqlConnection(_cadenaConexion))
             {
                 try
                 {
-                    SqlCommand cmd = new SqlCommand("usp_InsertarEvento", cn);
+                    using SqlCommand cmd = new SqlCommand("usp_InsertarEvento", cn);
                     cmd.CommandType = CommandType.StoredProcedure;
+
                     cmd.Parameters.AddWithValue("@titulo_evento", reg.TituloEvento);
                     cmd.Parameters.AddWithValue("@slug_evento", reg.SlugEvento);
                     cmd.Parameters.AddWithValue("@descripcion_evento", reg.DescripcionEvento);
@@ -78,24 +81,33 @@ namespace Meevent_API.src.Features.Eventos.DAO
                     cmd.Parameters.AddWithValue("@perfil_organizador_id", reg.PerfilOrganizadorId);
                     cmd.Parameters.AddWithValue("@subcategoria_evento_id", reg.SubcategoriaEventoId);
                     cmd.Parameters.AddWithValue("@local_id", reg.LocalId);
-                    cn.Open();
-                    int i = cmd.ExecuteNonQuery();
+
+                    await cn.OpenAsync();
+
+                    int i = await cmd.ExecuteNonQueryAsync();
+
                     mensaje = $"Se insertó correctamente el evento. Filas afectadas: {i}";
                 }
-                catch (Exception ex) { mensaje  = ex.Message; }
-                finally { cn.Close(); }
+                catch (Exception ex)
+                {
+                    mensaje = ex.Message;
+                }
             }
+
             return mensaje;
         }
-        public string updateEvento(Evento reg)
+
+        public async Task<string> updateEventoAsync(Evento reg)
         {
             string mensaje = "";
-            using (SqlConnection cn = new SqlConnection(_cadena))
+
+            using (SqlConnection cn = new SqlConnection(_cadenaConexion))
             {
                 try
                 {
-                    SqlCommand cmd = new SqlCommand("usp_ActualizarEvento", cn);
+                    using SqlCommand cmd = new SqlCommand("usp_ActualizarEvento", cn);
                     cmd.CommandType = CommandType.StoredProcedure;
+
                     cmd.Parameters.AddWithValue("@id_evento", reg.IdEvento);
                     cmd.Parameters.AddWithValue("@titulo_evento", reg.TituloEvento);
                     cmd.Parameters.AddWithValue("@slug_evento", reg.SlugEvento);
@@ -112,68 +124,76 @@ namespace Meevent_API.src.Features.Eventos.DAO
                     cmd.Parameters.AddWithValue("@perfil_organizador_id", reg.PerfilOrganizadorId);
                     cmd.Parameters.AddWithValue("@subcategoria_evento_id", reg.SubcategoriaEventoId);
                     cmd.Parameters.AddWithValue("@local_id", reg.LocalId);
-                    cn.Open();
-                    int i = cmd.ExecuteNonQuery();
+
+                    await cn.OpenAsync();
+
+                    int i = await cmd.ExecuteNonQueryAsync();
+
                     mensaje = $"Se ha actualizado {i} eventos";
                 }
-                catch (Exception ex) { mensaje = ex.Message; }
-                finally { cn.Close(); }
+                catch (Exception ex)
+                {
+                    mensaje = ex.Message;
+                }
             }
+
             return mensaje;
         }
-        public Evento GetEvento(int id)
+
+        public async Task<Evento?> GetEvento(int id)
         {
-            return GetAllAsync().Result.FirstOrDefault(e => e.IdEvento == id);
-        }
-        public string deleteEvento(int id)
-        {
-            throw new NotImplementedException();
+            var eventos = await GetAllAsync();
+            return eventos.FirstOrDefault(e => e.IdEvento == id);
         }
 
-        public Evento GetEventoPorSlug(string slugEvento)
+
+
+        public async Task<Evento?> GetEventoPorSlugAsync(string slugEvento)
         {
             Evento? evento = null;
 
-            using (SqlConnection cn = new SqlConnection(_cadena))
+            using (SqlConnection cn = new SqlConnection(_cadenaConexion))
+            using (SqlCommand cmd = new SqlCommand("usp_ObtenerEventoPorSlug", cn))
             {
-                using (SqlCommand cmd = new SqlCommand("usp_ObtenerEventoPorSlug", cn))
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@slug_evento", slugEvento);
+
+                await cn.OpenAsync();
+
+                using (SqlDataReader dr = await cmd.ExecuteReaderAsync(CommandBehavior.SingleRow))
                 {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@slug_evento", slugEvento);
-
-                    cn.Open();
-
-                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    if (await dr.ReadAsync())
                     {
-                        if (dr.Read())
+                        evento = new Evento
                         {
-                            evento = new Evento
-                            {
-                                IdEvento = dr.GetInt32(0),
-                                TituloEvento = dr.GetString(1),
-                                SlugEvento = dr.GetString(2),
-                                DescripcionEvento = dr.GetString(3),
-                                DescripcionCorta = dr.IsDBNull(4) ? null : dr.GetString(4),
-                                FechaInicio = dr.GetDateTimeOffset(5).ToString("yyyy-MM-dd HH:mm:ss"),
-                                FechaFin = dr.GetDateTimeOffset(6).ToString("yyyy-MM-dd HH:mm:ss"),
-                                ZonaHoraria = dr.GetString(7),
-                                EstadoEvento = dr.GetString(8),
-                                CapacidadEvento = dr.GetInt32(9),
-                                EventoGratuito = dr.GetBoolean(10),
-                                EventoOnline = dr.GetBoolean(11),
-                                ImagenPortadaUrl = dr.IsDBNull(12) ? null : dr.GetString(12),
-                                FechaCreacion = dr.GetDateTime(13).ToString("yyyy-MM-ddTHH:mm:ss"),
-                                FechaActualizacion = dr.GetDateTime(14).ToString("yyyy-MM-ddTHH:mm:ss"),
-                                PerfilOrganizadorId = dr.GetInt32(15),
-                                SubcategoriaEventoId = dr.GetInt32(16),
-                                LocalId = dr.GetInt32(17)
-                            };
-                        }
+                            IdEvento = dr.GetInt32(0),
+                            TituloEvento = dr.GetString(1),
+                            SlugEvento = dr.GetString(2),
+                            DescripcionEvento = dr.GetString(3),
+                            DescripcionCorta = dr.IsDBNull(4) ? null : dr.GetString(4),
+                            FechaInicio = dr.GetDateTimeOffset(5).ToString("yyyy-MM-dd HH:mm:ss"),
+                            FechaFin = dr.GetDateTimeOffset(6).ToString("yyyy-MM-dd HH:mm:ss"),
+                            ZonaHoraria = dr.GetString(7),
+                            EstadoEvento = dr.GetString(8),
+                            CapacidadEvento = dr.GetInt32(9),
+                            EventoGratuito = dr.GetBoolean(10),
+                            EventoOnline = dr.GetBoolean(11),
+                            ImagenPortadaUrl = dr.IsDBNull(12) ? null : dr.GetString(12),
+                            FechaCreacion = dr.GetDateTime(13).ToString("yyyy-MM-ddTHH:mm:ss"),
+                            FechaActualizacion = dr.GetDateTime(14).ToString("yyyy-MM-ddTHH:mm:ss"),
+                            PerfilOrganizadorId = dr.GetInt32(15),
+                            SubcategoriaEventoId = dr.GetInt32(16),
+                            LocalId = dr.GetInt32(17)
+                        };
                     }
                 }
             }
-
             return evento;
+        }
+
+        public Task<string> deleteEventoAsync(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

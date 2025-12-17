@@ -12,16 +12,16 @@ namespace Meevent_API.src.Features.Eventos
     [ApiController]
     public class EventosController : ControllerBase
     {
-        private readonly IEventoService _eventoDAO;
+        private readonly IEventoService _eventoService;
 
         public EventosController(IEventoService eventoService)
         {
-            _eventoDAO = eventoService;
+            _eventoService = eventoService;
         }
 
         [HttpGet("getEventos")] public async Task<ActionResult<EventoListResponseDTO>> GetEventos()
         {
-            var resultado = await _eventoDAO.GetAllEventosAsync();
+            var resultado = await _eventoService.GetAllEventosAsync();
 
             if (!resultado.Exitoso)
             {
@@ -30,30 +30,53 @@ namespace Meevent_API.src.Features.Eventos
 
             return Ok(resultado);
         }
-        [HttpPost("insertEvento")] public async Task<ActionResult<string>> insertEvento(Evento reg)
+        [HttpPost("insertEvento")]
+        public async Task<ActionResult<EventoResponseDTO>> InsertEvento(
+            [FromBody] EventoDetalleDTO dto)
         {
-            var mensaje = await Task.Run(() => new EventoDAO().insertEvento(reg));
-            return Ok(mensaje);
+            var response = await _eventoService.InsertEventoAsync(dto);
+
+            if (!response.Exitoso)
+                return BadRequest(response);
+
+            return Ok(response);
         }
-        [HttpPut("updateEvento")] public async Task<ActionResult<string>> updateEvento(Evento reg)
+
+        // UPDATE
+        [HttpPut("updateEvento/{id}")]
+        public async Task<ActionResult<EventoResponseDTO>> UpdateEvento(
+            int id,
+            [FromBody] EventoDetalleDTO dto)
         {
-            var mensaje = await Task.Run(() => new EventoDAO().updateEvento(reg));
-            return Ok(mensaje);
+            var response = await _eventoService.UpdateEventoAsync(id, dto);
+
+            if (!response.Exitoso)
+                return NotFound(response);
+
+            return Ok(response);
         }
-        [HttpGet("getEvento/{id}")] public async Task<ActionResult<List<Evento>>> getEvento(int id)
+
+        // GET BY ID
+        [HttpGet("getEvento/{id}")]
+        public async Task<ActionResult<Evento>> GetEvento(int id)
         {
-            var lista = await Task.Run(() => new EventoDAO().GetEvento(id));
-            return Ok(lista);
-        }
-        [HttpGet("getslug/{slug}")]
-        public IActionResult GetBySlug(string slug)
-        {
-            var evento = _eventoDAO.GetEventoPorSlug(slug);
+            var evento = await _eventoService.GetEventoByIdAsync(id);
 
             if (evento == null)
-                return NotFound();
+                return NotFound("Evento no encontrado");
 
             return Ok(evento);
+        }
+
+        [HttpGet("getslug/{slug}")]
+        public async Task<IActionResult> GetBySlug(string slug)
+        {
+            var response = await _eventoService.GetEventoPorSlugAsync(slug);
+
+            if (!response.Exitoso)
+                return NotFound(response);
+
+            return Ok(response);
         }
 
     }

@@ -6,8 +6,9 @@ namespace Meevent_API.src.Features.Eventos.Services
     public interface IEventoService
     {
         Task<EventoListResponseDTO> GetAllEventosAsync();
-        Evento? GetEventoPorSlug(string slug);
-
-
+        Task<EventoResponseDTO?> GetEventoPorSlugAsync(string slug);
+        Task<EventoResponseDTO?> GetEventoByIdAsync(int idEvento);
+        Task<EventoResponseDTO> InsertEventoAsync(EventoDetalleDTO eventoDto);
+        Task<EventoResponseDTO> UpdateEventoAsync(int idEvento, EventoDetalleDTO eventoDto);
     }
 }
