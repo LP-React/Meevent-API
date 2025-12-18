@@ -228,37 +228,15 @@ namespace Meevent_API.src.Features.Usuarios.Service
             }
         }
 
-        public async Task<VerificarEmailResponseDTO> VerificarCorreoExistenteAsync(string correo_electronico)
+        public async Task<bool> VerificarCorreoExistenteAsync(string correo_electronico)
         {
             try
             {
-                if (string.IsNullOrEmpty(correo_electronico))
-                {
-                    return new VerificarEmailResponseDTO
-                    {
-                        Exitoso = false,
-                        Mensaje = "El correo electrónico es requerido",
-                        CorreoExiste = false
-                    };
-                }
-
-                bool existe = await Task.Run(() => _usuarioDAO.VerificarCorreoExistente(correo_electronico));
-
-                return new VerificarEmailResponseDTO
-                {
-                    Exitoso = true,
-                    Mensaje = existe ? "El correo ya está registrado" : "Correo disponible",
-                    CorreoExiste = existe
-                };
+                return await Task.Run(() => _usuarioDAO.VerificarCorreoExistente(correo_electronico));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return new VerificarEmailResponseDTO
-                {
-                    Exitoso = false,
-                    Mensaje = $"Error al verificar correo: {ex.Message}",
-                    CorreoExiste = false
-                };
+                return false;
             }
         }
 

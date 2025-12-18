@@ -1,6 +1,7 @@
 ﻿using Meevent_API.src.Features.Usuarios.Meevent_API.src.Features.Usuarios;
 using Meevent_API.src.Features.Usuarios.Service;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace Meevent_API.src.Features.Usuarios
 {
@@ -147,18 +148,24 @@ namespace Meevent_API.src.Features.Usuarios
             return Ok(respuesta);
         }
 
-        [HttpPost("verificarEmail")]
-        public async Task<ActionResult<VerificarEmailResponseDTO>> VerificarEmail([FromBody] VerificarEmailDTO request)
+        [HttpGet("verificarEmail/{correo}")]
+        public async Task<ActionResult<bool>> VerificarEmail(string correo)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            if (string.IsNullOrEmpty(correo))
+                return BadRequest("El correo electrónico es requerido");
 
-            var respuesta = await _usuarioService.VerificarCorreoExistenteAsync(request.correo_electronico);
+            if (!new EmailAddressAttribute().IsValid(correo))
+                return BadRequest("Formato de correo inválido");
 
-            if (!respuesta.Exitoso)
-                return StatusCode(500, respuesta);
-
-            return Ok(respuesta);
+            try
+            {
+                bool existe = await _usuarioService.VerificarCorreoExistenteAsync(correo);
+                return Ok(existe);  // Devuelve directamente true o false
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al verificar correo: {ex.Message}");
+            }
         }
 
     }

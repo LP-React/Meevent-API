@@ -12,6 +12,6 @@ namespace Meevent_API.src.Features.Usuarios.Service
         Task<string> RegistrarUsuarioAsync(UsuarioRegistroDTO registro);
         Task<LoginResponseDTO> LoginAsync(LoginDTO login);
         Task<UsuarioEditarResponseDTO> ActualizarUsuarioAsync(int id_usuario, UsuarioEditarDTO usuario);
-        Task<VerificarEmailResponseDTO> VerificarCorreoExistenteAsync(string correo_electronico);
+        Task<bool> VerificarCorreoExistenteAsync(string correo_electronico);
     }
 }
