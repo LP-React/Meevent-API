@@ -1,4 +1,5 @@
 ﻿
+using Meevent_API.src.Features.Paises;
 using System.ComponentModel.DataAnnotations;
 
 namespace Meevent_API.src.Features.Usuarios
@@ -12,6 +13,7 @@ namespace Meevent_API.src.Features.Usuarios
         public string? imagen_perfil_url { get; set; }
         public DateTime? fecha_nacimiento { get; set; }
         public string tipo_usuario { get; set; }
+        public int id_pais { get; set; }
     }
 
     public class UsuarioListResponseDTO
@@ -48,6 +50,9 @@ namespace Meevent_API.src.Features.Usuarios
         [RegularExpression("^(normal|artista|organizador)$",
             ErrorMessage = "El tipo de usuario debe ser: normal, artista u organizador")]
         public string tipo_usuario { get; set; } = "normal";
+
+        [Range(1, 99, ErrorMessage = "El ID de país debe ser un número positivo y menor a 100 ")]
+        public int id_pais { get; set; } = 1;
     }
 
     public class LoginDTO
@@ -112,6 +117,9 @@ namespace Meevent_API.src.Features.Usuarios
             [RegularExpression("^(normal|artista|organizador)$",
                 ErrorMessage = "El tipo de usuario debe ser: normal, artista u organizador")]
             public string? tipo_usuario { get; set; }
+
+            [Range(1, 99, ErrorMessage = "El ID de país debe ser un número positivo y menor a 100 ")]
+            public int? id_pais { get; set; } 
         }
     }
 
@@ -127,6 +135,21 @@ namespace Meevent_API.src.Features.Usuarios
         [Required(ErrorMessage = "El correo electrónico es obligatorio")]
         [EmailAddress(ErrorMessage = "Formato de correo inválido")]
         public string correo_electronico { get; set; }
+    }
+    public class VerificarPaisDTO
+    {
+        [Required(ErrorMessage = "El ID de país es obligatorio")]
+        [Range(1, 999, ErrorMessage = "El ID de país debe ser un número positivo")]
+        public int id_pais { get; set; }
+    }
+
+
+    public class VerificarPaisResponseDTO
+    {
+        public bool Exitoso { get; set; }
+        public string Mensaje { get; set; }
+        public bool PaisExiste { get; set; }
+        public PaisDTO? Pais { get; set; }
     }
 
     public class VerificarEmailResponseDTO

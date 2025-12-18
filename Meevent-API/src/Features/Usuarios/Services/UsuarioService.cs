@@ -27,7 +27,8 @@ namespace Meevent_API.src.Features.Usuarios.Service
                     numero_telefono = u.NumeroTelefono,
                     imagen_perfil_url = u.ImagenPerfilUrl,
                     fecha_nacimiento = u.FechaNacimiento,
-                    tipo_usuario = u.TipoUsuario
+                    tipo_usuario = u.TipoUsuario,
+                    id_pais = u.IdPais
                 }).ToList();
 
                 return new UsuarioListResponseDTO
@@ -68,7 +69,8 @@ namespace Meevent_API.src.Features.Usuarios.Service
                     numero_telefono = usuario.NumeroTelefono,
                     imagen_perfil_url = usuario.ImagenPerfilUrl,
                     fecha_nacimiento = usuario.FechaNacimiento,
-                    tipo_usuario = usuario.TipoUsuario
+                    tipo_usuario = usuario.TipoUsuario,
+                    id_pais = usuario.IdPais
                 };
             }
             catch
@@ -95,7 +97,8 @@ namespace Meevent_API.src.Features.Usuarios.Service
                     numero_telefono = usuario.NumeroTelefono,
                     imagen_perfil_url = usuario.ImagenPerfilUrl,
                     fecha_nacimiento = usuario.FechaNacimiento,
-                    tipo_usuario = usuario.TipoUsuario
+                    tipo_usuario = usuario.TipoUsuario,
+                    id_pais = usuario.IdPais
                 };
             }
             catch
@@ -114,6 +117,18 @@ namespace Meevent_API.src.Features.Usuarios.Service
                     return "Tipo de usuario inválido. Debe ser: normal, artista u organizador";
                 }
 
+                bool paisExiste = await VerificarPaisExisteAsync(registro.id_pais);
+                if (!paisExiste)
+                {
+                    return $"El país con ID {registro.id_pais} no existe";
+                }
+
+                bool correoExiste = await VerificarCorreoExistenteAsync(registro.correo_electronico);
+                if (correoExiste)
+                {
+                    return "El correo electrónico ya está registrado";
+                }
+
                 return await Task.Run(() => _usuarioDAO.InsertUsuario(registro));
             }
             catch (Exception ex)
@@ -121,7 +136,6 @@ namespace Meevent_API.src.Features.Usuarios.Service
                 return $"Error al registrar usuario: {ex.Message}";
             }
         }
-
         public async Task<LoginResponseDTO> LoginAsync(LoginDTO login)
         {
             try
@@ -173,7 +187,8 @@ namespace Meevent_API.src.Features.Usuarios.Service
                     string.IsNullOrEmpty(usuario.tipo_usuario) &&
                     !usuario.email_verificado.HasValue &&
                     !usuario.cuenta_activa.HasValue &&
-                    string.IsNullOrEmpty(usuario.contrasena))
+                    string.IsNullOrEmpty(usuario.contrasena) &&
+                    !usuario.id_pais.HasValue) 
                 {
                     return new UsuarioEditarResponseDTO
                     {
@@ -182,7 +197,29 @@ namespace Meevent_API.src.Features.Usuarios.Service
                         UsuarioActualizado = null
                     };
                 }
-
+                if (!string.IsNullOrEmpty(usuario.tipo_usuario) &&
+                    !new[] { "normal", "artista", "organizador" }.Contains(usuario.tipo_usuario.ToLower()))
+                {
+                    return new UsuarioEditarResponseDTO
+                    {
+                        Exitoso = false,
+                        Mensaje = "Tipo de usuario inválido. Debe ser: normal, artista u organizador",
+                        UsuarioActualizado = null
+                    };
+                }
+                if (usuario.id_pais.HasValue)
+                {
+                    bool paisExiste = await VerificarPaisExisteAsync(usuario.id_pais.Value);
+                    if (!paisExiste)
+                    {
+                        return new UsuarioEditarResponseDTO
+                        {
+                            Exitoso = false,
+                            Mensaje = $"El país con ID {usuario.id_pais.Value} no existe",
+                            UsuarioActualizado = null
+                        };
+                    }
+                }
                 var usuarioExistente = await ObtenerUsuarioPorIdAsync(id_usuario);
                 if (usuarioExistente == null)
                 {
@@ -233,6 +270,18 @@ namespace Meevent_API.src.Features.Usuarios.Service
             try
             {
                 return await Task.Run(() => _usuarioDAO.VerificarCorreoExistente(correo_electronico));
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> VerificarPaisExisteAsync(int id_pais)
+        {
+            try
+            {
+                return await Task.Run(() => _usuarioDAO.VerificarPaisExiste(id_pais));
             }
             catch (Exception)
             {

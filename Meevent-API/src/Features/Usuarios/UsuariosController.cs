@@ -67,13 +67,10 @@ namespace Meevent_API.src.Features.Usuarios
 
             var resultado = await _usuarioService.RegistrarUsuarioAsync(registro);
 
-            if (resultado.Contains("ya está registrado"))
+            if (resultado.Contains("correctamente"))
+                return Ok(new { Exitoso = true, Mensaje = resultado });
+            else
                 return BadRequest(new { Exitoso = false, Mensaje = resultado });
-
-            if (resultado.Contains("Error"))
-                return StatusCode(500, new { Exitoso = false, Mensaje = resultado });
-
-            return Ok(new { Exitoso = true, Mensaje = resultado });
         }
 
         [HttpPost("loginUsuario")]
@@ -96,6 +93,7 @@ namespace Meevent_API.src.Features.Usuarios
             if (id <= 0)
                 return BadRequest(new { Mensaje = "ID de usuario inválido" });
 
+       
             if (string.IsNullOrEmpty(usuario.nombre_completo) &&
                 string.IsNullOrEmpty(usuario.numero_telefono) &&
                 string.IsNullOrEmpty(usuario.imagen_perfil_url) &&
@@ -103,7 +101,8 @@ namespace Meevent_API.src.Features.Usuarios
                 string.IsNullOrEmpty(usuario.tipo_usuario) &&
                 !usuario.email_verificado.HasValue &&
                 !usuario.cuenta_activa.HasValue &&
-                string.IsNullOrEmpty(usuario.contrasena))
+                string.IsNullOrEmpty(usuario.contrasena) &&
+                !usuario.id_pais.HasValue) 
             {
                 return BadRequest(new
                 {
@@ -111,6 +110,7 @@ namespace Meevent_API.src.Features.Usuarios
                     Mensaje = "Debe proporcionar al menos un campo para actualizar"
                 });
             }
+
             if (!string.IsNullOrEmpty(usuario.contrasena))
             {
                 if (usuario.contrasena.Length < 8)
@@ -139,7 +139,7 @@ namespace Meevent_API.src.Features.Usuarios
                 if (respuesta.Mensaje.Contains("no encontrado"))
                     return NotFound(respuesta);
 
-                if (respuesta.Mensaje.Contains("inválido"))
+                if (respuesta.Mensaje.Contains("inválido") || respuesta.Mensaje.Contains("no existe"))
                     return BadRequest(respuesta);
 
                 return StatusCode(500, respuesta);
@@ -147,6 +147,7 @@ namespace Meevent_API.src.Features.Usuarios
 
             return Ok(respuesta);
         }
+
 
         [HttpGet("verificarEmail/{correo}")]
         public async Task<ActionResult<bool>> VerificarEmail(string correo)
@@ -165,6 +166,23 @@ namespace Meevent_API.src.Features.Usuarios
             catch (Exception ex)
             {
                 return StatusCode(500, $"Error al verificar correo: {ex.Message}");
+            }
+        }
+
+        [HttpGet("verificarPais/{idPais}")]
+        public async Task<ActionResult<bool>> VerificarPais(int idPais)
+        {
+            if (idPais <= 0)
+                return BadRequest("El ID de país debe ser un número positivo");
+
+            try
+            {
+                bool existe = await _usuarioService.VerificarPaisExisteAsync(idPais);
+                return Ok(existe);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al verificar país: {ex.Message}");
             }
         }
 

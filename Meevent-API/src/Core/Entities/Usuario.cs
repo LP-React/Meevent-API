@@ -1,6 +1,5 @@
 ﻿namespace Meevent_API.src.Core.Entities
 {
-    // Meevent_API.src.Core.Entities/Usuario.cs
     using System.ComponentModel.DataAnnotations.Schema;
 
     namespace Meevent_API.src.Core.Entities
@@ -42,6 +41,9 @@
 
             [Column("tipo_usuario")]
             public string TipoUsuario { get; set; } = "normal";
+
+            [Column("id_pais")]
+            public int IdPais { get; set; } = 1;
         }
     }
 }
