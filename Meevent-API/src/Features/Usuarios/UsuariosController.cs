@@ -160,7 +160,7 @@ namespace Meevent_API.src.Features.Usuarios
             try
             {
                 bool existe = await _usuarioService.VerificarCorreoExistenteAsync(correo);
-                return Ok(existe);  // Devuelve directamente true o false
+                return Ok(existe);  
             }
             catch (Exception ex)
             {
