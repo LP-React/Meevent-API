@@ -1,6 +1,7 @@
 ﻿using Meevent_API.src.Core.Entities;
 using Meevent_API.src.Core.Entities.Meevent_API.src.Core.Entities;
 using Meevent_API.src.Features.Usuarios;
+using Meevent_API.src.Features.Usuarios.Meevent_API.src.Features.Usuarios;
 
 namespace Meevent_API.src.Features.Usuarios.DAO
 {
@@ -11,6 +12,7 @@ namespace Meevent_API.src.Features.Usuarios.DAO
         IEnumerable<Usuario> GetUsuariosPorCorreo(string correo_electronico);
         string InsertUsuario(UsuarioRegistroDTO reg);
         string LoginUsuario(LoginDTO login);
-        string ActualizarUsuario(UsuarioEditarDTO usuario);
+        string ActualizarUsuario(int id_usuario, UsuarioEditarDTO usuario);
+        bool VerificarCorreoExistente(string correo_electronico);
     }
 }

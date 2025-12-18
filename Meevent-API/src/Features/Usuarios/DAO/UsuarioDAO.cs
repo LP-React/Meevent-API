@@ -1,6 +1,7 @@
 ﻿using Meevent_API.src.Core.Entities;
 using Meevent_API.src.Core.Entities.Meevent_API.src.Core.Entities;
 using Meevent_API.src.Features.Usuarios;
+using Meevent_API.src.Features.Usuarios.Meevent_API.src.Features.Usuarios;
 using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
 using System.Data;
@@ -123,12 +124,8 @@ namespace Meevent_API.src.Features.Usuarios.DAO
             {
                 cn.Open();
 
-                SqlCommand validar = new SqlCommand(
-                    "SELECT COUNT(*) FROM usuarios WHERE correo_electronico=@correo", cn);
-                validar.Parameters.AddWithValue("@correo", reg.correo_electronico);
-
-                int existe = (int)validar.ExecuteScalar();
-                if (existe > 0)
+                bool correoExiste = VerificarCorreoExistente(reg.correo_electronico);
+                if (correoExiste)
                     return "El correo ya está registrado";
 
                 string hash = BCrypt.Net.BCrypt.HashPassword(reg.contrasena);
@@ -144,7 +141,9 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                 cmd.Parameters.AddWithValue("@fecha_nacimiento", reg.fecha_nacimiento ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@email_verificado", false);
                 cmd.Parameters.AddWithValue("@cuenta_activa", true);
-                cmd.Parameters.AddWithValue("@tipo_usuario", "normal");
+
+                cmd.Parameters.AddWithValue("@tipo_usuario",
+                    string.IsNullOrEmpty(reg.tipo_usuario) ? "normal" : reg.tipo_usuario);
 
                 cmd.ExecuteNonQuery();
 
@@ -217,56 +216,85 @@ namespace Meevent_API.src.Features.Usuarios.DAO
         }
 
 
-        public string ActualizarUsuario(UsuarioEditarDTO usuario)
+        public string ActualizarUsuario(int id_usuario, UsuarioEditarDTO usuario)
         {
             using (SqlConnection cn = new SqlConnection(_cadena))
             {
                 cn.Open();
-                var usuarioActual = GetUsuariosPorId(usuario.id_usuario).FirstOrDefault();
-
+                var usuarioActual = GetUsuariosPorId(id_usuario).FirstOrDefault();
                 if (usuarioActual == null)
                     return "Usuario no encontrado";
-                string contrasenaHash = usuarioActual.ContrasenaHash;
-
-                if (!string.IsNullOrEmpty(usuario.contrasena))
-                {
-                    contrasenaHash = BCrypt.Net.BCrypt.HashPassword(usuario.contrasena);
-                }
-
                 if (!string.IsNullOrEmpty(usuario.tipo_usuario) &&
                     !new[] { "normal", "artista", "organizador" }.Contains(usuario.tipo_usuario.ToLower()))
                 {
                     return "Tipo de usuario inválido. Debe ser: normal, artista u organizador";
                 }
-
                 string tipoUsuario = !string.IsNullOrEmpty(usuario.tipo_usuario)
                     ? usuario.tipo_usuario.ToLower()
                     : usuarioActual.TipoUsuario;
 
-                bool emailVerificado = usuario.email_verificado ?? usuarioActual.EmailVerificado;
-                bool cuentaActiva = usuario.cuenta_activa ?? usuarioActual.CuentaActiva;
+                bool? emailVerificado = usuario.email_verificado ?? usuarioActual.EmailVerificado;
+                bool? cuentaActiva = usuario.cuenta_activa ?? usuarioActual.CuentaActiva;
+
+                string contrasenaHash = usuarioActual.ContrasenaHash;
+                if (!string.IsNullOrEmpty(usuario.contrasena))
+                {
+                    contrasenaHash = BCrypt.Net.BCrypt.HashPassword(usuario.contrasena);
+                }
 
                 SqlCommand cmd = new SqlCommand("usp_ActualizarUsuario", cn);
                 cmd.CommandType = CommandType.StoredProcedure;
-
-                cmd.Parameters.AddWithValue("@id_usuario", usuario.id_usuario);
-                cmd.Parameters.AddWithValue("@nombre_completo", usuario.nombre_completo);
-                cmd.Parameters.AddWithValue("@contrasena_hash", contrasenaHash);
-                cmd.Parameters.AddWithValue("@numero_telefono", usuario.numero_telefono ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@imagen_perfil_url", usuario.imagen_perfil_url ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@fecha_nacimiento", usuario.fecha_nacimiento ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@email_verificado", emailVerificado);
-                cmd.Parameters.AddWithValue("@cuenta_activa", cuentaActiva);
-                cmd.Parameters.AddWithValue("@tipo_usuario", tipoUsuario);
-
+                cmd.Parameters.AddWithValue("@id_usuario", id_usuario);
+                cmd.Parameters.AddWithValue("@nombre_completo",
+                    string.IsNullOrEmpty(usuario.nombre_completo) ?
+                    (object)DBNull.Value : usuario.nombre_completo);
+                cmd.Parameters.AddWithValue("@numero_telefono",
+                    string.IsNullOrEmpty(usuario.numero_telefono) ?
+                    (object)DBNull.Value : usuario.numero_telefono);
+                cmd.Parameters.AddWithValue("@imagen_perfil_url",
+                    string.IsNullOrEmpty(usuario.imagen_perfil_url) ?
+                    (object)DBNull.Value : usuario.imagen_perfil_url);
+                cmd.Parameters.AddWithValue("@fecha_nacimiento",
+                    usuario.fecha_nacimiento ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@email_verificado",
+                    emailVerificado ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@cuenta_activa",
+                    cuentaActiva ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@tipo_usuario",
+                    string.IsNullOrEmpty(usuario.tipo_usuario) ?
+                    (object)DBNull.Value : tipoUsuario);
+                cmd.Parameters.AddWithValue("@contrasena_hash",
+                    string.IsNullOrEmpty(usuario.contrasena) ?
+                    (object)DBNull.Value : contrasenaHash);
                 int filasAfectadas = cmd.ExecuteNonQuery();
-
                 if (filasAfectadas > 0)
                     return "Usuario actualizado correctamente";
                 else
                     return "No se pudo actualizar el usuario";
             }
         }
+
+        public bool VerificarCorreoExistente(string correo_electronico)
+        {
+            using (SqlConnection cn = new SqlConnection(_cadena))
+            {
+                SqlCommand cmd = new SqlCommand("usp_VerificarCorreo", cn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@correo_electronico", correo_electronico);
+
+                cn.Open();
+
+                object result = cmd.ExecuteScalar();
+
+                if (result != null && result != DBNull.Value)
+                {
+                    return Convert.ToBoolean(result);
+                }
+
+                return false;
+            }
+        }
+
 
     }
 }

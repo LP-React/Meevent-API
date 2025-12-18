@@ -37,9 +37,17 @@ namespace Meevent_API.src.Features.Usuarios
             ErrorMessage = "La contraseña debe tener al menos 1 mayúscula y 1 número")]
         public string contrasena { get; set; }
 
+        [RegularExpression(@"^\d+$",
+        ErrorMessage = "El número de teléfono solo debe contener números")]
         public string? numero_telefono { get; set; }
+
         public string? imagen_perfil_url { get; set; }
+
         public DateTime? fecha_nacimiento { get; set; }
+
+        [RegularExpression("^(normal|artista|organizador)$",
+            ErrorMessage = "El tipo de usuario debe ser: normal, artista u organizador")]
+        public string tipo_usuario { get; set; } = "normal";
     }
 
     public class LoginDTO
@@ -73,35 +81,38 @@ namespace Meevent_API.src.Features.Usuarios
         }
     }
 
-    public class UsuarioEditarDTO
+    namespace Meevent_API.src.Features.Usuarios
     {
-        [Required(ErrorMessage = "El ID de usuario es obligatorio")]
-        public int id_usuario { get; set; }
+        public class UsuarioEditarDTO
+        {
 
-        public string? contrasena { get; set; }  
+            [MinLength(8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres")]
+            [RegularExpression(@"^(?=.*[A-Z])(?=.*\d).+$",
+                ErrorMessage = "La contraseña debe tener al menos 1 mayúscula y 1 número")]
+            public string? contrasena { get; set; }
 
-        [Required(ErrorMessage = "El nombre completo es obligatorio")]
-        [StringLength(100, ErrorMessage = "El nombre no puede exceder 100 caracteres")]
-        public string nombre_completo { get; set; }
+            [StringLength(100, ErrorMessage = "El nombre no puede exceder 100 caracteres")]
+            public string? nombre_completo { get; set; }
 
-        [Phone(ErrorMessage = "Formato de teléfono inválido")]
-        [StringLength(20, ErrorMessage = "El teléfono no puede exceder 20 caracteres")]
-        public string? numero_telefono { get; set; }
+            [Phone(ErrorMessage = "Formato de teléfono inválido")]
+            [StringLength(20, ErrorMessage = "El teléfono no puede exceder 20 caracteres")]
+            public string? numero_telefono { get; set; }
 
-        [Url(ErrorMessage = "La URL de la imagen no es válida")]
-        [StringLength(300, ErrorMessage = "La URL no puede exceder 300 caracteres")]
-        public string? imagen_perfil_url { get; set; }
+            [Url(ErrorMessage = "La URL de la imagen no es válida")]
+            [StringLength(300, ErrorMessage = "La URL no puede exceder 300 caracteres")]
+            public string? imagen_perfil_url { get; set; }
 
-        [DataType(DataType.Date, ErrorMessage = "Formato de fecha inválido")]
-        public DateTime? fecha_nacimiento { get; set; }
+            [DataType(DataType.Date, ErrorMessage = "Formato de fecha inválido")]
+            public DateTime? fecha_nacimiento { get; set; }
 
-        public bool? email_verificado { get; set; }
+            public bool? email_verificado { get; set; }
 
-        public bool? cuenta_activa { get; set; }
+            public bool? cuenta_activa { get; set; }
 
-        [RegularExpression("^(normal|artista|organizador)$",
-            ErrorMessage = "El tipo de usuario debe ser: normal, artista u organizador")]
-        public string? tipo_usuario { get; set; }
+            [RegularExpression("^(normal|artista|organizador)$",
+                ErrorMessage = "El tipo de usuario debe ser: normal, artista u organizador")]
+            public string? tipo_usuario { get; set; }
+        }
     }
 
     public class UsuarioEditarResponseDTO
@@ -109,6 +120,20 @@ namespace Meevent_API.src.Features.Usuarios
         public bool Exitoso { get; set; }
         public string Mensaje { get; set; }
         public UsuarioDTO UsuarioActualizado { get; set; }
+    }
+
+    public class VerificarEmailDTO
+    {
+        [Required(ErrorMessage = "El correo electrónico es obligatorio")]
+        [EmailAddress(ErrorMessage = "Formato de correo inválido")]
+        public string correo_electronico { get; set; }
+    }
+
+    public class VerificarEmailResponseDTO
+    {
+        public bool Exitoso { get; set; }
+        public string Mensaje { get; set; }
+        public bool CorreoExiste { get; set; }
     }
 
 }

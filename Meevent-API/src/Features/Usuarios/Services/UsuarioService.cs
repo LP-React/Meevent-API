@@ -1,5 +1,6 @@
 ﻿using Meevent_API.src.Core.Entities;
 using Meevent_API.src.Features.Usuarios.DAO;
+using Meevent_API.src.Features.Usuarios.Meevent_API.src.Features.Usuarios;
 
 namespace Meevent_API.src.Features.Usuarios.Service
 {
@@ -107,6 +108,12 @@ namespace Meevent_API.src.Features.Usuarios.Service
         {
             try
             {
+                if (!string.IsNullOrEmpty(registro.tipo_usuario) &&
+                    !new[] { "normal", "artista", "organizador" }.Contains(registro.tipo_usuario.ToLower()))
+                {
+                    return "Tipo de usuario inválido. Debe ser: normal, artista u organizador";
+                }
+
                 return await Task.Run(() => _usuarioDAO.InsertUsuario(registro));
             }
             catch (Exception ex)
@@ -132,9 +139,9 @@ namespace Meevent_API.src.Features.Usuarios.Service
                     };
                 }
 
-   
+
                 var usuario = await ObtenerUsuarioPorCorreoAsync(login.correo_electronico);
-                    
+
                 return new LoginResponseDTO
                 {
                     Exitoso = true,
@@ -155,12 +162,28 @@ namespace Meevent_API.src.Features.Usuarios.Service
             }
         }
 
-        public async Task<UsuarioEditarResponseDTO> ActualizarUsuarioAsync(UsuarioEditarDTO usuario)
+        public async Task<UsuarioEditarResponseDTO> ActualizarUsuarioAsync(int id_usuario, UsuarioEditarDTO usuario)
         {
             try
             {
-                var usuarioExistente = await ObtenerUsuarioPorIdAsync(usuario.id_usuario);
+                if (string.IsNullOrEmpty(usuario.nombre_completo) &&
+                    string.IsNullOrEmpty(usuario.numero_telefono) &&
+                    string.IsNullOrEmpty(usuario.imagen_perfil_url) &&
+                    !usuario.fecha_nacimiento.HasValue &&
+                    string.IsNullOrEmpty(usuario.tipo_usuario) &&
+                    !usuario.email_verificado.HasValue &&
+                    !usuario.cuenta_activa.HasValue &&
+                    string.IsNullOrEmpty(usuario.contrasena))
+                {
+                    return new UsuarioEditarResponseDTO
+                    {
+                        Exitoso = false,
+                        Mensaje = "Debe proporcionar al menos un campo para actualizar",
+                        UsuarioActualizado = null
+                    };
+                }
 
+                var usuarioExistente = await ObtenerUsuarioPorIdAsync(id_usuario);
                 if (usuarioExistente == null)
                 {
                     return new UsuarioEditarResponseDTO
@@ -171,16 +194,16 @@ namespace Meevent_API.src.Features.Usuarios.Service
                     };
                 }
 
-                var resultado = await Task.Run(() => _usuarioDAO.ActualizarUsuario(usuario));
+                var resultado = await Task.Run(() => _usuarioDAO.ActualizarUsuario(id_usuario, usuario));
 
                 if (resultado.Contains("correctamente"))
                 {
-                    var usuarioActualizado = await ObtenerUsuarioPorIdAsync(usuario.id_usuario);
+                    var usuarioActualizado = await ObtenerUsuarioPorIdAsync(id_usuario);
 
                     return new UsuarioEditarResponseDTO
                     {
                         Exitoso = true,
-                        Mensaje = " Usuario actualizado correctamente",
+                        Mensaje = resultado,
                         UsuarioActualizado = usuarioActualizado
                     };
                 }
@@ -189,7 +212,7 @@ namespace Meevent_API.src.Features.Usuarios.Service
                     return new UsuarioEditarResponseDTO
                     {
                         Exitoso = false,
-                        Mensaje = $"no se actualizo {resultado}",
+                        Mensaje = resultado,
                         UsuarioActualizado = null
                     };
                 }
@@ -199,10 +222,45 @@ namespace Meevent_API.src.Features.Usuarios.Service
                 return new UsuarioEditarResponseDTO
                 {
                     Exitoso = false,
-                    Mensaje = $" Error al actualizar usuario: {ex.Message}",
+                    Mensaje = $"Error al actualizar usuario: {ex.Message}",
                     UsuarioActualizado = null
                 };
             }
         }
+
+        public async Task<VerificarEmailResponseDTO> VerificarCorreoExistenteAsync(string correo_electronico)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(correo_electronico))
+                {
+                    return new VerificarEmailResponseDTO
+                    {
+                        Exitoso = false,
+                        Mensaje = "El correo electrónico es requerido",
+                        CorreoExiste = false
+                    };
+                }
+
+                bool existe = await Task.Run(() => _usuarioDAO.VerificarCorreoExistente(correo_electronico));
+
+                return new VerificarEmailResponseDTO
+                {
+                    Exitoso = true,
+                    Mensaje = existe ? "El correo ya está registrado" : "Correo disponible",
+                    CorreoExiste = existe
+                };
+            }
+            catch (Exception ex)
+            {
+                return new VerificarEmailResponseDTO
+                {
+                    Exitoso = false,
+                    Mensaje = $"Error al verificar correo: {ex.Message}",
+                    CorreoExiste = false
+                };
+            }
+        }
+
     }
 }

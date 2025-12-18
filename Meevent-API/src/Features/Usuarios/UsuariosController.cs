@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Meevent_API.src.Features.Usuarios.Meevent_API.src.Features.Usuarios;
 using Meevent_API.src.Features.Usuarios.Service;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Meevent_API.src.Features.Usuarios
 {
@@ -53,6 +54,16 @@ namespace Meevent_API.src.Features.Usuarios
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            if (!string.IsNullOrEmpty(registro.tipo_usuario) &&
+                !new[] { "normal", "artista", "organizador" }.Contains(registro.tipo_usuario.ToLower()))
+            {
+                return BadRequest(new
+                {
+                    Exitoso = false,
+                    Mensaje = "Tipo de usuario debe ser: normal, artista u organizador"
+                });
+            }
+
             var resultado = await _usuarioService.RegistrarUsuarioAsync(registro);
 
             if (resultado.Contains("ya está registrado"))
@@ -78,28 +89,77 @@ namespace Meevent_API.src.Features.Usuarios
             return Ok(respuesta);
         }
 
-        [HttpPut("editarUsuario")]
-        public async Task<ActionResult<UsuarioEditarResponseDTO>> EditarUsuario([FromBody] UsuarioEditarDTO usuario)
+        [HttpPatch("editarUsuario/{id}")]
+        public async Task<ActionResult<UsuarioEditarResponseDTO>> EditarUsuario(int id, [FromBody] UsuarioEditarDTO usuario)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            if (usuario.id_usuario <= 0)
+            if (id <= 0)
                 return BadRequest(new { Mensaje = "ID de usuario inválido" });
 
-            var respuesta = await _usuarioService.ActualizarUsuarioAsync(usuario);
+            if (string.IsNullOrEmpty(usuario.nombre_completo) &&
+                string.IsNullOrEmpty(usuario.numero_telefono) &&
+                string.IsNullOrEmpty(usuario.imagen_perfil_url) &&
+                !usuario.fecha_nacimiento.HasValue &&
+                string.IsNullOrEmpty(usuario.tipo_usuario) &&
+                !usuario.email_verificado.HasValue &&
+                !usuario.cuenta_activa.HasValue &&
+                string.IsNullOrEmpty(usuario.contrasena))
+            {
+                return BadRequest(new
+                {
+                    Exitoso = false,
+                    Mensaje = "Debe proporcionar al menos un campo para actualizar"
+                });
+            }
+            if (!string.IsNullOrEmpty(usuario.contrasena))
+            {
+                if (usuario.contrasena.Length < 8)
+                {
+                    return BadRequest(new
+                    {
+                        Exitoso = false,
+                        Mensaje = "La contraseña debe tener al menos 8 caracteres"
+                    });
+                }
+
+                if (!System.Text.RegularExpressions.Regex.IsMatch(usuario.contrasena, @"^(?=.*[A-Z])(?=.*\d).+$"))
+                {
+                    return BadRequest(new
+                    {
+                        Exitoso = false,
+                        Mensaje = "La contraseña debe tener al menos 1 mayúscula y 1 número"
+                    });
+                }
+            }
+
+            var respuesta = await _usuarioService.ActualizarUsuarioAsync(id, usuario);
 
             if (!respuesta.Exitoso)
             {
                 if (respuesta.Mensaje.Contains("no encontrado"))
                     return NotFound(respuesta);
 
-                return BadRequest(respuesta);
+                if (respuesta.Mensaje.Contains("inválido"))
+                    return BadRequest(respuesta);
+
+                return StatusCode(500, respuesta);
             }
 
             return Ok(respuesta);
         }
 
+        [HttpPost("verificarEmail")]
+        public async Task<ActionResult<VerificarEmailResponseDTO>> VerificarEmail([FromBody] VerificarEmailDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var respuesta = await _usuarioService.VerificarCorreoExistenteAsync(request.correo_electronico);
+
+            if (!respuesta.Exitoso)
+                return StatusCode(500, respuesta);
+
+            return Ok(respuesta);
+        }
 
     }
 }
