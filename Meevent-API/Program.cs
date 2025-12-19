@@ -1,4 +1,5 @@
-﻿using Meevent_API.src.Features.Paises.DAO;
+﻿using gRcp_Paises;
+using Meevent_API.src.Features.Paises.DAO;
 using Meevent_API.src.Features.Paises.Services;
 using Meevent_API.src.Features.Paises.Services.Interfaces;
 using Meevent_API.src.Features.Usuarios.DAO;
@@ -19,6 +20,10 @@ builder.Services.AddCors(options =>
         });
 });
 
+builder.Services.AddGrpcClient<ServicioPaises.ServicioPaisesClient>(o =>
+{
+    o.Address = new Uri("https://localhost:7170");
+});
 
 // Add services to the container.
 
