@@ -15,5 +15,7 @@ namespace Meevent_API.src.Features.Usuarios.DAO
         string ActualizarUsuario(int id_usuario, UsuarioEditarDTO usuario);
         bool VerificarCorreoExistente(string correo_electronico);
         bool VerificarPaisExiste(int id_pais);
+        string ActivarDesactivarCuenta(int id_usuario, bool cuenta_activa);
+
     }
 }

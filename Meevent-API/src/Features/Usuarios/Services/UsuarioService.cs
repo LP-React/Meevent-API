@@ -28,7 +28,8 @@ namespace Meevent_API.src.Features.Usuarios.Service
                     imagen_perfil_url = u.ImagenPerfilUrl,
                     fecha_nacimiento = u.FechaNacimiento,
                     tipo_usuario = u.TipoUsuario,
-                    id_pais = u.IdPais
+                    id_pais = u.IdPais,
+                    cuenta_activa = u.CuentaActiva 
                 }).ToList();
 
                 return new UsuarioListResponseDTO
@@ -70,7 +71,8 @@ namespace Meevent_API.src.Features.Usuarios.Service
                     imagen_perfil_url = usuario.ImagenPerfilUrl,
                     fecha_nacimiento = usuario.FechaNacimiento,
                     tipo_usuario = usuario.TipoUsuario,
-                    id_pais = usuario.IdPais
+                    id_pais = usuario.IdPais,
+                    cuenta_activa = usuario.CuentaActiva  
                 };
             }
             catch
@@ -98,7 +100,8 @@ namespace Meevent_API.src.Features.Usuarios.Service
                     imagen_perfil_url = usuario.ImagenPerfilUrl,
                     fecha_nacimiento = usuario.FechaNacimiento,
                     tipo_usuario = usuario.TipoUsuario,
-                    id_pais = usuario.IdPais
+                    id_pais = usuario.IdPais,
+                    cuenta_activa = usuario.CuentaActiva  
                 };
             }
             catch
@@ -106,7 +109,6 @@ namespace Meevent_API.src.Features.Usuarios.Service
                 return null;
             }
         }
-
         public async Task<string> RegistrarUsuarioAsync(UsuarioRegistroDTO registro)
         {
             try
@@ -175,7 +177,6 @@ namespace Meevent_API.src.Features.Usuarios.Service
                 };
             }
         }
-
         public async Task<UsuarioEditarResponseDTO> ActualizarUsuarioAsync(int id_usuario, UsuarioEditarDTO usuario)
         {
             try
@@ -186,9 +187,8 @@ namespace Meevent_API.src.Features.Usuarios.Service
                     !usuario.fecha_nacimiento.HasValue &&
                     string.IsNullOrEmpty(usuario.tipo_usuario) &&
                     !usuario.email_verificado.HasValue &&
-                    !usuario.cuenta_activa.HasValue &&
                     string.IsNullOrEmpty(usuario.contrasena) &&
-                    !usuario.id_pais.HasValue) 
+                    !usuario.id_pais.HasValue)
                 {
                     return new UsuarioEditarResponseDTO
                     {
@@ -197,6 +197,28 @@ namespace Meevent_API.src.Features.Usuarios.Service
                         UsuarioActualizado = null
                     };
                 }
+
+                var usuarioExistente = await ObtenerUsuarioPorIdAsync(id_usuario);
+
+                if (usuarioExistente == null)
+                {
+                    return new UsuarioEditarResponseDTO
+                    {
+                        Exitoso = false,
+                        Mensaje = "Usuario no encontrado",
+                        UsuarioActualizado = null
+                    };
+                }
+                if (!usuarioExistente.cuenta_activa)
+                {
+                    return new UsuarioEditarResponseDTO
+                    {
+                        Exitoso = false,
+                        Mensaje = "No se puede editar un usuario con cuenta desactivada",
+                        UsuarioActualizado = null
+                    };
+                }
+
                 if (!string.IsNullOrEmpty(usuario.tipo_usuario) &&
                     !new[] { "normal", "artista", "organizador" }.Contains(usuario.tipo_usuario.ToLower()))
                 {
@@ -207,6 +229,7 @@ namespace Meevent_API.src.Features.Usuarios.Service
                         UsuarioActualizado = null
                     };
                 }
+
                 if (usuario.id_pais.HasValue)
                 {
                     bool paisExiste = await VerificarPaisExisteAsync(usuario.id_pais.Value);
@@ -219,16 +242,6 @@ namespace Meevent_API.src.Features.Usuarios.Service
                             UsuarioActualizado = null
                         };
                     }
-                }
-                var usuarioExistente = await ObtenerUsuarioPorIdAsync(id_usuario);
-                if (usuarioExistente == null)
-                {
-                    return new UsuarioEditarResponseDTO
-                    {
-                        Exitoso = false,
-                        Mensaje = "Usuario no encontrado",
-                        UsuarioActualizado = null
-                    };
                 }
 
                 var resultado = await Task.Run(() => _usuarioDAO.ActualizarUsuario(id_usuario, usuario));
@@ -264,7 +277,6 @@ namespace Meevent_API.src.Features.Usuarios.Service
                 };
             }
         }
-
         public async Task<bool> VerificarCorreoExistenteAsync(string correo_electronico)
         {
             try
@@ -289,5 +301,40 @@ namespace Meevent_API.src.Features.Usuarios.Service
             }
         }
 
+        public async Task<UsuarioActivarCuentaResponseDTO> ActivarDesactivarCuentaAsync(int id_usuario, bool cuenta_activa)
+        {
+            try
+            {
+                string resultado = await Task.Run(() => _usuarioDAO.ActivarDesactivarCuenta(id_usuario, cuenta_activa));
+
+                if (resultado.Contains("exitosa"))
+                {
+                    return new UsuarioActivarCuentaResponseDTO
+                    {
+                        Exitoso = true,
+                        Mensaje = resultado,
+                        CuentaActiva = cuenta_activa
+                    };
+                }
+                else
+                {
+                    return new UsuarioActivarCuentaResponseDTO
+                    {
+                        Exitoso = false,
+                        Mensaje = resultado,
+                        CuentaActiva = !cuenta_activa
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new UsuarioActivarCuentaResponseDTO
+                {
+                    Exitoso = false,
+                    Mensaje = $"Error: {ex.Message}",
+                    CuentaActiva = false
+                };
+            }
+        }
     }
 }

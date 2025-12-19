@@ -13,6 +13,7 @@ namespace Meevent_API.src.Features.Usuarios
         public string? imagen_perfil_url { get; set; }
         public DateTime? fecha_nacimiento { get; set; }
         public string tipo_usuario { get; set; }
+        public bool cuenta_activa { get; set; }
         public int id_pais { get; set; }
     }
 
@@ -112,7 +113,6 @@ namespace Meevent_API.src.Features.Usuarios
 
             public bool? email_verificado { get; set; }
 
-            public bool? cuenta_activa { get; set; }
 
             [RegularExpression("^(normal|artista|organizador)$",
                 ErrorMessage = "El tipo de usuario debe ser: normal, artista u organizador")]
@@ -159,4 +159,19 @@ namespace Meevent_API.src.Features.Usuarios
         public bool CorreoExiste { get; set; }
     }
 
+
+
+}
+public class UsuarioActivarCuentaDTO
+{
+    [Required(ErrorMessage = "El estado de la cuenta es obligatorio")]
+    public bool cuenta_activa { get; set; }
+
+}
+
+public class UsuarioActivarCuentaResponseDTO
+{
+    public bool Exitoso { get; set; }
+    public string Mensaje { get; set; }
+    public bool CuentaActiva { get; set; }
 }

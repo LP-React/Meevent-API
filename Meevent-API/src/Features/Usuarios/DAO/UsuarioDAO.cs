@@ -36,7 +36,6 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                         IdUsuario = dr.GetInt32(dr.GetOrdinal("id_usuario")),
                         NombreCompleto = dr.GetString(dr.GetOrdinal("nombre_completo")),
                         CorreoElectronico = dr.GetString(dr.GetOrdinal("correo_electronico")),
-                        ContrasenaHash = dr.GetString(dr.GetOrdinal("contrasena_hash")),
                         NumeroTelefono = dr.IsDBNull(dr.GetOrdinal("numero_telefono")) ? null : dr.GetString(dr.GetOrdinal("numero_telefono")),
                         ImagenPerfilUrl = dr.IsDBNull(dr.GetOrdinal("imagen_perfil_url")) ? null : dr.GetString(dr.GetOrdinal("imagen_perfil_url")),
                         FechaNacimiento = dr.IsDBNull(dr.GetOrdinal("fecha_nacimiento")) ? null : dr.GetDateTime(dr.GetOrdinal("fecha_nacimiento")),
@@ -221,6 +220,16 @@ namespace Meevent_API.src.Features.Usuarios.DAO
             using (SqlConnection cn = new SqlConnection(_cadena))
             {
                 cn.Open();
+
+                SqlCommand cmdVerificar = new SqlCommand("SELECT cuenta_activa FROM usuarios WHERE id_usuario = @id_usuario", cn);
+                cmdVerificar.Parameters.AddWithValue("@id_usuario", id_usuario);
+
+                var resultadoVerificacion = cmdVerificar.ExecuteScalar();
+                if (resultadoVerificacion == null)
+                    return "Usuario no encontrado";
+                bool cuentaActivaActual = (bool)resultadoVerificacion;
+                if (!cuentaActivaActual)
+                    return "No se puede editar un usuario con cuenta desactivada";
                 var usuarioActual = GetUsuariosPorId(id_usuario).FirstOrDefault();
                 if (usuarioActual == null)
                     return "Usuario no encontrado";
@@ -229,13 +238,12 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                 {
                     return "Tipo de usuario inválido. Debe ser: normal, artista u organizador";
                 }
+
                 string tipoUsuario = !string.IsNullOrEmpty(usuario.tipo_usuario)
                     ? usuario.tipo_usuario.ToLower()
                     : usuarioActual.TipoUsuario;
 
                 bool? emailVerificado = usuario.email_verificado ?? usuarioActual.EmailVerificado;
-                bool? cuentaActiva = usuario.cuenta_activa ?? usuarioActual.CuentaActiva;
-
                 string contrasenaHash = usuarioActual.ContrasenaHash;
                 if (!string.IsNullOrEmpty(usuario.contrasena))
                 {
@@ -245,15 +253,14 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                 SqlCommand cmd = new SqlCommand("usp_ActualizarUsuario", cn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@id_usuario", id_usuario);
-                cmd.Parameters.AddWithValue("@nombre_completo",string.IsNullOrEmpty(usuario.nombre_completo) ?(object)DBNull.Value : usuario.nombre_completo);
-                cmd.Parameters.AddWithValue("@numero_telefono",string.IsNullOrEmpty(usuario.numero_telefono) ?(object)DBNull.Value : usuario.numero_telefono);
-                cmd.Parameters.AddWithValue("@imagen_perfil_url",string.IsNullOrEmpty(usuario.imagen_perfil_url) ?(object)DBNull.Value : usuario.imagen_perfil_url);
-                cmd.Parameters.AddWithValue("@fecha_nacimiento",usuario.fecha_nacimiento ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@email_verificado",emailVerificado ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@cuenta_activa",cuentaActiva ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@tipo_usuario",string.IsNullOrEmpty(usuario.tipo_usuario) ?(object)DBNull.Value : tipoUsuario);
-                cmd.Parameters.AddWithValue("@contrasena_hash",string.IsNullOrEmpty(usuario.contrasena) ?(object)DBNull.Value : contrasenaHash);
-                cmd.Parameters.AddWithValue("@id_pais",usuario.id_pais.HasValue ? usuario.id_pais.Value : (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@nombre_completo", string.IsNullOrEmpty(usuario.nombre_completo) ? (object)DBNull.Value : usuario.nombre_completo);
+                cmd.Parameters.AddWithValue("@numero_telefono", string.IsNullOrEmpty(usuario.numero_telefono) ? (object)DBNull.Value : usuario.numero_telefono);
+                cmd.Parameters.AddWithValue("@imagen_perfil_url", string.IsNullOrEmpty(usuario.imagen_perfil_url) ? (object)DBNull.Value : usuario.imagen_perfil_url);
+                cmd.Parameters.AddWithValue("@fecha_nacimiento", usuario.fecha_nacimiento ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@email_verificado", emailVerificado ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@tipo_usuario", string.IsNullOrEmpty(usuario.tipo_usuario) ? (object)DBNull.Value : tipoUsuario);
+                cmd.Parameters.AddWithValue("@contrasena_hash", string.IsNullOrEmpty(usuario.contrasena) ? (object)DBNull.Value : contrasenaHash);
+                cmd.Parameters.AddWithValue("@id_pais", usuario.id_pais.HasValue ? usuario.id_pais.Value : (object)DBNull.Value);
 
                 int filasAfectadas = cmd.ExecuteNonQuery();
                 if (filasAfectadas > 0)
@@ -304,5 +311,44 @@ namespace Meevent_API.src.Features.Usuarios.DAO
             }
         }
 
+        public string ActivarDesactivarCuenta(int id_usuario, bool cuenta_activa)
+        {
+            try
+            {
+                using (SqlConnection cn = new SqlConnection(_cadena))
+                {
+                    cn.Open();
+                    SqlCommand cmdVerificar = new SqlCommand(
+                        "SELECT COUNT(1) FROM usuarios WHERE id_usuario = @id_usuario",
+                        cn);
+                    cmdVerificar.Parameters.AddWithValue("@id_usuario", id_usuario);
+
+                    int existe = (int)cmdVerificar.ExecuteScalar();
+
+                    if (existe == 0)
+                    {
+                        return $"Usuario con ID {id_usuario} no encontrado";
+                    }
+                    SqlCommand cmd = new SqlCommand("usp_EditarCuentaActiva", cn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@id_usuario", id_usuario);
+                    cmd.Parameters.AddWithValue("@cuenta_activa", cuenta_activa);
+
+                    int filasAfectadas = cmd.ExecuteNonQuery();
+
+                    if (filasAfectadas > 0)
+                    {
+                        string estado = cuenta_activa ? "activada" : "desactivada";
+                        return $"Cuenta {estado} exitosamente";
+                    }
+
+                    return "No se pudo actualizar el estado de la cuenta";
+                }
+            }
+            catch (Exception ex)
+            {
+                return $"Error: {ex.Message}";
+            }
+        }
     }
 }

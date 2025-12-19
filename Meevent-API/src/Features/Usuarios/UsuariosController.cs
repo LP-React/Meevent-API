@@ -93,16 +93,14 @@ namespace Meevent_API.src.Features.Usuarios
             if (id <= 0)
                 return BadRequest(new { Mensaje = "ID de usuario inválido" });
 
-       
             if (string.IsNullOrEmpty(usuario.nombre_completo) &&
                 string.IsNullOrEmpty(usuario.numero_telefono) &&
                 string.IsNullOrEmpty(usuario.imagen_perfil_url) &&
                 !usuario.fecha_nacimiento.HasValue &&
                 string.IsNullOrEmpty(usuario.tipo_usuario) &&
                 !usuario.email_verificado.HasValue &&
-                !usuario.cuenta_activa.HasValue &&
                 string.IsNullOrEmpty(usuario.contrasena) &&
-                !usuario.id_pais.HasValue) 
+                !usuario.id_pais.HasValue)
             {
                 return BadRequest(new
                 {
@@ -183,6 +181,30 @@ namespace Meevent_API.src.Features.Usuarios
             catch (Exception ex)
             {
                 return StatusCode(500, $"Error al verificar país: {ex.Message}");
+            }
+        }
+
+        [HttpPatch("activarCuenta/{id}")]
+        public async Task<IActionResult> ActivarCuenta(int id, [FromBody] UsuarioActivarCuentaDTO estado)
+        {
+            if (id <= 0)
+                return BadRequest(new { Mensaje = "ID de usuario inválido" });
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var respuesta = await _usuarioService.ActivarDesactivarCuentaAsync(id, estado.cuenta_activa);
+
+            if (respuesta.Exitoso)
+            {
+                return Ok(respuesta);
+            }
+            else
+            {
+                if (respuesta.Mensaje.Contains("no encontrado"))
+                    return NotFound(respuesta);
+
+                return BadRequest(respuesta);
             }
         }
 
