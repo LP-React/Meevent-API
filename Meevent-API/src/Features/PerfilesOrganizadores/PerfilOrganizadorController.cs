@@ -56,12 +56,20 @@ public class PerfilesOrganizadorController : ControllerBase
     {
         if (id <= 0)
             return BadRequest(new { Mensaje = "ID de perfil inválido" });
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
         if (string.IsNullOrEmpty(perfil.nombre_organizador) &&
             string.IsNullOrEmpty(perfil.descripcion_organizador) &&
             string.IsNullOrEmpty(perfil.sitio_web) &&
+            string.IsNullOrEmpty(perfil.logo_url) &&
             string.IsNullOrEmpty(perfil.facebook_url) &&
             string.IsNullOrEmpty(perfil.instagram_url) &&
-            string.IsNullOrEmpty(perfil.tiktok_url))
+            string.IsNullOrEmpty(perfil.tiktok_url) &&
+            string.IsNullOrEmpty(perfil.twitter_url) &&
+            string.IsNullOrEmpty(perfil.direccion_organizador) &&
+            string.IsNullOrEmpty(perfil.telefono_contacto) &&
+            !perfil.usuario_id.HasValue)
         {
             return BadRequest(new
             {

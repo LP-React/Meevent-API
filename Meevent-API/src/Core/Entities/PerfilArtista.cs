@@ -2,5 +2,6 @@
 {
     public class PerfilArtista
     {
+        public int zzzz {get; set; }    
     }
 }

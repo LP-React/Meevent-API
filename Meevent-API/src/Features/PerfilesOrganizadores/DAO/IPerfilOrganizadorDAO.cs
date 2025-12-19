@@ -9,6 +9,7 @@ namespace Meevent_API.src.Features.PerfilesOrganizadores.DAO
         IEnumerable<PerfilOrganizador> GetPerfilOrganizadorPorId(int id_perfil_organizador);
         string CrearPerfilOrganizador(PerfilOrganizadorCrearDTO perfil);
         string ActualizarPerfilOrganizador(int id, PerfilOrganizadorEditarDTO perfil);
+
     }
 
 }

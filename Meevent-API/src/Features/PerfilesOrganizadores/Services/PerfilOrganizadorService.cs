@@ -82,6 +82,15 @@ namespace Meevent_API.src.Features.PerfilesOrganizadores.Services
         {
             try
             {
+                if (string.IsNullOrEmpty(perfil.nombre_organizador))
+                    return "El nombre del organizador es obligatorio";
+                if (string.IsNullOrEmpty(perfil.descripcion_organizador))
+                    return "La descripción del organizador es obligatoria";
+                if (perfil.nombre_organizador.Length < 2)
+                    return "El nombre debe tener al menos 2 caracteres";
+                if (perfil.descripcion_organizador.Length < 10)
+                    return "La descripción debe tener al menos 10 caracteres";
+
                 return await Task.Run(() => _perfilOrganizadorDAO.CrearPerfilOrganizador(perfil));
             }
             catch (Exception ex)
@@ -97,9 +106,14 @@ namespace Meevent_API.src.Features.PerfilesOrganizadores.Services
                 if (string.IsNullOrEmpty(perfil.nombre_organizador) &&
                     string.IsNullOrEmpty(perfil.descripcion_organizador) &&
                     string.IsNullOrEmpty(perfil.sitio_web) &&
+                    string.IsNullOrEmpty(perfil.logo_url) &&
                     string.IsNullOrEmpty(perfil.facebook_url) &&
                     string.IsNullOrEmpty(perfil.instagram_url) &&
-                    string.IsNullOrEmpty(perfil.tiktok_url))
+                    string.IsNullOrEmpty(perfil.tiktok_url) &&
+                    string.IsNullOrEmpty(perfil.twitter_url) &&
+                    string.IsNullOrEmpty(perfil.direccion_organizador) &&
+                    string.IsNullOrEmpty(perfil.telefono_contacto) &&
+                    !perfil.usuario_id.HasValue)
                 {
                     return "Debe proporcionar al menos un campo para actualizar";
                 }

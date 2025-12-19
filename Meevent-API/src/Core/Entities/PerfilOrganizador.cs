@@ -18,6 +18,9 @@ namespace Meevent_API.src.Core.Entities
         [Column("sitio_web")]
         public string? SitioWeb { get; set; }
 
+        [Column("logo_url")]
+        public string? LogoUrl { get; set; }
+
         [Column("facebook_url")]
         public string? FacebookUrl { get; set; }
 
@@ -26,6 +29,12 @@ namespace Meevent_API.src.Core.Entities
 
         [Column("tiktok_url")]
         public string? TiktokUrl { get; set; }
+        [Column("twitter_url")]
+        public string? TwitterUrl { get; set; }
+        [Column("direccion_organizador")]
+        public string? DireccionOrganizador { get; set; }
+        [Column("telefono_contacto")]
+        public string? TelefonoContacto { get; set; }
 
         [Column("fecha_creacion")]
         public DateTime FechaCreacion { get; set; }
