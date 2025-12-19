@@ -9,7 +9,7 @@
         public string? DescripcionCorta { get; set; }
         public string FechaInicio { get; set; }
         public string FechaFin { get; set; }
-        public string ZonaHoraria { get; set; } = "UTC";
+        public string ZonaHoraria { get; set; } = "UTC-5";
         public string EstadoEvento { get; set; } = "borrador";
         public int CapacidadEvento { get; set; }
         public bool EventoGratuito { get; set; } = false;

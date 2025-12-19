@@ -72,45 +72,32 @@ namespace Meevent_API.src.Features.Eventos.Services
 
 
 
-        public async Task<EventoListResponseDTO> GetAllEventosAsync()
+        public async Task<EventoListResponseDTO> ListarEventosAsync()
         {
             try
             {
-                // 1. Obtener datos del DAO
-                var eventos = await _eventoDAO.GetAllAsync();
+                var eventos = await _eventoDAO.ListarEventosAsync();
 
-                // 2. Convertir a DTO (mapeo manual)
-                var eventoDTO = eventos.Select(p => new EventoDTO
-                {
-                    TituloEvento = p.TituloEvento,
-                    DescripcionCorta = p.DescripcionCorta,
-                    EventoGratuito = p.EventoGratuito,
-                    EventoOnline = p.EventoOnline,
-                    SubcategoriaEventoId = p.SubcategoriaEventoId,
-                    LocalId = p.LocalId
-                }).ToList();
-
-                // 3. Retornar respuesta estructurada
                 return new EventoListResponseDTO
                 {
                     Exitoso = true,
                     Mensaje = "Eventos obtenidos correctamente",
-                    Total_Eventos = eventoDTO.Count,
-                    Eventos = eventoDTO
+                    Total_Eventos = eventos.Count,
+                    Eventos = eventos
                 };
             }
             catch (Exception ex)
             {
-                // 4. Manejo de errores centralizado
                 return new EventoListResponseDTO
                 {
                     Exitoso = false,
-                    Mensaje = $"Error al obtener países: {ex.Message}",
+                    Mensaje = $"Error al obtener eventos: {ex.Message}",
                     Total_Eventos = 0,
-                    Eventos = new List<EventoDTO>()
+                    Eventos = new List<EventoListadoDTO>()
                 };
             }
         }
+
         // ============================
         // OBTENER EVENTO POR ID
         // ============================
@@ -118,7 +105,7 @@ namespace Meevent_API.src.Features.Eventos.Services
         {
             try
             {
-                var evento = await _eventoDAO.GetEvento(idEvento);
+                var evento = await _eventoDAO.GetEventoPorIdAsync(idEvento);
 
                 if (evento == null)
                 {
@@ -147,6 +134,7 @@ namespace Meevent_API.src.Features.Eventos.Services
                 };
             }
         }
+
 
 
         // ============================
@@ -190,7 +178,6 @@ namespace Meevent_API.src.Features.Eventos.Services
                     CapacidadEvento = evento.CapacidadEvento,
                     SubcategoriaEventoId = evento.SubcategoriaEventoId,
                     LocalId = evento.LocalId,
-                    PerfilOrganizadorId = evento.PerfilOrganizadorId
                 }
             };
         }
@@ -200,11 +187,11 @@ namespace Meevent_API.src.Features.Eventos.Services
         // ============================
         // ACTUALIZAR EVENTO
         // ============================
-        public async Task<EventoResponseDTO> UpdateEventoAsync(int idEvento, EventoDetalleDTO dto)
+        public async Task<EventoResponseDTO> UpdateEventoAsync(int idEvento, EventoActualizarDTO dto)
         {
             try
             {
-                var evento = await _eventoDAO.GetEvento(idEvento);
+                var evento = await _eventoDAO.GetEventoPorIdAsync(idEvento);
 
                 if (evento == null)
                 {
@@ -217,8 +204,10 @@ namespace Meevent_API.src.Features.Eventos.Services
                 }
 
                 evento.TituloEvento = dto.TituloEvento;
+                evento.SlugEvento = dto.SlugEvento;
                 evento.DescripcionEvento = dto.DescripcionEvento;
                 evento.DescripcionCorta = dto.DescripcionCorta;
+
                 evento.FechaInicio = dto.FechaInicio;
                 evento.FechaFin = dto.FechaFin;
                 evento.EventoGratuito = dto.EventoGratuito;
@@ -254,6 +243,7 @@ namespace Meevent_API.src.Features.Eventos.Services
             return new EventoDetalleDTO
             {
                 TituloEvento = evento.TituloEvento,
+                SlugEvento = evento.SlugEvento,
                 DescripcionEvento = evento.DescripcionEvento,
                 DescripcionCorta = evento.DescripcionCorta,
                 FechaInicio = evento.FechaInicio,

@@ -21,7 +21,7 @@ namespace Meevent_API.src.Features.Eventos
 
         [HttpGet("getEventos")] public async Task<ActionResult<EventoListResponseDTO>> GetEventos()
         {
-            var resultado = await _eventoService.GetAllEventosAsync();
+            var resultado = await _eventoService.ListarEventosAsync();
 
             if (!resultado.Exitoso)
             {
@@ -46,7 +46,7 @@ namespace Meevent_API.src.Features.Eventos
         [HttpPut("updateEvento/{id}")]
         public async Task<ActionResult<EventoResponseDTO>> UpdateEvento(
             int id,
-            [FromBody] EventoDetalleDTO dto)
+            [FromBody] EventoActualizarDTO dto)
         {
             var response = await _eventoService.UpdateEventoAsync(id, dto);
 
