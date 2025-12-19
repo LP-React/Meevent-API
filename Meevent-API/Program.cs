@@ -1,6 +1,8 @@
 ﻿using Meevent_API.src.Features.Paises.DAO;
 using Meevent_API.src.Features.Paises.Services;
 using Meevent_API.src.Features.Paises.Services.Interfaces;
+using Meevent_API.src.Features.Resenas.DAO;
+using Meevent_API.src.Features.Resenas.Service;
 using Meevent_API.src.Features.Usuarios.DAO;
 using Meevent_API.src.Features.Usuarios.Service;
 
@@ -35,14 +37,14 @@ builder.Services.AddScoped<IUsuarioDAO, UsuarioDAO>();
 // parte de FRANCO
 // parte de ELTON
 
-
+builder.Services.AddScoped<IResenasOrganizadorDAO, ResenasOrganizadorDAO>();
 // ---- Registrar Services ----
 builder.Services.AddScoped<IPaisService, PaisService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 // parte de FRANCO
 // parte de ELTON
 
-
+builder.Services.AddScoped<IResenasOrganizadorService, ResenasOrganizadorService>();
 // ====================================
 
 
