@@ -1,3 +1,4 @@
+using gRcp_Meevent.Services;
 using gRpc_Meevent.Services;
 
 var builder = WebApplication.CreateBuilder(args);
