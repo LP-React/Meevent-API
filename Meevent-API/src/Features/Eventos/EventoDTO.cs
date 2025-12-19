@@ -47,9 +47,6 @@ namespace Meevent_API.src.Features.Eventos
     }
 
 
-
-
-
     public class EventoListResponseDTO
     {
         public bool Exitoso { get; set; }
@@ -104,41 +101,33 @@ namespace Meevent_API.src.Features.Eventos
 
     public class EventoActualizarDTO
     {
-        [Required(ErrorMessage = "El título del evento es obligatorio")]
         [StringLength(250, ErrorMessage = "El título no puede exceder 250 caracteres")]
         [MinLength(3, ErrorMessage = "El título debe tener al menos 3 caracteres")]
         public string TituloEvento { get; set; } = null!;
 
-        [Required(ErrorMessage = "La descripción del evento es obligatoria")]
         [StringLength(5000, ErrorMessage = "La descripción no puede exceder 5000 caracteres")]
         [MinLength(10, ErrorMessage = "La descripción debe tener al menos 10 caracteres")]
         public string DescripcionEvento { get; set; } = null!;
 
-        [Required(ErrorMessage = "El slug del evento es obligatorio")]
         [StringLength(250, ErrorMessage = "El slug no puede exceder 250 caracteres")]
         public string SlugEvento { get; set; } = null!;
 
         [StringLength(500, ErrorMessage = "La descripción corta no puede exceder 500 caracteres")]
         public string? DescripcionCorta { get; set; }
 
-        [Required(ErrorMessage = "La fecha de inicio es obligatoria")]
         public string FechaInicio { get; set; } = null!;
 
-        [Required(ErrorMessage = "La fecha de fin es obligatoria")]
         public string FechaFin { get; set; } = null!;
 
         public bool EventoGratuito { get; set; }
         public bool EventoOnline { get; set; }
 
-        [Required(ErrorMessage = "La capacidad del evento es obligatoria")]
         [Range(1, int.MaxValue, ErrorMessage = "La capacidad debe ser mayor a 0")]
         public int CapacidadEvento { get; set; }
 
-        [Required(ErrorMessage = "La subcategoría del evento es obligatoria")]
         [Range(1, int.MaxValue, ErrorMessage = "La subcategoría debe ser válida")]
         public int SubcategoriaEventoId { get; set; }
 
-        [Required(ErrorMessage = "El local del evento es obligatorio")]
         [Range(1, int.MaxValue, ErrorMessage = "El local debe ser válido")]
         public int LocalId { get; set; }
 
