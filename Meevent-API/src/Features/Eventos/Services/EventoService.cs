@@ -261,11 +261,12 @@ namespace Meevent_API.src.Features.Eventos.Services
             int? idSubCategoria,
             int? idLocal, 
             bool? eventoGratuito,
-            bool? eventoOnline)
+            bool? eventoOnline,
+            string? estadoEvento)
         {
             try
             {
-                var eventos = await _eventoDAO.ListarEventosCompletosAsync(idOrganizador, idSubCategoria, idLocal, eventoGratuito,eventoOnline);
+                var eventos = await _eventoDAO.ListarEventosCompletosAsync(idOrganizador, idSubCategoria, idLocal, eventoGratuito,eventoOnline,estadoEvento);
 
                 var listaEventos = eventos.ToList();
 

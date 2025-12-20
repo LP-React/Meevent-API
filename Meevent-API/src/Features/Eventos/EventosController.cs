@@ -87,14 +87,16 @@ namespace Meevent_API.src.Features.Eventos
             int? idSubCategoria,
             int? idLocal,
             bool? eventoGratuito,
-            bool? eventoOnline)
+            bool? eventoOnline,
+            string? estadoEvento)
         {
             var resultado = await _eventoService.ListarEventosCompletosAsync(
                 idPerfilOrganizador,
                 idSubCategoria, 
                 idLocal, 
                 eventoGratuito,
-                eventoOnline);
+                eventoOnline,
+                estadoEvento);
 
             if (!resultado.Exitoso)
             {
