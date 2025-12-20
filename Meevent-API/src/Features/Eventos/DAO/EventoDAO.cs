@@ -259,7 +259,9 @@ namespace Meevent_API.src.Features.Eventos.DAO
             int? idLocal,
             bool? eventoGratuito,
             bool? eventoOnline,
-            string? estadoEvento)
+            string? estadoEvento,
+            string? fchDesde,
+            string? fchHasta)
         {
             List<EventoCompletoDTO> listaEventos = new List<EventoCompletoDTO>();
 
@@ -274,6 +276,8 @@ namespace Meevent_API.src.Features.Eventos.DAO
                     cmd.Parameters.AddWithValue("@eventoGratuito", eventoGratuito);
                     cmd.Parameters.AddWithValue("@eventoOnline", eventoOnline);
                     cmd.Parameters.AddWithValue("@estadoEvento", estadoEvento);
+                    cmd.Parameters.AddWithValue("@fechaDesde", fchDesde);
+                    cmd.Parameters.AddWithValue("@fechaHasta", fchHasta);
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     await cn.OpenAsync();

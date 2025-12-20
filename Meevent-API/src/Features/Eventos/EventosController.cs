@@ -88,7 +88,9 @@ namespace Meevent_API.src.Features.Eventos
             int? idLocal,
             bool? eventoGratuito,
             bool? eventoOnline,
-            string? estadoEvento)
+            string? estadoEvento,
+            string? fchDesde,
+            string? fchHasta)
         {
             var resultado = await _eventoService.ListarEventosCompletosAsync(
                 idPerfilOrganizador,
@@ -96,7 +98,9 @@ namespace Meevent_API.src.Features.Eventos
                 idLocal, 
                 eventoGratuito,
                 eventoOnline,
-                estadoEvento);
+                estadoEvento,
+                fchDesde,
+                fchHasta);
 
             if (!resultado.Exitoso)
             {

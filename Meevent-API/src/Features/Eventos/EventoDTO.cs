@@ -203,6 +203,7 @@ namespace Meevent_API.src.Features.Eventos
         public string ZonaHoraria { get; set; }
         public string EstadoEvento { get; set; }
         public string EstadoEventoCliente { get; set; }
+        public string EstadoEventoAdmin { get; set; }
         public int CapacidadEvento { get; set; }
         public bool EventoGratuito { get; set; }
         public bool EventoOnline { get; set; }
