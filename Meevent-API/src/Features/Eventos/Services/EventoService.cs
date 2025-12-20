@@ -256,6 +256,38 @@ namespace Meevent_API.src.Features.Eventos.Services
             };
         }
 
+        public async Task<EventoCompletoListResponseDTO> ListarEventosCompletosAsync(int? idOrganizador)
+        {
+            try
+            {
+                var eventos = await _eventoDAO.ListarEventosCompletosAsync(idOrganizador);
+
+                var listaEventos = eventos.ToList();
+
+
+
+                return new EventoCompletoListResponseDTO
+                {
+                    Exitoso = true,
+                    Mensaje = listaEventos.Any()
+                        ? $"Se encontraron {listaEventos.Count} evento(s)"
+                        : "No hay eventos disponibles",
+                    TotalEventos = listaEventos.Count,
+                    Eventos = listaEventos
+                };
+            }
+            catch (Exception ex)
+            {
+                return new EventoCompletoListResponseDTO
+                {
+                    Exitoso = false,
+                    Mensaje = $"Error al listar eventos: {ex.Message}",
+                    TotalEventos = 0,
+                    Eventos = new List<EventoCompletoDTO>()
+                };
+            }
+        }
+
     }
 
 }

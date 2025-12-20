@@ -79,5 +79,20 @@ namespace Meevent_API.src.Features.Eventos
             return Ok(response);
         }
 
+
+
+        [HttpGet("listarEventosCompletos")]
+        public async Task<ActionResult<EventoListResponseDTO>> ListarEventos(int? id)
+        {
+            var resultado = await _eventoService.ListarEventosCompletosAsync(id);
+
+            if (!resultado.Exitoso)
+            {
+                return StatusCode(500, resultado);
+            }
+
+            return Ok(resultado);
+        }
+
     }
 }

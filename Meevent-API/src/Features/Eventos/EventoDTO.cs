@@ -1,5 +1,4 @@
-﻿using Meevent_API.src.Features.Paises;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Meevent_API.src.Features.Eventos
 {
@@ -45,8 +44,6 @@ namespace Meevent_API.src.Features.Eventos
         public string NombreSubcategoria { get; set; } = null!;
         public string? NombreLocal { get; set; }
     }
-
-
     public class EventoListResponseDTO
     {
         public bool Exitoso { get; set; }
@@ -98,7 +95,6 @@ namespace Meevent_API.src.Features.Eventos
         [Range(1, int.MaxValue, ErrorMessage = "El perfil del organizador debe ser válido")]
         public int PerfilOrganizadorId { get; set; } 
     }
-
     public class EventoActualizarDTO
     {
         [StringLength(250, ErrorMessage = "El título no puede exceder 250 caracteres")]
@@ -132,13 +128,107 @@ namespace Meevent_API.src.Features.Eventos
         public int LocalId { get; set; }
 
     }
-
-
-
     public class EventoResponseDTO
     {
         public bool Exitoso { get; set; }
         public string Mensaje { get; set; } = null!;
         public EventoDetalleDTO? Evento { get; set; }
     }
+
+    // DTO's para listado completo con objetos relacionados
+    public class OrganizadorDTO
+    {
+        public int IdPerfilOrganizador { get; set; }
+        public string NombreOrganizador { get; set; }
+        public string DescripcionOrganizador { get; set; }
+        public string SitioWeb { get; set; }
+        public string LogoUrl { get; set; }
+        public string FacebookUrl { get; set; }
+        public string InstagramUrl { get; set; }
+        public string TiktokUrl { get; set; }
+        public string TwitterUrl { get; set; }
+        public string DireccionOrganizador { get; set; }
+        public string TelefonoContacto { get; set; }
+    }
+
+    public class CategoriaEventoDTO
+    {
+        public int IdCategoriaEvento { get; set; }
+        public string NombreCategoria { get; set; }
+        public string SlugCategoria { get; set; }
+        public string IconoUrl { get; set; }
+    }
+
+    public class SubcategoriaEventoDTO
+    {
+        public int IdSubcategoriaEvento { get; set; }
+        public string NombreSubcategoria { get; set; }
+        public string SlugSubcategoria { get; set; }
+        public CategoriaEventoDTO Categoria { get; set; }
+    }
+
+    public class PaisDTO
+    {
+        public int IdPais { get; set; }
+        public string NombrePais { get; set; }
+        public string CodigoISO { get; set; }
+    }
+
+    public class CiudadDTO
+    {
+        public int IdCiudad { get; set; }
+        public string NombreCiudad { get; set; }
+        public PaisDTO Pais { get; set; }
+    }
+
+    public class LocalDTO
+    {
+        public int IdLocal { get; set; }
+        public string NombreLocal { get; set; }
+        public int CapacidadLocal { get; set; }
+        public string DireccionLocal { get; set; }
+        public CiudadDTO Ciudad { get; set; }
+    }
+
+    public class EventoCompletoDTO
+    {
+        // Datos básicos del evento
+        public int IdEvento { get; set; }
+        public string TituloEvento { get; set; }
+        public string SlugEvento { get; set; }
+        public string DescripcionEvento { get; set; }
+        public string DescripcionCorta { get; set; }
+        public string FechaInicio { get; set; }
+        public string FechaFin { get; set; }
+        public string ZonaHoraria { get; set; }
+        public string EstadoEvento { get; set; }
+        public string EstadoEventoCliente { get; set; }
+        public int CapacidadEvento { get; set; }
+        public bool EventoGratuito { get; set; }
+        public bool EventoOnline { get; set; }
+        public string ImagenPortadaUrl { get; set; }
+        public DateTime FechaCreacion { get; set; }
+        public DateTime FechaActualizacion { get; set; }
+
+        // Objetos relacionados completos
+        public OrganizadorDTO Organizador { get; set; }
+        public SubcategoriaEventoDTO Subcategoria { get; set; }
+        public LocalDTO Local { get; set; }
+    }
+
+    public class EventoCompletoResponseDTO
+    {
+        public bool Exitoso { get; set; }
+        public string Mensaje { get; set; }
+        public EventoCompletoDTO Evento { get; set; }
+    }
+
+    public class EventoCompletoListResponseDTO
+    {
+        public bool Exitoso { get; set; }
+        public string Mensaje { get; set; }
+        public int TotalEventos { get; set; }
+        public IEnumerable<EventoCompletoDTO> Eventos { get; set; }
+    }
+
 }
