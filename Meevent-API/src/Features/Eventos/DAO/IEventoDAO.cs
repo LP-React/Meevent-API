@@ -12,7 +12,7 @@ namespace Meevent_API.src.Features.Eventos.DAO
         Task<string> deleteEventoAsync(int id);
 
         // Otros métodos relacionados con eventos pueden ser añadidos aquí
-        Task<IEnumerable<EventoCompletoDTO>> ListarEventosCompletosAsync(int? idOrganizador,int? idSubCategoria);
+        Task<IEnumerable<EventoCompletoDTO>> ListarEventosCompletosAsync(int? idOrganizador,int? idSubCategoria, int? idLocal);
 
     }
 }
