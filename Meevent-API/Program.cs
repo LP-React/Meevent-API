@@ -22,7 +22,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddGrpcClient<ServicioPaises.ServicioPaisesClient>(o =>
 {
-    o.Address = new Uri("https://localhost:7170");
+    o.Address = new Uri("https://localhost:7111");
 });
 
 // Add services to the container.
