@@ -7,7 +7,11 @@
     <RootNamespace>Meevent_API</RootNamespace>
   </PropertyGroup>
 
-  <ItemGroup>
+	<ItemGroup>
+		<Protobuf Include="Protos\paises.proto" GrpcServices="Client" />
+	</ItemGroup>
+
+	<ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.3" />
