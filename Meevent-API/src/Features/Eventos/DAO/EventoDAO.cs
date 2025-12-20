@@ -253,7 +253,7 @@ namespace Meevent_API.src.Features.Eventos.DAO
 
         // Otros métodos relacionados con eventos pueden ser implementados aquí
 
-        public async Task<IEnumerable<EventoCompletoDTO>> ListarEventosCompletosAsync(int? idOrganizador)
+        public async Task<IEnumerable<EventoCompletoDTO>> ListarEventosCompletosAsync(int? idOrganizador,int? idSubCategoria)
         {
             List<EventoCompletoDTO> listaEventos = new List<EventoCompletoDTO>();
 
@@ -263,6 +263,7 @@ namespace Meevent_API.src.Features.Eventos.DAO
 
                 {
                     cmd.Parameters.AddWithValue("@idOrganizador", idOrganizador);
+                    cmd.Parameters.AddWithValue("@idSubCategoria", idSubCategoria);
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     await cn.OpenAsync();

@@ -256,11 +256,11 @@ namespace Meevent_API.src.Features.Eventos.Services
             };
         }
 
-        public async Task<EventoCompletoListResponseDTO> ListarEventosCompletosAsync(int? idOrganizador)
+        public async Task<EventoCompletoListResponseDTO> ListarEventosCompletosAsync(int? idOrganizador, int? idSubCategoria)
         {
             try
             {
-                var eventos = await _eventoDAO.ListarEventosCompletosAsync(idOrganizador);
+                var eventos = await _eventoDAO.ListarEventosCompletosAsync(idOrganizador, idSubCategoria);
 
                 var listaEventos = eventos.ToList();
 
