@@ -82,9 +82,9 @@ namespace Meevent_API.src.Features.Eventos
 
 
         [HttpGet("listarEventosCompletos")]
-        public async Task<ActionResult<EventoListResponseDTO>> ListarEventos(int? idPerfilOrganizador, int? idSubCategoria, int? idLocal)
+        public async Task<ActionResult<EventoListResponseDTO>> ListarEventos(int? idPerfilOrganizador, int? idSubCategoria, int? idLocal, bool? eventoGratuito)
         {
-            var resultado = await _eventoService.ListarEventosCompletosAsync(idPerfilOrganizador, idSubCategoria, idLocal);
+            var resultado = await _eventoService.ListarEventosCompletosAsync(idPerfilOrganizador, idSubCategoria, idLocal, eventoGratuito);
 
             if (!resultado.Exitoso)
             {
