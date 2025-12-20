@@ -1,5 +1,4 @@
 ﻿using gRcp_Paises;
-using Meevent_API.src.Features.Paises.DAO;
 using Meevent_API.src.Features.Paises.Services;
 using Meevent_API.src.Features.Paises.Services.Interfaces;
 using Meevent_API.src.Features.Usuarios.DAO;
@@ -35,7 +34,6 @@ builder.Services.AddSwaggerGen();
 
 // ===== INYECCIÓN DE DEPENDENCIAS =====
 // ---- Registrar DAOs ----
-builder.Services.AddScoped<IPaisDAO, PaisDAO>();
 builder.Services.AddScoped<IUsuarioDAO, UsuarioDAO>();
 // parte de FRANCO
 // parte de ELTON
