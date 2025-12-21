@@ -1,6 +1,5 @@
 ﻿using Meevent_API.src.Core.Entities;
 using Meevent_API.src.Core.Entities.Meevent_API.src.Core.Entities;
-using Meevent_API.src.Features.Usuarios.Meevent_API.src.Features.Usuarios;
 using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
 using System.Data;
@@ -21,45 +20,60 @@ namespace Meevent_API.src.Features.Usuarios.DAO
             _cadena = configuration.GetConnectionString("MeeventDB");
         }
 
-        public IEnumerable<Usuario> GetUsuarios()
+        public string ActivarDesactivarCuenta(int id_usuario, bool cuenta_activa)
         {
-            List<Usuario> temporal = new List<Usuario>();
-            using (SqlConnection cn = new SqlConnection(_cadena))
-            {
-                SqlCommand cmd = new SqlCommand("usp_ListarUsuarios", cn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cn.Open();
-                SqlDataReader dr = cmd.ExecuteReader();
-                while (dr.Read())
-                {
-                    temporal.Add(new Usuario
-                    {
-                        IdUsuario = dr.GetInt32(dr.GetOrdinal("id_usuario")),
-                        NombreCompleto = dr.GetString(dr.GetOrdinal("nombre_completo")),
-                        CorreoElectronico = dr.GetString(dr.GetOrdinal("correo_electronico")),
-                        NumeroTelefono = dr.IsDBNull(dr.GetOrdinal("numero_telefono")) ? null : dr.GetString(dr.GetOrdinal("numero_telefono")),
-                        ImagenPerfilUrl = dr.IsDBNull(dr.GetOrdinal("imagen_perfil_url")) ? null : dr.GetString(dr.GetOrdinal("imagen_perfil_url")),
-                        FechaNacimiento = dr.IsDBNull(dr.GetOrdinal("fecha_nacimiento")) ? null : DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_nacimiento"))),
-                        FechaCreacion = DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_creacion"))),
-                        FechaActualizacion = DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_actualizacion"))),
-                        EmailVerificado = dr.GetBoolean(dr.GetOrdinal("email_verificado")),
-                        CuentaActiva = dr.GetBoolean(dr.GetOrdinal("cuenta_activa")),
-                        TipoUsuario = dr.GetString(dr.GetOrdinal("tipo_usuario")),
-                        IdPaisNavigation = new Pais
-                        {NombrePais = dr.GetString(dr.GetOrdinal("nombre_pais")) },
-                        IdCiudadNavigation = new Ciudad
-                        {
-                            IdCiudad = dr.GetInt32(dr.GetOrdinal("id_ciudad")),
-                            NombreCiudad = dr.GetString(dr.GetOrdinal("nombre_ciudad")),
-                            IdPais = dr.GetInt32(dr.GetOrdinal("id_pais"))
-                        }
-                    });
-                }
-            }
-            return temporal;
+            throw new NotImplementedException();
         }
 
-        public IEnumerable<Usuario> GetUsuariosPorId(int id_usuario)
+        public string ActualizarUsuario(int id_usuario, UsuarioEditarDTO usuario)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<Usuario> GetUsuarios()
+        {
+            throw new NotImplementedException();
+        }
+
+        /*public IEnumerable<Usuario> GetUsuarios()
+         {
+             List<Usuario> temporal = new List<Usuario>();
+             using (SqlConnection cn = new SqlConnection(_cadena))
+             {
+                 SqlCommand cmd = new SqlCommand("usp_ListarUsuarios", cn);
+                 cmd.CommandType = CommandType.StoredProcedure;
+                 cn.Open();
+                 SqlDataReader dr = cmd.ExecuteReader();
+                 while (dr.Read())
+                 {
+                     temporal.Add(new Usuario
+                     {
+                         IdUsuario = dr.GetInt32(dr.GetOrdinal("id_usuario")),
+                         NombreCompleto = dr.GetString(dr.GetOrdinal("nombre_completo")),
+                         CorreoElectronico = dr.GetString(dr.GetOrdinal("correo_electronico")),
+                         NumeroTelefono = dr.IsDBNull(dr.GetOrdinal("numero_telefono")) ? null : dr.GetString(dr.GetOrdinal("numero_telefono")),
+                         ImagenPerfilUrl = dr.IsDBNull(dr.GetOrdinal("imagen_perfil_url")) ? null : dr.GetString(dr.GetOrdinal("imagen_perfil_url")),
+                         FechaNacimiento = dr.IsDBNull(dr.GetOrdinal("fecha_nacimiento")) ? null : DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_nacimiento"))),
+                         FechaCreacion = DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_creacion"))),
+                         FechaActualizacion = DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_actualizacion"))),
+                         EmailVerificado = dr.GetBoolean(dr.GetOrdinal("email_verificado")),
+                         CuentaActiva = dr.GetBoolean(dr.GetOrdinal("cuenta_activa")),
+                         TipoUsuario = dr.GetString(dr.GetOrdinal("tipo_usuario")),
+                         IdPaisNavigation = new Pais
+                         {NombrePais = dr.GetString(dr.GetOrdinal("nombre_pais")) },
+                         IdCiudadNavigation = new Ciudad
+                         {
+                             IdCiudad = dr.GetInt32(dr.GetOrdinal("id_ciudad")),
+                             NombreCiudad = dr.GetString(dr.GetOrdinal("nombre_ciudad")),
+                             IdPais = dr.GetInt32(dr.GetOrdinal("id_pais"))
+                         }
+                     });
+                 }
+             }
+             return temporal;
+         }
+        */
+        /*public IEnumerable<Usuario> GetUsuariosPorId(int id_usuario)
         {
             List<Usuario> temporal = new List<Usuario>();
             using (SqlConnection cn = new SqlConnection(_cadena))
@@ -101,48 +115,48 @@ namespace Meevent_API.src.Features.Usuarios.DAO
             }
             return temporal;
         }
-
-        public IEnumerable<Usuario> GetUsuariosPorCorreo(string correo_electronico)
+        */
+        public async Task<UsuarioDetalleDTO> GetUsuariosPorCorreo(string correo_electronico)
         {
-            List<Usuario> temporal = new List<Usuario>();
+            UsuarioDetalleDTO usuario = null;
+
             using (SqlConnection cn = new SqlConnection(_cadena))
             {
                 SqlCommand cmd = new SqlCommand("usp_UsuarioPorCorreo", cn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@correo_electronico", correo_electronico);
-                cn.Open();
-                SqlDataReader dr = cmd.ExecuteReader();
-                while (dr.Read())
-                {
-                    temporal.Add(new Usuario
-                    {
-                        IdUsuario = dr.GetInt32(dr.GetOrdinal("id_usuario")),
-                        NombreCompleto = dr.GetString(dr.GetOrdinal("nombre_completo")),
-                        CorreoElectronico = dr.GetString(dr.GetOrdinal("correo_electronico")),
-                        ContrasenaHash = dr.GetString(dr.GetOrdinal("contrasena_hash")),
-                        NumeroTelefono = dr.IsDBNull(dr.GetOrdinal("numero_telefono")) ? null : dr.GetString(dr.GetOrdinal("numero_telefono")),
-                        ImagenPerfilUrl = dr.IsDBNull(dr.GetOrdinal("imagen_perfil_url")) ? null : dr.GetString(dr.GetOrdinal("imagen_perfil_url")),
-                        FechaNacimiento = dr.IsDBNull(dr.GetOrdinal("fecha_nacimiento")) ? null : DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_nacimiento"))),
-                        FechaCreacion = DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_creacion"))),
-                        FechaActualizacion = DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_actualizacion"))),
-                        EmailVerificado = dr.GetBoolean(dr.GetOrdinal("email_verificado")),
-                        CuentaActiva = dr.GetBoolean(dr.GetOrdinal("cuenta_activa")),
-                        TipoUsuario = dr.GetString(dr.GetOrdinal("tipo_usuario")),
-                        IdPaisNavigation = new Pais
-                        {
-                            NombrePais = dr.GetString(dr.GetOrdinal("nombre_pais"))
-                        },
 
-                        IdCiudadNavigation = new Ciudad
+                await cn.OpenAsync();
+
+                using (SqlDataReader dr = await cmd.ExecuteReaderAsync())
+                {
+                    if (await dr.ReadAsync())
+                    {
+                        usuario = new UsuarioDetalleDTO
                         {
-                            IdCiudad = dr.GetInt32(dr.GetOrdinal("id_ciudad")),
-                            NombreCiudad = dr.GetString(dr.GetOrdinal("nombre_ciudad")),
-                            IdPais = dr.GetInt32(dr.GetOrdinal("id_pais"))
-                        }
-                    });
+                            id_usuario = dr.GetInt32(0),
+                            nombre_completo = dr.GetString(1),
+                            correo_electronico = dr.GetString(2),
+                            numero_telefono = dr.IsDBNull(3) ? null : dr.GetString(3),
+                            imagen_perfil_url = dr.IsDBNull(4) ? null : dr.GetString(4),
+                            fecha_nacimiento = dr.IsDBNull(5) ? (DateTime?)null : dr.GetDateTime(5),
+                            email_verificado = dr.GetBoolean(6),
+                            cuenta_activa = dr.GetBoolean(7),
+                            id_ciudad = dr.GetInt32(8),
+                            nombre_ciudad = dr.GetString(9),
+                            id_pais = dr.GetInt32(10),
+                            nombre_pais = dr.GetString(11),
+                            codigo_iso = dr.GetString(12),
+                        };
+                    }
                 }
             }
-            return temporal;
+            return usuario;
+        }
+
+        public IEnumerable<Usuario> GetUsuariosPorId(int id_usuario)
+        {
+            throw new NotImplementedException();
         }
 
         public string InsertUsuario(UsuarioRegistroDTO reg)
@@ -153,6 +167,7 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                 if (VerificarCorreoExistente(reg.correo_electronico)) return "El correo ya está registrado";
 
                 string hash = BCrypt.Net.BCrypt.HashPassword(reg.contrasena);
+
                 SqlCommand cmd = new SqlCommand("usp_CrearUsuario", cn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@nombre_completo", reg.nombre_completo);
@@ -164,14 +179,19 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                 cmd.Parameters.AddWithValue("@email_verificado", false);
                 cmd.Parameters.AddWithValue("@cuenta_activa", true);
                 cmd.Parameters.AddWithValue("@tipo_usuario", string.IsNullOrEmpty(reg.tipo_usuario) ? "normal" : reg.tipo_usuario);
-                cmd.Parameters.AddWithValue("@id_pais", reg.id_pais);
                 cmd.Parameters.AddWithValue("@id_ciudad", reg.id_ciudad);
+
                 cmd.ExecuteNonQuery();
                 return "Usuario registrado correctamente";
             }
         }
 
         public string LoginUsuario(LoginDTO login)
+        {
+            throw new NotImplementedException();
+        }
+
+        /*public string LoginUsuario(LoginDTO login)
         {
             var usuario = GetUsuariosPorCorreo(login.correo_electronico).FirstOrDefault();
             if (usuario == null) return "Correo o contraseña incorrectos";
@@ -194,9 +214,9 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                 signingCredentials: creds
             );
             return new JwtSecurityTokenHandler().WriteToken(token);
-        }
+        }*/
 
-        public string ActualizarUsuario(int id_usuario, UsuarioEditarDTO usuario)
+        /*public string ActualizarUsuario(int id_usuario, UsuarioEditarDTO usuario)
         {
             using (SqlConnection cn = new SqlConnection(_cadena))
             {
@@ -225,34 +245,34 @@ namespace Meevent_API.src.Features.Usuarios.DAO
 
                 return cmd.ExecuteNonQuery() > 0 ? "Usuario actualizado correctamente" : "No se pudo actualizar el usuario";
             }
-        }
+        }*/
 
-        public string ActivarDesactivarCuenta(int id_usuario, bool cuenta_activa)
-        {
-            using (SqlConnection cn = new SqlConnection(_cadena))
-            {
-                cn.Open();
-                SqlCommand cmd = new SqlCommand("usp_EditarCuentaActiva", cn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@id_usuario", id_usuario);
-                cmd.Parameters.AddWithValue("@cuenta_activa", cuenta_activa);
-                return cmd.ExecuteNonQuery() > 0 ? (cuenta_activa ? "Cuenta activada exitosamente" : "Cuenta desactivada exitosamente") : "No se pudo actualizar el estado";
-            }
-        }
+        /* public string ActivarDesactivarCuenta(int id_usuario, bool cuenta_activa)
+         {
+             using (SqlConnection cn = new SqlConnection(_cadena))
+             {
+                 cn.Open();
+                 SqlCommand cmd = new SqlCommand("usp_EditarCuentaActiva", cn);
+                 cmd.CommandType = CommandType.StoredProcedure;
+                 cmd.Parameters.AddWithValue("@id_usuario", id_usuario);
+                 cmd.Parameters.AddWithValue("@cuenta_activa", cuenta_activa);
+                 return cmd.ExecuteNonQuery() > 0 ? (cuenta_activa ? "Cuenta activada exitosamente" : "Cuenta desactivada exitosamente") : "No se pudo actualizar el estado";
+             }
+         }*/
 
-        public bool VerificarCorreoExistente(string correo_electronico)
-        {
-            using (SqlConnection cn = new SqlConnection(_cadena))
-            {
-                SqlCommand cmd = new SqlCommand("usp_VerificarCorreo", cn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@correo_electronico", correo_electronico);
-                cn.Open();
-                return Convert.ToBoolean(cmd.ExecuteScalar());
-            }
-        }
+        /* public bool VerificarCorreoExistente(string correo_electronico)
+         {
+             using (SqlConnection cn = new SqlConnection(_cadena))
+             {
+                 SqlCommand cmd = new SqlCommand("usp_VerificarCorreo", cn);
+                 cmd.CommandType = CommandType.StoredProcedure;
+                 cmd.Parameters.AddWithValue("@correo_electronico", correo_electronico);
+                 cn.Open();
+                 return Convert.ToBoolean(cmd.ExecuteScalar());
+             }
+         }*/
 
-        public bool VerificarPaisExiste(int id_pais)
+        /*public bool VerificarPaisExiste(int id_pais)
         {
             using (SqlConnection cn = new SqlConnection(_cadena))
             {
@@ -263,7 +283,7 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                 return Convert.ToBoolean(cmd.ExecuteScalar());
             }
         }
-
+        */
         public bool VerificarCiudadExiste(int id_ciudad)
         {
             using (SqlConnection cn = new SqlConnection(_cadena))
@@ -274,6 +294,16 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                 cn.Open();
                 return Convert.ToBoolean(cmd.ExecuteScalar());
             }
+        }
+
+        public bool VerificarCorreoExistente(string correo_electronico)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool VerificarPaisExiste(int id_pais)
+        {
+            throw new NotImplementedException();
         }
     }
 }

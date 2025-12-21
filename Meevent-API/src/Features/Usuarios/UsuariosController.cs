@@ -1,5 +1,4 @@
-﻿using Meevent_API.src.Features.Usuarios.Meevent_API.src.Features.Usuarios;
-using Meevent_API.src.Features.Usuarios.Service;
+﻿using Meevent_API.src.Features.Usuarios.Service;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
@@ -38,13 +37,17 @@ namespace Meevent_API.src.Features.Usuarios
             return Ok(usuario);
         }
 
-        [HttpGet("Buscar-Por-correo/{correo}")]
-        public async Task<ActionResult<UsuarioDTO>> GetPorCorreo(string correo)
+        [HttpGet("buscar-por-correo/{correo}")]
+        public async Task<ActionResult<UsuarioDetalleDTO>> GetPorCorreo(string correo)
         {
             var usuario = await _usuarioService.ObtenerUsuarioPorCorreoAsync(correo);
 
             if (usuario == null)
-                return NotFound(new { Mensaje = "Usuario no encontrado" });
+            {
+                return NotFound(new { 
+                        Mensaje = "El usuario no existe." 
+                    });
+            }
 
             return Ok(usuario);
         }
@@ -55,22 +58,22 @@ namespace Meevent_API.src.Features.Usuarios
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!string.IsNullOrEmpty(registro.tipo_usuario) &&
-                !new[] { "normal", "artista", "organizador" }.Contains(registro.tipo_usuario.ToLower()))
-            {
-                return BadRequest(new
-                {
-                    Exitoso = false,
-                    Mensaje = "Tipo de usuario debe ser: normal, artista u organizador"
-                });
-            }
-
             var resultado = await _usuarioService.RegistrarUsuarioAsync(registro);
 
             if (resultado.Contains("correctamente"))
-                return Ok(new { Exitoso = true, Mensaje = resultado });
-            else
-                return BadRequest(new { Exitoso = false, Mensaje = resultado });
+            {
+                return Ok(new
+                {
+                    Exitoso = true,
+                    Mensaje = resultado
+                });
+            }
+
+            return BadRequest(new
+            {
+                Exitoso = false,
+                Mensaje = resultado
+            });
         }
 
         [HttpPost("loginUsuario")]

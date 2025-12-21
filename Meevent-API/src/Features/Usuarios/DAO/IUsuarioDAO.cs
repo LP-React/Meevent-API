@@ -1,5 +1,4 @@
 ﻿using Meevent_API.src.Core.Entities.Meevent_API.src.Core.Entities;
-using Meevent_API.src.Features.Usuarios.Meevent_API.src.Features.Usuarios;
 
 namespace Meevent_API.src.Features.Usuarios.DAO
 {
@@ -7,7 +6,7 @@ namespace Meevent_API.src.Features.Usuarios.DAO
     {
         IEnumerable<Usuario> GetUsuarios();
         IEnumerable<Usuario> GetUsuariosPorId(int id_usuario);
-        IEnumerable<Usuario> GetUsuariosPorCorreo(string correo_electronico);
+        Task<UsuarioDetalleDTO> GetUsuariosPorCorreo(string correo_electronico);
         string InsertUsuario(UsuarioRegistroDTO reg);
         string LoginUsuario(LoginDTO login);
         string ActualizarUsuario(int id_usuario, UsuarioEditarDTO usuario);

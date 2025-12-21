@@ -1,11 +1,8 @@
 ﻿
 using Meevent_API.src.Features.Paises;
-using Meevent_API.src.Features.PerfilesArtistas;
 using Meevent_API.src.Features.PerfilesArtistas.DAO;
-using Meevent_API.src.Features.PerfilesOrganizadores;
 using Meevent_API.src.Features.PerfilesOrganizadores.DAO;
 using Meevent_API.src.Features.Usuarios.DAO;
-using Meevent_API.src.Features.Usuarios.Meevent_API.src.Features.Usuarios;
 
 namespace Meevent_API.src.Features.Usuarios.Service
 {
@@ -127,78 +124,55 @@ namespace Meevent_API.src.Features.Usuarios.Service
             catch { return null; }
         }
 
-        public async Task<UsuarioDTO> ObtenerUsuarioPorCorreoAsync(string correo_electronico)
+        public async Task<UsuarioDetalleDTO> ObtenerUsuarioPorCorreoAsync(string correo_electronico)
         {
-            try
-            {
-                var usuarios = await Task.Run(() => _usuarioDAO.GetUsuariosPorCorreo(correo_electronico));
-                var usuario = usuarios.FirstOrDefault();
+            if (string.IsNullOrWhiteSpace(correo_electronico)) 
+                return null;
 
-                if (usuario == null) return null;
+            var usuario = await Task.Run(() => _usuarioDAO.GetUsuariosPorCorreo(correo_electronico));
 
-                var dto = new UsuarioDTO
-                {
-                    id_usuario = usuario.IdUsuario,
-                    nombre_completo = usuario.NombreCompleto,
-                    correo_electronico = usuario.CorreoElectronico,
-                    numero_telefono = usuario.NumeroTelefono,
-                    imagen_perfil_url = usuario.ImagenPerfilUrl,
-                    fecha_nacimiento = usuario.FechaNacimiento,
-                    tipo_usuario = usuario.TipoUsuario,
-                    cuenta_activa = usuario.CuentaActiva,
-                    jsonCiudad = new CiudadDTO
-                    {
-                        IdCiudad = usuario.IdCiudadNavigation.IdCiudad,
-                        NombreCiudad = usuario.IdCiudadNavigation.NombreCiudad,
-                        IdPais = usuario.IdCiudadNavigation.IdPais,
-                        jsonPais = new PaisJDTO
-                        {
-                            NombrePais = usuario.IdPaisNavigation.NombrePais,
-                        }
-                    }
-                };
-
-                if (usuario.TipoUsuario?.ToLower() == "artista")
-                    dto.perfil = await _perfilArtistaDAO.ObtenerPorUsuarioIdAsync(usuario.IdUsuario);
-                else if (usuario.TipoUsuario?.ToLower() == "organizador")
-                    dto.perfil = await _perfilOrganizadorDAO.ObtenerPorUsuarioIdAsync(usuario.IdUsuario);
-
-                return dto;
-            }
-            catch { return null; }
+            return usuario;
         }
 
         public async Task<string> RegistrarUsuarioAsync(UsuarioRegistroDTO registro)
         {
             try
             {
+                var tiposValidos = new[] { "normal", "artista", "organizador" };
                 if (!string.IsNullOrEmpty(registro.tipo_usuario) &&
-                    !new[] { "normal", "artista", "organizador" }.Contains(registro.tipo_usuario.ToLower()))
+                    !tiposValidos.Contains(registro.tipo_usuario.ToLower()))
                 {
-                    return "Tipo de usuario inválido. Debe ser: normal, artista u organizador";
+                    return "Tipo de usuario inválido.";
                 }
 
-                if (!await VerificarPaisExisteAsync(registro.id_pais))
+                if (!await VerificarCiudadExisteAsync(registro.id_ciudad))
                 {
-                    return $"El país con ID {registro.id_pais} no existe";
+                    return $"La ciudad con ID {registro.id_ciudad} no existe.";
                 }
 
                 if (await VerificarCorreoExistenteAsync(registro.correo_electronico))
                 {
-                    return "El correo electrónico ya está registrado";
+                    return "El correo electrónico ya está registrado.";
                 }
 
                 return await Task.Run(() => _usuarioDAO.InsertUsuario(registro));
             }
             catch (Exception ex)
             {
-                return $"Error al registrar usuario: {ex.Message}";
+                return $"Error interno al procesar el registro.";
             }
         }
 
         public async Task<LoginResponseDTO> LoginAsync(LoginDTO login)
         {
-            try
+
+            return new LoginResponseDTO 
+            { 
+                Exitoso = false, 
+                Mensaje = "Servicio de login no disponible temporalmente" 
+            };
+
+            /*try
             {
                 if (string.IsNullOrEmpty(login.contrasena) || string.IsNullOrEmpty(login.correo_electronico))
                 {
@@ -233,7 +207,7 @@ namespace Meevent_API.src.Features.Usuarios.Service
             catch (Exception ex)
             {
                 return new LoginResponseDTO { Exitoso = false, Mensaje = "Correo o contraseña incorrectos" };
-            }
+            }*/
         }
 
         public async Task<UsuarioEditarResponseDTO> ActualizarUsuarioAsync(int id_usuario, UsuarioEditarDTO usuario)

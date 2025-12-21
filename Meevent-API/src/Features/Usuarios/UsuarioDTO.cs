@@ -1,7 +1,4 @@
-﻿
-using Meevent_API.src.Features.Paises;
-using Meevent_API.src.Features.PerfilesOrganizadores; 
-using Meevent_API.src.Features.PerfilesArtistas;
+﻿using Meevent_API.src.Features.Paises;
 
 using System.ComponentModel.DataAnnotations;
 
@@ -35,36 +32,33 @@ namespace Meevent_API.src.Features.Usuarios
     public class UsuarioRegistroDTO
     {
         [Required(ErrorMessage = "El nombre completo es obligatorio")]
+        [StringLength(150, ErrorMessage = "El nombre no puede exceder los 150 caracteres")]
         public string nombre_completo { get; set; }
 
         [Required(ErrorMessage = "El correo es obligatorio")]
         [EmailAddress(ErrorMessage = "Formato de correo inválido")]
+        [StringLength(150)]
         public string correo_electronico { get; set; }
 
         [Required(ErrorMessage = "La contraseña es obligatoria")]
         [MinLength(8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres")]
-        [RegularExpression(@"^(?=.*[A-Z])(?=.*\d).+$",
-            ErrorMessage = "La contraseña debe tener al menos 1 mayúscula y 1 número")]
+        [RegularExpression(@"^(?=.*[A-Z])(?=.*\d).+$", ErrorMessage = "La contraseña debe tener al menos una mayúscula y un número")]
         public string contrasena { get; set; }
 
-        [RegularExpression(@"^\d+$",
-        ErrorMessage = "El número de teléfono solo debe contener números")]
+        [RegularExpression(@"^\+?\d+$", ErrorMessage = "El número de teléfono solo debe contener números")]
+        [StringLength(20)]
         public string? numero_telefono { get; set; }
 
         public string? imagen_perfil_url { get; set; }
 
-
-        [Required(ErrorMessage = "La Fecha de Nacimiento es Necesario")]
+        [Required(ErrorMessage = "La fecha de nacimiento es obligatoria")]
         public DateTime? fecha_nacimiento { get; set; }
 
         [RegularExpression("^(normal|artista|organizador)$",
-            ErrorMessage = "El tipo de usuario debe ser: normal, artista u organizador")]
+        ErrorMessage = "El tipo de usuario debe ser: normal, artista u organizador")]
         public string tipo_usuario { get; set; } = "normal";
 
-        [Range(1, 99, ErrorMessage = "El ID de país debe ser un número positivo y menor a 100 ")]
-        public int id_pais { get; set; } = 1;
-
-        [Range(1, 99, ErrorMessage = "El ID de país debe ser un número positivo y menor a 100 ")]
+        [Required(ErrorMessage = "La ciudad es obligatoria")]
         public int id_ciudad { get; set; } = 1;
     }
 
@@ -99,9 +93,7 @@ namespace Meevent_API.src.Features.Usuarios
         }
     }
 
-    namespace Meevent_API.src.Features.Usuarios
-    {
-        public class UsuarioEditarDTO
+    public class UsuarioEditarDTO
         {
 
             [MinLength(8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres")]
@@ -134,7 +126,6 @@ namespace Meevent_API.src.Features.Usuarios
             public int? id_ciudad { get; set; }
             public bool? email_verificado { get; set; }
         }
-    }
 
     public class UsuarioEditarResponseDTO
     {
@@ -203,5 +194,29 @@ public class UsuarioActivarCuentaResponseDTO
     public bool CuentaActiva { get; set; }
 }
 
+
+// DTO para detalles completos del usuario 
+
+public class UsuarioDetalleDTO
+{
+    // Datos básicos del usuario
+    public int id_usuario { get; set; }
+    public string nombre_completo { get; set; }
+    public string correo_electronico { get; set; }
+    public string? numero_telefono { get; set; }
+    public string? imagen_perfil_url { get; set; }
+    public DateTime? fecha_nacimiento { get; set; }
+    public bool email_verificado { get; set; }
+    public bool cuenta_activa { get; set; }
+
+    // Información de Ciudad
+    public int id_ciudad { get; set; }
+    public string nombre_ciudad { get; set; }
+
+    // Información de País
+    public int id_pais { get; set; }
+    public string nombre_pais { get; set; }
+    public string codigo_iso { get; set; }
+}
 
 
