@@ -1,5 +1,4 @@
-﻿using Meevent_API.src.Core.Entities;
-using Meevent_API.src.Features.Paises;
+﻿using Meevent_API.src.Features.Paises;
 using Meevent_API.src.Features.Usuarios.DAO;
 using Meevent_API.src.Features.Usuarios.Meevent_API.src.Features.Usuarios;
 
@@ -278,7 +277,6 @@ public async Task<UsuarioEditarResponseDTO> ActualizarUsuarioAsync(int id_usuari
             }
         }
 
-        // 6. Validar Ciudad (Solo si se envió)
         if (usuario.id_ciudad.HasValue)
         {
             bool ciudadExiste = await VerificarCiudadExisteAsync(usuario.id_ciudad.Value);
