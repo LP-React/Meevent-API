@@ -16,14 +16,16 @@ namespace Meevent_API.src.Features.Usuarios
         }
 
         [HttpGet("ListarUsuarios")]
-        public async Task<ActionResult<UsuarioListResponseDTO>> Get()
+        public async Task<ActionResult<UsuarioListResponseDTO>> GetAllUsuariosAsync()
         {
-            var respuesta = await _usuarioService.ObtenerUsuariosAsync();
+            var resultado = await _usuarioService.ListarUsuariosAsync();
 
-            if (!respuesta.Exitoso)
-                return StatusCode(500, respuesta);
+            if (!resultado.Exitoso)
+            {
+                return StatusCode(500, resultado);
+            }
 
-            return Ok(respuesta);
+            return Ok(resultado);
         }
 
         [HttpGet("Buscar{id}")]

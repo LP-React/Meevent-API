@@ -2,7 +2,7 @@
 {
     public interface IUsuarioService
     {
-        Task<UsuarioListResponseDTO> ObtenerUsuariosAsync();
+        Task<UsuariosListaResponseDTO> ListarUsuariosAsync();
         Task<UsuarioDTO> ObtenerUsuarioPorIdAsync(int id_usuario);
         Task<UsuarioDetalleDTO> ObtenerUsuarioPorCorreoAsync(string correo_electronico);
         Task<string> RegistrarUsuarioAsync(UsuarioRegistroDTO registro);

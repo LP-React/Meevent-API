@@ -22,65 +22,25 @@ namespace Meevent_API.src.Features.Usuarios.Service
             _perfilOrganizadorDAO = perfilOrganizadorDAO;
         }
 
-        public async Task<UsuarioListResponseDTO> ObtenerUsuariosAsync()
+        public async Task<UsuariosListaResponseDTO> ListarUsuariosAsync()
         {
+            var respuesta = new UsuariosListaResponseDTO();
             try
             {
-                var usuarios = await Task.Run(() => _usuarioDAO.GetUsuarios());
+                var lista = await _usuarioDAO.GetUsuarios();
 
-                var usuariosDTO = new List<UsuarioDTO>();
-                foreach (var u in usuarios)
-                {
-                    var dto = new UsuarioDTO
-                    {
-                        id_usuario = u.IdUsuario,
-                        nombre_completo = u.NombreCompleto,
-                        correo_electronico = u.CorreoElectronico,
-                        numero_telefono = u.NumeroTelefono,
-                        imagen_perfil_url = u.ImagenPerfilUrl,
-                        fecha_nacimiento = u.FechaNacimiento,
-                        fecha_creacion = u.FechaCreacion,
-                        fecha_actualizacion = u.FechaActualizacion,
-                        tipo_usuario = u.TipoUsuario,
-                        cuenta_activa = u.CuentaActiva,
-                        jsonCiudad = new CiudadDTO
-                        {
-                            IdCiudad = u.IdCiudadNavigation.IdCiudad,
-                            NombreCiudad = u.IdCiudadNavigation.NombreCiudad,
-                            IdPais = u.IdCiudadNavigation.IdPais,
-                            jsonPais = new PaisJDTO
-                            {
-                                NombrePais = u.IdPaisNavigation.NombrePais,
-                            }
-                        }
-                    };
-
-                    if (u.TipoUsuario?.ToLower() == "artista")
-                        dto.perfil = await _perfilArtistaDAO.ObtenerPorUsuarioIdAsync(u.IdUsuario);
-                    else if (u.TipoUsuario?.ToLower() == "organizador")
-                        dto.perfil = await _perfilOrganizadorDAO.ObtenerPorUsuarioIdAsync(u.IdUsuario);
-
-                    usuariosDTO.Add(dto);
-                }
-
-                return new UsuarioListResponseDTO
-                {
-                    Exitoso = true,
-                    Mensaje = "Usuarios obtenidos exitosamente",
-                    TotalUsuarios = usuariosDTO.Count,
-                    Usuarios = usuariosDTO
-                };
+                respuesta.Exitoso = true;
+                respuesta.Mensaje = lista.Any() ? "Usuarios recuperados correctamente" : "No hay usuarios registrados";
+                respuesta.Usuarios = lista;
             }
             catch (Exception ex)
             {
-                return new UsuarioListResponseDTO
-                {
-                    Exitoso = false,
-                    Mensaje = $"Error al obtener usuarios: {ex.Message}",
-                    TotalUsuarios = 0,
-                    Usuarios = Enumerable.Empty<UsuarioDTO>()
-                };
+                respuesta.Exitoso = false;
+                respuesta.Mensaje = "Error al obtener la lista: " + ex.Message;
+                respuesta.Usuarios = null;
             }
+
+            return respuesta;
         }
 
         public async Task<UsuarioDTO> ObtenerUsuarioPorIdAsync(int id_usuario)

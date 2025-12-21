@@ -30,49 +30,47 @@ namespace Meevent_API.src.Features.Usuarios.DAO
             throw new NotImplementedException();
         }
 
-        public IEnumerable<Usuario> GetUsuarios()
-        {
-            throw new NotImplementedException();
-        }
-
-        /*public IEnumerable<Usuario> GetUsuarios()
+        public async Task<IEnumerable<UsuarioDetalleDTO>> GetUsuarios()
          {
-             List<Usuario> temporal = new List<Usuario>();
-             using (SqlConnection cn = new SqlConnection(_cadena))
-             {
-                 SqlCommand cmd = new SqlCommand("usp_ListarUsuarios", cn);
-                 cmd.CommandType = CommandType.StoredProcedure;
-                 cn.Open();
-                 SqlDataReader dr = cmd.ExecuteReader();
-                 while (dr.Read())
-                 {
-                     temporal.Add(new Usuario
-                     {
-                         IdUsuario = dr.GetInt32(dr.GetOrdinal("id_usuario")),
-                         NombreCompleto = dr.GetString(dr.GetOrdinal("nombre_completo")),
-                         CorreoElectronico = dr.GetString(dr.GetOrdinal("correo_electronico")),
-                         NumeroTelefono = dr.IsDBNull(dr.GetOrdinal("numero_telefono")) ? null : dr.GetString(dr.GetOrdinal("numero_telefono")),
-                         ImagenPerfilUrl = dr.IsDBNull(dr.GetOrdinal("imagen_perfil_url")) ? null : dr.GetString(dr.GetOrdinal("imagen_perfil_url")),
-                         FechaNacimiento = dr.IsDBNull(dr.GetOrdinal("fecha_nacimiento")) ? null : DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_nacimiento"))),
-                         FechaCreacion = DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_creacion"))),
-                         FechaActualizacion = DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_actualizacion"))),
-                         EmailVerificado = dr.GetBoolean(dr.GetOrdinal("email_verificado")),
-                         CuentaActiva = dr.GetBoolean(dr.GetOrdinal("cuenta_activa")),
-                         TipoUsuario = dr.GetString(dr.GetOrdinal("tipo_usuario")),
-                         IdPaisNavigation = new Pais
-                         {NombrePais = dr.GetString(dr.GetOrdinal("nombre_pais")) },
-                         IdCiudadNavigation = new Ciudad
-                         {
-                             IdCiudad = dr.GetInt32(dr.GetOrdinal("id_ciudad")),
-                             NombreCiudad = dr.GetString(dr.GetOrdinal("nombre_ciudad")),
-                             IdPais = dr.GetInt32(dr.GetOrdinal("id_pais"))
-                         }
-                     });
-                 }
-             }
-             return temporal;
-         }
-        */
+            var lista = new List<UsuarioDetalleDTO>();
+
+            using (SqlConnection cn = new SqlConnection(_cadena))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_ListarUsuarios", cn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    await cn.OpenAsync();
+
+                    using (SqlDataReader dr = await cmd.ExecuteReaderAsync())
+                    {
+                        // Usamos while para recorrer todas las filas devueltas
+                        while (await dr.ReadAsync())
+                        {
+                            lista.Add(new UsuarioDetalleDTO
+                            {
+                                id_usuario = dr.GetInt32(0),
+                                nombre_completo = dr.GetString(1),
+                                tipo_usuario = dr.GetString(2),
+                                correo_electronico = dr.GetString(3),
+                                numero_telefono = dr.IsDBNull(4) ? null : dr.GetString(4),
+                                imagen_perfil_url = dr.IsDBNull(5) ? null : dr.GetString(5),
+                                fecha_nacimiento = dr.IsDBNull(6) ? (DateTime?)null : dr.GetDateTime(6),
+                                email_verificado = dr.GetBoolean(7),
+                                cuenta_activa = dr.GetBoolean(8),
+                                id_ciudad = dr.GetInt32(9),
+                                nombre_ciudad = dr.GetString(10),
+                                id_pais = dr.GetInt32(11),
+                                nombre_pais = dr.GetString(12),
+                                codigo_iso = dr.GetString(13),
+                            });
+                        }
+                    }
+                }
+            }
+            return lista;
+        }
+        
         /*public IEnumerable<Usuario> GetUsuariosPorId(int id_usuario)
         {
             List<Usuario> temporal = new List<Usuario>();
@@ -116,6 +114,7 @@ namespace Meevent_API.src.Features.Usuarios.DAO
             return temporal;
         }
         */
+        
         public async Task<UsuarioDetalleDTO> GetUsuariosPorCorreo(string correo_electronico)
         {
             UsuarioDetalleDTO usuario = null;
@@ -136,17 +135,18 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                         {
                             id_usuario = dr.GetInt32(0),
                             nombre_completo = dr.GetString(1),
-                            correo_electronico = dr.GetString(2),
-                            numero_telefono = dr.IsDBNull(3) ? null : dr.GetString(3),
-                            imagen_perfil_url = dr.IsDBNull(4) ? null : dr.GetString(4),
-                            fecha_nacimiento = dr.IsDBNull(5) ? (DateTime?)null : dr.GetDateTime(5),
-                            email_verificado = dr.GetBoolean(6),
-                            cuenta_activa = dr.GetBoolean(7),
-                            id_ciudad = dr.GetInt32(8),
-                            nombre_ciudad = dr.GetString(9),
-                            id_pais = dr.GetInt32(10),
-                            nombre_pais = dr.GetString(11),
-                            codigo_iso = dr.GetString(12),
+                            tipo_usuario = dr.GetString(2),
+                            correo_electronico = dr.GetString(3),
+                            numero_telefono = dr.IsDBNull(4) ? null : dr.GetString(4),
+                            imagen_perfil_url = dr.IsDBNull(5) ? null : dr.GetString(5),
+                            fecha_nacimiento = dr.IsDBNull(6) ? (DateTime?)null : dr.GetDateTime(6),
+                            email_verificado = dr.GetBoolean(7),
+                            cuenta_activa = dr.GetBoolean(8),
+                            id_ciudad = dr.GetInt32(9),
+                            nombre_ciudad = dr.GetString(10),
+                            id_pais = dr.GetInt32(11),
+                            nombre_pais = dr.GetString(12),
+                            codigo_iso = dr.GetString(13),
                         };
                     }
                 }

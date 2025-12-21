@@ -202,6 +202,7 @@ public class UsuarioDetalleDTO
     // Datos básicos del usuario
     public int id_usuario { get; set; }
     public string nombre_completo { get; set; }
+    public string tipo_usuario { get; set; }
     public string correo_electronico { get; set; }
     public string? numero_telefono { get; set; }
     public string? imagen_perfil_url { get; set; }
@@ -219,4 +220,16 @@ public class UsuarioDetalleDTO
     public string codigo_iso { get; set; }
 }
 
+public class UsuarioDetalleResponseDTO
+{
+    public bool Exitoso { get; set; }
+    public string Mensaje { get; set; }
+    public UsuarioDetalleDTO Usuario { get; set; }
+}
 
+public class UsuariosListaResponseDTO
+{
+    public bool Exitoso { get; set; }
+    public string Mensaje { get; set; }
+    public IEnumerable<UsuarioDetalleDTO> Usuarios { get; set; }
+}
