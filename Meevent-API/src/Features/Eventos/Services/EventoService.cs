@@ -218,24 +218,6 @@ namespace Meevent_API.src.Features.Eventos.Services
             }
         }
 
-        private EventoDetalleDTO MapToDetalleDTO(Evento evento)
-        {
-            return new EventoDetalleDTO
-            {
-                TituloEvento = evento.TituloEvento,
-                SlugEvento = evento.SlugEvento,
-                DescripcionEvento = evento.DescripcionEvento,
-                DescripcionCorta = evento.DescripcionCorta,
-                FechaInicio = evento.FechaInicio,
-                FechaFin = evento.FechaFin,
-                EventoGratuito = evento.EventoGratuito,
-                EventoOnline = evento.EventoOnline,
-                CapacidadEvento = evento.CapacidadEvento,
-                SubcategoriaEventoId = evento.SubcategoriaEventoId,
-                LocalId = evento.LocalId
-            };
-        }
-
         public async Task<EventosCompletosListResponseDTO> ListarEventosCompletosAsync(
             int? idOrganizador,
             int? idSubCategoria,
