@@ -6,6 +6,6 @@ public class CiudadDTO
     public string NombreCiudad { get; set; }
     public int IdPais { get; set; }
 
-    public PaisDTO? jsonPais { get; set; }
+    public PaisJDTO? jsonPais { get; set; }
 
 }

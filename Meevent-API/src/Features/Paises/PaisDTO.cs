@@ -8,6 +8,12 @@
 
 
     }
+    public class PaisJDTO
+    {
+        public string NombrePais { get; set; }
+
+
+    }
 
     // DTO para respuestas con metadata adicional
     public class PaisListResponseDTO

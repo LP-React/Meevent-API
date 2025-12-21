@@ -38,8 +38,8 @@ namespace Meevent_API.src.Features.PerfilesOrganizador.DAO
                         FacebookUrl = dr.IsDBNull(dr.GetOrdinal("facebook_url")) ? "" : dr.GetString(dr.GetOrdinal("facebook_url")),
                         InstagramUrl = dr.IsDBNull(dr.GetOrdinal("instagram_url")) ? "" : dr.GetString(dr.GetOrdinal("instagram_url")),
                         TiktokUrl = dr.IsDBNull(dr.GetOrdinal("tiktok_url")) ? "" : dr.GetString(dr.GetOrdinal("tiktok_url")),
-                        FechaCreacion = dr.GetDateTime(dr.GetOrdinal("fecha_creacion")),
-                        FechaActualizacion = dr.GetDateTime(dr.GetOrdinal("fecha_actualizacion")),
+                        FechaCreacion = DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_creacion"))),
+                        FechaActualizacion = DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_actualizacion"))),
                         UsuarioId = dr.GetInt32(dr.GetOrdinal("usuario_id"))
                     });
                 }
@@ -69,8 +69,8 @@ namespace Meevent_API.src.Features.PerfilesOrganizador.DAO
                         FacebookUrl = dr.IsDBNull(dr.GetOrdinal("facebook_url")) ? "" : dr.GetString(dr.GetOrdinal("facebook_url")),
                         InstagramUrl = dr.IsDBNull(dr.GetOrdinal("instagram_url")) ? "" : dr.GetString(dr.GetOrdinal("instagram_url")),
                         TiktokUrl = dr.IsDBNull(dr.GetOrdinal("tiktok_url")) ? "" : dr.GetString(dr.GetOrdinal("tiktok_url")),
-                        FechaCreacion = dr.GetDateTime(dr.GetOrdinal("fecha_creacion")),
-                        FechaActualizacion = dr.GetDateTime(dr.GetOrdinal("fecha_actualizacion")),
+                        FechaCreacion = DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_creacion"))),
+                        FechaActualizacion = DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_actualizacion"))),
                         UsuarioId = dr.GetInt32(dr.GetOrdinal("usuario_id"))
                     });
                 }
@@ -140,6 +140,44 @@ namespace Meevent_API.src.Features.PerfilesOrganizador.DAO
             {
                 return $"Error al actualizar perfil: {ex.Message}";
             }
+        }
+
+        public async Task<PerfilOrganizador> ObtenerPorUsuarioIdAsync(int usuarioId)
+        {
+            using (SqlConnection cn = new SqlConnection(_cadena))
+            {
+                string query = "SELECT * FROM perfiles_organizador WHERE usuario_id = @usuarioId";
+                SqlCommand cmd = new SqlCommand(query, cn);
+                cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+
+                await cn.OpenAsync();
+                using (SqlDataReader dr = await cmd.ExecuteReaderAsync(CommandBehavior.SingleRow))
+                {
+                    if (await dr.ReadAsync())
+                    {
+                        return new PerfilOrganizador
+                        {
+                            IdPerfilOrganizador = dr.GetInt32(dr.GetOrdinal("id_perfil_organizador")),
+                            NombreOrganizador = dr.GetString(dr.GetOrdinal("nombre_organizador")),
+                            DescripcionOrganizador = dr.GetString(dr.GetOrdinal("descripcion_organizador")),
+                            SitioWeb = dr.IsDBNull(dr.GetOrdinal("sitio_web")) ? null : dr.GetString(dr.GetOrdinal("sitio_web")),
+                            LogoUrl = dr.IsDBNull(dr.GetOrdinal("logo_url")) ? null : dr.GetString(dr.GetOrdinal("logo_url")),
+                            FacebookUrl = dr.IsDBNull(dr.GetOrdinal("facebook_url")) ? null : dr.GetString(dr.GetOrdinal("facebook_url")),
+                            InstagramUrl = dr.IsDBNull(dr.GetOrdinal("instagram_url")) ? null : dr.GetString(dr.GetOrdinal("instagram_url")),
+                            TiktokUrl = dr.IsDBNull(dr.GetOrdinal("tiktok_url")) ? null : dr.GetString(dr.GetOrdinal("tiktok_url")),
+                            TwitterUrl = dr.IsDBNull(dr.GetOrdinal("twitter_url")) ? null : dr.GetString(dr.GetOrdinal("twitter_url")),
+                            DireccionOrganizador = dr.IsDBNull(dr.GetOrdinal("direccion_organizador")) ? null : dr.GetString(dr.GetOrdinal("direccion_organizador")),
+                            TelefonoContacto = dr.IsDBNull(dr.GetOrdinal("telefono_contacto")) ? null : dr.GetString(dr.GetOrdinal("telefono_contacto")),
+
+                            FechaCreacion = DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_creacion"))),
+                            FechaActualizacion = DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_actualizacion"))),
+
+                            UsuarioId = dr.GetInt32(dr.GetOrdinal("usuario_id"))
+                        };
+                    }
+                }
+            }
+            return null;
         }
     }
 }

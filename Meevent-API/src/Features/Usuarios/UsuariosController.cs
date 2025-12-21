@@ -184,6 +184,22 @@ namespace Meevent_API.src.Features.Usuarios
             }
         }
 
+        [HttpGet("verificarCiudad/{idCiudad}")]
+        public async Task<ActionResult<bool>> VerificarCiudad(int idCiudad)
+        {
+            if (idCiudad <= 0)
+                return BadRequest("El ID de ciudad debe ser un número positivo");
+            try
+            {
+                bool existe = await _usuarioService.VerificarCiudadExisteAsync(idCiudad);
+                return Ok(existe);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al verificar ciudad: {ex.Message}");
+            }
+        }
+
         [HttpPatch("activarCuenta/{id}")]
         public async Task<IActionResult> ActivarCuenta(int id, [FromBody] UsuarioActivarCuentaDTO estado)
         {

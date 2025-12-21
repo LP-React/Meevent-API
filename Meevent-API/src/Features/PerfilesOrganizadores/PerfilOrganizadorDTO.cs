@@ -16,8 +16,8 @@ namespace Meevent_API.src.Features.PerfilesOrganizadores
         public string? twitter_url { get; set; }
         public string? direccion_organizador { get; set; }
         public string? telefono_contacto { get; set; }
-        public DateTime fecha_creacion { get; set; }
-        public DateTime fecha_actualizacion { get; set; }
+        public DateOnly fecha_creacion { get; set; }
+        public DateOnly fecha_actualizacion { get; set; }
         public int usuario_id { get; set; }
     }
     public class PerfilOrganizadorListResponseDTO
@@ -123,8 +123,8 @@ namespace Meevent_API.src.Features.PerfilesOrganizadores
         public string? twitter_url { get; set; }
         public string? direccion_organizador { get; set; }
         public string? telefono_contacto { get; set; }
-        public DateTime fecha_creacion { get; set; }
-        public DateTime fecha_actualizacion { get; set; }
+        public DateOnly fecha_creacion { get; set; }
+        public DateOnly fecha_actualizacion { get; set; }
         public int usuario_id { get; set; }
     }
 

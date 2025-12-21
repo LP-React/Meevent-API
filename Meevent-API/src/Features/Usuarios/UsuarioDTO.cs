@@ -1,5 +1,7 @@
 ﻿
 using Meevent_API.src.Features.Paises;
+using Meevent_API.src.Features.PerfilesOrganizadores; 
+using Meevent_API.src.Features.PerfilesArtistas;
 
 using System.ComponentModel.DataAnnotations;
 
@@ -16,8 +18,10 @@ namespace Meevent_API.src.Features.Usuarios
         public DateOnly fecha_creacion { get; set; }
         public DateOnly fecha_actualizacion { get; set; }
         public string tipo_usuario { get; set; }
+        public object? perfil { get; set; }
         public bool cuenta_activa { get; set; }
         public CiudadDTO? jsonCiudad { get; set; }
+
     }   
 
     public class UsuarioListResponseDTO

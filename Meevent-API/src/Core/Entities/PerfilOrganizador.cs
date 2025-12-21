@@ -37,10 +37,10 @@ namespace Meevent_API.src.Core.Entities
         public string? TelefonoContacto { get; set; }
 
         [Column("fecha_creacion")]
-        public DateTime FechaCreacion { get; set; }
+        public DateOnly FechaCreacion { get; set; }
 
         [Column("fecha_actualizacion")]
-        public DateTime FechaActualizacion { get; set; }
+        public DateOnly FechaActualizacion { get; set; }
 
         [Column("usuario_id")]
         public int UsuarioId { get; set; }

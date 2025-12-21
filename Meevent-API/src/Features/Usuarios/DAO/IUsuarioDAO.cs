@@ -1,6 +1,4 @@
-﻿using Meevent_API.src.Core.Entities;
-using Meevent_API.src.Core.Entities.Meevent_API.src.Core.Entities;
-using Meevent_API.src.Features.Usuarios;
+﻿using Meevent_API.src.Core.Entities.Meevent_API.src.Core.Entities;
 using Meevent_API.src.Features.Usuarios.Meevent_API.src.Features.Usuarios;
 
 namespace Meevent_API.src.Features.Usuarios.DAO
@@ -15,6 +13,7 @@ namespace Meevent_API.src.Features.Usuarios.DAO
         string ActualizarUsuario(int id_usuario, UsuarioEditarDTO usuario);
         bool VerificarCorreoExistente(string correo_electronico);
         bool VerificarPaisExiste(int id_pais);
+        bool VerificarCiudadExiste(int id_ciudad);
         string ActivarDesactivarCuenta(int id_usuario, bool cuenta_activa);
 
     }

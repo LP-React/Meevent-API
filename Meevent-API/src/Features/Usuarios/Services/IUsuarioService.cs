@@ -1,6 +1,4 @@
-﻿
-using Meevent_API.src.Features.Usuarios;
-using Meevent_API.src.Features.Usuarios.Meevent_API.src.Features.Usuarios;
+﻿using Meevent_API.src.Features.Usuarios.Meevent_API.src.Features.Usuarios;
 
 namespace Meevent_API.src.Features.Usuarios.Service
 {
@@ -15,8 +13,8 @@ namespace Meevent_API.src.Features.Usuarios.Service
         Task<bool> VerificarCorreoExistenteAsync(string correo_electronico);
         Task<bool> VerificarPaisExisteAsync(int id_pais);
         Task<bool> VerificarCiudadExisteAsync(int id_ciudad);
-
         Task<UsuarioActivarCuentaResponseDTO> ActivarDesactivarCuentaAsync(int id_usuario, bool cuenta_activa);
+
 
     }
 }
