@@ -348,24 +348,20 @@ namespace Meevent_API.src.Features.Eventos.DAO
                     }
                 },
 
-                // Local con ciudad y país anidados
-                Local = new LocalDTO
+                Ubicacion = new UbicacionDTO
                 {
+                    // Pais
+                    IdPais = dr.GetInt32(39),
+                    NombrePais = dr.GetString(40),
+                    CodigoISO = dr.GetString(41),
+                    // Ciudad
+                    IdCiudad = dr.GetInt32(37),
+                    NombreCiudad = dr.GetString(38),
+                    // Local
                     IdLocal = dr.GetInt32(33),
                     NombreLocal = dr.GetString(34),
                     CapacidadLocal = dr.GetInt32(35),
-                    DireccionLocal = dr.GetString(36),
-                    Ciudad = new CiudadDTO
-                    {
-                        IdCiudad = dr.GetInt32(37),
-                        NombreCiudad = dr.GetString(38),
-                        Pais = new PaisDTO
-                        {
-                            IdPais = dr.GetInt32(39),
-                            NombrePais = dr.GetString(40),
-                            CodigoISO = dr.GetString(41)
-                        }
-                    }
+                    DireccionLocal = dr.IsDBNull(36) ? string.Empty : dr.GetString(36)
                 }
             };
         }

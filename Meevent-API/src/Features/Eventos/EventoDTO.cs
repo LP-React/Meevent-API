@@ -167,38 +167,21 @@ namespace Meevent_API.src.Features.Eventos
         public CategoriaEventoDTO Categoria { get; set; }
     }
 
-    public class PaisDTO
+    public class UbicacionDTO 
     {
         public int IdPais { get; set; }
         public string NombrePais { get; set; }
         public string CodigoISO { get; set; }
-    }
 
-    public class CiudadDTO
-    {
         public int IdCiudad { get; set; }
         public string NombreCiudad { get; set; }
-        public PaisDTO Pais { get; set; }
-    }
 
-    public class LocalDTO
-    {
         public int IdLocal { get; set; }
         public string NombreLocal { get; set; }
         public int CapacidadLocal { get; set; }
         public string DireccionLocal { get; set; }
-        public CiudadDTO Ciudad { get; set; }
     }
-    public class EstadisticasEventoDTO
-    {
-        public int TotalSeguidores { get; set; }
-        public double? CalificacionPromedio { get; set; }
-        public int TotalResenas { get; set; }
-        public decimal? PrecioMinimo { get; set; }
-        public decimal? PrecioMaximo { get; set; }
-        public int EntradasVendidas { get; set; } = 0;
-        public int EntradasDisponibles { get; set; } = 0;
-    }
+    
     public class EventoCompletoDTO
     {
         // Datos básicos del evento
@@ -216,30 +199,29 @@ namespace Meevent_API.src.Features.Eventos
         public int CapacidadEvento { get; set; }
         public bool EventoGratuito { get; set; }
         public bool EventoOnline { get; set; }
-        public string ImagenPortadaUrl { get; set; }
+        public string? ImagenPortadaUrl { get; set; }
         public DateTime FechaCreacion { get; set; }
         public DateTime FechaActualizacion { get; set; }
 
         // Objetos relacionados completos
-        public OrganizadorDTO Organizador { get; set; }
-        public SubcategoriaEventoDTO Subcategoria { get; set; }
-        public LocalDTO Local { get; set; }
-        public EstadisticasEventoDTO Estadisticas { get; set; }
+        public OrganizadorDTO? Organizador { get; set; }
+        public SubcategoriaEventoDTO? Subcategoria { get; set; }
+        public UbicacionDTO? Ubicacion { get; set; }
     }
 
     public class EventoCompletoResponseDTO
     {
         public bool Exitoso { get; set; }
         public string Mensaje { get; set; }
-        public EventoCompletoDTO Evento { get; set; }
+        public EventoCompletoDTO? Evento { get; set; }
     }
 
-    public class EventoCompletoListResponseDTO
+    public class EventosCompletosListResponseDTO
     {
         public bool Exitoso { get; set; }
         public string Mensaje { get; set; }
         public int TotalEventos { get; set; }
-        public IEnumerable<EventoCompletoDTO> Eventos { get; set; }
+        public IEnumerable<EventoCompletoDTO?> Eventos { get; set; }
     }
 
 }

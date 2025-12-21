@@ -256,7 +256,7 @@ namespace Meevent_API.src.Features.Eventos.Services
             };
         }
 
-        public async Task<EventoCompletoListResponseDTO> ListarEventosCompletosAsync(
+        public async Task<EventosCompletosListResponseDTO> ListarEventosCompletosAsync(
             int? idOrganizador,
             int? idSubCategoria,
             int? idLocal,
@@ -280,7 +280,7 @@ namespace Meevent_API.src.Features.Eventos.Services
                     AsignarEstados(evento);
                 }
 
-                return new EventoCompletoListResponseDTO
+                return new EventosCompletosListResponseDTO
                 {
                     Exitoso = true,
                     Mensaje = listaEventos.Any()
@@ -292,7 +292,7 @@ namespace Meevent_API.src.Features.Eventos.Services
             }
             catch (Exception ex)
             {
-                return new EventoCompletoListResponseDTO
+                return new EventosCompletosListResponseDTO
                 {
                     Exitoso = false,
                     Mensaje = $"Error al listar eventos: {ex.Message}",
@@ -354,19 +354,9 @@ namespace Meevent_API.src.Features.Eventos.Services
             }
 
             // Lógica para determinar estado del cliente
-            if (ahora < fechaInicio)
-            {
-                // El evento aún no ha comenzado
-                // Verificar si está agotado
-                if (evento.Estadisticas != null &&
-                    evento.Estadisticas.EntradasVendidas >= evento.CapacidadEvento)
-                {
-                    evento.EstadoEventoCliente = "agotado";
-                }
-                else
-                {
-                    evento.EstadoEventoCliente = "próximo";
-                }
+            if (ahora < fechaInicio) 
+            { 
+                evento.EstadoEventoCliente = "próximo";
             }
             else if (ahora >= fechaInicio && ahora <= fechaFin)
             {

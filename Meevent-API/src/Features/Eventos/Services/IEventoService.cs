@@ -12,7 +12,7 @@
             Task<EventoResponseDTO> UpdateEventoAsync(int idEvento, EventoActualizarDTO eventoDto);
 
             // Otros métodos relacionados con eventos pueden ser añadidos aquí
-            Task<EventoCompletoListResponseDTO> ListarEventosCompletosAsync(
+            Task<EventosCompletosListResponseDTO> ListarEventosCompletosAsync(
                 int? idOrganizador,
                 int? idSubCategoria,
                 int? idLocal,
