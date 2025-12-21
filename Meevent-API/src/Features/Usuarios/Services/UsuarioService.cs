@@ -43,45 +43,34 @@ namespace Meevent_API.src.Features.Usuarios.Service
             return respuesta;
         }
 
-        public async Task<UsuarioDTO> ObtenerUsuarioPorIdAsync(int id_usuario)
+        public async Task<UsuarioDetalleResponseDTO> ObtenerUsuarioPorIdAsync(int id_usuario)
         {
+            var respuesta = new UsuarioDetalleResponseDTO();
+
             try
             {
-                var usuarios = await Task.Run(() => _usuarioDAO.GetUsuariosPorId(id_usuario));
-                var usuario = usuarios.FirstOrDefault();
+                var usuario = await _usuarioDAO.GetUsuariosPorId(id_usuario);
 
-                if (usuario == null) return null;
-
-                var dto = new UsuarioDTO
+                if (usuario == null)
                 {
-                    id_usuario = usuario.IdUsuario,
-                    nombre_completo = usuario.NombreCompleto,
-                    correo_electronico = usuario.CorreoElectronico,
-                    numero_telefono = usuario.NumeroTelefono,
-                    imagen_perfil_url = usuario.ImagenPerfilUrl,
-                    fecha_nacimiento = usuario.FechaNacimiento,
-                    tipo_usuario = usuario.TipoUsuario,
-                    cuenta_activa = usuario.CuentaActiva,
-                    jsonCiudad = new CiudadDTO
-                    {
-                        IdCiudad = usuario.IdCiudadNavigation.IdCiudad,
-                        NombreCiudad = usuario.IdCiudadNavigation.NombreCiudad,
-                        IdPais = usuario.IdCiudadNavigation.IdPais,
-                        jsonPais = new PaisJDTO
-                        {
-                            NombrePais = usuario.IdPaisNavigation.NombrePais,
-                        }
-                    }
-                };
-
-                if (usuario.TipoUsuario?.ToLower() == "artista")
-                    dto.perfil = await _perfilArtistaDAO.ObtenerPorUsuarioIdAsync(usuario.IdUsuario);
-                else if (usuario.TipoUsuario?.ToLower() == "organizador")
-                    dto.perfil = await _perfilOrganizadorDAO.ObtenerPorUsuarioIdAsync(usuario.IdUsuario);
-
-                return dto;
+                    respuesta.Exitoso = false;
+                    respuesta.Mensaje = $"No se encontró un usuario con el ID {id_usuario}";
+                    respuesta.Usuario = null;
+                }
+                else
+                {
+                    respuesta.Exitoso = true;
+                    respuesta.Mensaje = "Usuario encontrado.";
+                    respuesta.Usuario = usuario;
+                }
             }
-            catch { return null; }
+            catch (Exception ex)
+            {
+                respuesta.Exitoso = false;
+                respuesta.Mensaje = "Error: " + ex.Message;
+            }
+
+            return respuesta;
         }
 
         public async Task<UsuarioDetalleDTO> ObtenerUsuarioPorCorreoAsync(string correo_electronico)
@@ -170,7 +159,7 @@ namespace Meevent_API.src.Features.Usuarios.Service
             }*/
         }
 
-        public async Task<UsuarioEditarResponseDTO> ActualizarUsuarioAsync(int id_usuario, UsuarioEditarDTO usuario)
+        /*public async Task<UsuarioEditarResponseDTO> ActualizarUsuarioAsync(int id_usuario, UsuarioEditarDTO usuario)
         {
             try
             {
@@ -259,7 +248,7 @@ namespace Meevent_API.src.Features.Usuarios.Service
                 };
             }
         }
-
+        */
         public async Task<bool> VerificarCorreoExistenteAsync(string correo) 
             => await Task.Run(() => _usuarioDAO.VerificarCorreoExistente(correo));
         public async Task<bool> VerificarPaisExisteAsync(int id)

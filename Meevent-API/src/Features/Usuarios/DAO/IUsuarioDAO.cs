@@ -5,7 +5,7 @@ namespace Meevent_API.src.Features.Usuarios.DAO
     public interface IUsuarioDAO
     {
         Task<IEnumerable<UsuarioDetalleDTO>> GetUsuarios();
-        IEnumerable<Usuario> GetUsuariosPorId(int id_usuario);
+        Task<UsuarioDetalleDTO> GetUsuariosPorId(int id_usuario);
         Task<UsuarioDetalleDTO> GetUsuariosPorCorreo(string correo_electronico);
         string InsertUsuario(UsuarioRegistroDTO reg);
         string LoginUsuario(LoginDTO login);

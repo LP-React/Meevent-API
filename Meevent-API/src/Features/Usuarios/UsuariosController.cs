@@ -28,15 +28,17 @@ namespace Meevent_API.src.Features.Usuarios
             return Ok(resultado);
         }
 
-        [HttpGet("Buscar{id}")]
-        public async Task<ActionResult<UsuarioDTO>> Get(int id)
+        [HttpGet("buscar/{id}")]
+        public async Task<ActionResult<UsuarioDetalleResponseDTO>> GetByIdUsuario(int id)
         {
-            var usuario = await _usuarioService.ObtenerUsuarioPorIdAsync(id);
+            var resultado = await _usuarioService.ObtenerUsuarioPorIdAsync(id);
 
-            if (usuario == null)
-                return NotFound(new { Mensaje = "Usuario no encontrado" });
+            if (!resultado.Exitoso)
+            {
+                return NotFound(resultado);
+            }
 
-            return Ok(usuario);
+            return Ok(resultado);
         }
 
         [HttpGet("buscar-por-correo/{correo}")]
@@ -54,7 +56,7 @@ namespace Meevent_API.src.Features.Usuarios
             return Ok(usuario);
         }
 
-        [HttpPost("registrarUsuario")]
+        /*[HttpPost("registrarUsuario")]
         public async Task<IActionResult> Registrar([FromBody] UsuarioRegistroDTO registro)
         {
             if (!ModelState.IsValid)
@@ -77,8 +79,9 @@ namespace Meevent_API.src.Features.Usuarios
                 Mensaje = resultado
             });
         }
-
-        [HttpPost("loginUsuario")]
+        */
+        
+        /*[HttpPost("loginUsuario")]
         public async Task<ActionResult<LoginResponseDTO>> Login([FromBody] LoginDTO login)
         {
             if (!ModelState.IsValid)
@@ -90,9 +93,9 @@ namespace Meevent_API.src.Features.Usuarios
                 return Unauthorized(respuesta);
 
             return Ok(respuesta);
-        }
+        }*/
 
-        [HttpPatch("editarUsuario/{id}")]
+        /*[HttpPatch("editarUsuario/{id}")]
         public async Task<ActionResult<UsuarioEditarResponseDTO>> EditarUsuario(int id, [FromBody] UsuarioEditarDTO usuario)
         {
             if (id <= 0)
@@ -150,7 +153,7 @@ namespace Meevent_API.src.Features.Usuarios
 
             return Ok(respuesta);
         }
-
+        */
 
         [HttpGet("verificarEmail/{correo}")]
         public async Task<ActionResult<bool>> VerificarEmail(string correo)
@@ -205,7 +208,7 @@ namespace Meevent_API.src.Features.Usuarios
             }
         }
 
-        [HttpPatch("activarCuenta/{id}")]
+        /*[HttpPatch("activarCuenta/{id}")]
         public async Task<IActionResult> ActivarCuenta(int id, [FromBody] UsuarioActivarCuentaDTO estado)
         {
             if (id <= 0)
@@ -228,6 +231,6 @@ namespace Meevent_API.src.Features.Usuarios
                 return BadRequest(respuesta);
             }
         }
-
+        */
     }
 }

@@ -154,9 +154,43 @@ namespace Meevent_API.src.Features.Usuarios.DAO
             return usuario;
         }
 
-        public IEnumerable<Usuario> GetUsuariosPorId(int id_usuario)
+        public async Task<UsuarioDetalleDTO> GetUsuariosPorId(int id_usuario)
         {
-            throw new NotImplementedException();
+            UsuarioDetalleDTO usuario = null;
+
+            using (SqlConnection cn = new SqlConnection(_cadena))
+            {
+                SqlCommand cmd = new SqlCommand("usp_UsuarioPorId", cn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@id_usuario", id_usuario);
+
+                await cn.OpenAsync();
+
+                using (SqlDataReader dr = await cmd.ExecuteReaderAsync())
+                {
+                    if (await dr.ReadAsync())
+                    {
+                        usuario = new UsuarioDetalleDTO
+                        {
+                            id_usuario = dr.GetInt32(0),
+                            nombre_completo = dr.GetString(1),
+                            tipo_usuario = dr.GetString(2),
+                            correo_electronico = dr.GetString(3),
+                            numero_telefono = dr.IsDBNull(4) ? null : dr.GetString(4),
+                            imagen_perfil_url = dr.IsDBNull(5) ? null : dr.GetString(5),
+                            fecha_nacimiento = dr.IsDBNull(6) ? (DateTime?)null : dr.GetDateTime(6),
+                            email_verificado = dr.GetBoolean(7),
+                            cuenta_activa = dr.GetBoolean(8),
+                            id_ciudad = dr.GetInt32(9),
+                            nombre_ciudad = dr.GetString(10),
+                            id_pais = dr.GetInt32(11),
+                            nombre_pais = dr.GetString(12),
+                            codigo_iso = dr.GetString(13),
+                        };
+                    }
+                }
+            }
+            return usuario;
         }
 
         public string InsertUsuario(UsuarioRegistroDTO reg)
