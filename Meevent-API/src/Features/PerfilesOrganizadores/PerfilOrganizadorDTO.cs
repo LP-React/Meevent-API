@@ -82,27 +82,21 @@ namespace Meevent_API.src.Features.PerfilesOrganizadores
         public string? descripcion_organizador { get; set; }
 
         [StringLength(300, ErrorMessage = "El sitio web no puede exceder 300 caracteres")]
-        [Url(ErrorMessage = "Formato de URL inválido")]
         public string? sitio_web { get; set; }
 
         [StringLength(500, ErrorMessage = "La URL del logo no puede exceder 500 caracteres")]
-        [Url(ErrorMessage = "Formato de URL inválido")]
         public string? logo_url { get; set; }
 
         [StringLength(300, ErrorMessage = "La URL de Facebook no puede exceder 300 caracteres")]
-        [Url(ErrorMessage = "Formato de URL inválido")]
         public string? facebook_url { get; set; }
 
         [StringLength(300, ErrorMessage = "La URL de Instagram no puede exceder 300 caracteres")]
-        [Url(ErrorMessage = "Formato de URL inválido")]
         public string? instagram_url { get; set; }
 
         [StringLength(300, ErrorMessage = "La URL de TikTok no puede exceder 300 caracteres")]
-        [Url(ErrorMessage = "Formato de URL inválido")]
         public string? tiktok_url { get; set; }
 
         [StringLength(300, ErrorMessage = "La URL de Twitter no puede exceder 300 caracteres")]
-        [Url(ErrorMessage = "Formato de URL inválido")]
         public string? twitter_url { get; set; }
 
         [StringLength(300, ErrorMessage = "La dirección no puede exceder 300 caracteres")]

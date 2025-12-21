@@ -1,5 +1,6 @@
 ﻿
 using Meevent_API.src.Features.Paises;
+
 using System.ComponentModel.DataAnnotations;
 
 namespace Meevent_API.src.Features.Usuarios
@@ -11,11 +12,13 @@ namespace Meevent_API.src.Features.Usuarios
         public string correo_electronico { get; set; }
         public string? numero_telefono { get; set; }
         public string? imagen_perfil_url { get; set; }
-        public DateTime? fecha_nacimiento { get; set; }
+        public DateOnly? fecha_nacimiento { get; set; }
+        public DateOnly fecha_creacion { get; set; }
+        public DateOnly fecha_actualizacion { get; set; }
         public string tipo_usuario { get; set; }
         public bool cuenta_activa { get; set; }
-        public int id_pais { get; set; }
-    }
+        public CiudadDTO? jsonCiudad { get; set; }
+    }   
 
     public class UsuarioListResponseDTO
     {
@@ -46,6 +49,8 @@ namespace Meevent_API.src.Features.Usuarios
 
         public string? imagen_perfil_url { get; set; }
 
+
+        [Required(ErrorMessage = "La Fecha de Nacimiento es Necesario")]
         public DateTime? fecha_nacimiento { get; set; }
 
         [RegularExpression("^(normal|artista|organizador)$",
@@ -54,6 +59,9 @@ namespace Meevent_API.src.Features.Usuarios
 
         [Range(1, 99, ErrorMessage = "El ID de país debe ser un número positivo y menor a 100 ")]
         public int id_pais { get; set; } = 1;
+
+        [Range(1, 99, ErrorMessage = "El ID de país debe ser un número positivo y menor a 100 ")]
+        public int id_ciudad { get; set; } = 1;
     }
 
     public class LoginDTO
@@ -111,15 +119,16 @@ namespace Meevent_API.src.Features.Usuarios
             [DataType(DataType.Date, ErrorMessage = "Formato de fecha inválido")]
             public DateTime? fecha_nacimiento { get; set; }
 
-            public bool? email_verificado { get; set; }
-
-
             [RegularExpression("^(normal|artista|organizador)$",
                 ErrorMessage = "El tipo de usuario debe ser: normal, artista u organizador")]
             public string? tipo_usuario { get; set; }
 
             [Range(1, 99, ErrorMessage = "El ID de país debe ser un número positivo y menor a 100 ")]
-            public int? id_pais { get; set; } 
+            public int? id_pais { get; set; }
+
+            [Range(1, 99, ErrorMessage = "El ID de país debe ser un número positivo y menor a 100 ")]
+            public int? id_ciudad { get; set; }
+            public bool? email_verificado { get; set; }
         }
     }
 
@@ -136,13 +145,19 @@ namespace Meevent_API.src.Features.Usuarios
         [EmailAddress(ErrorMessage = "Formato de correo inválido")]
         public string correo_electronico { get; set; }
     }
+    public class VerificarEmailResponseDTO
+    {
+        public bool Exitoso { get; set; }
+        public string Mensaje { get; set; }
+        public bool CorreoExiste { get; set; }
+    }
+
     public class VerificarPaisDTO
     {
         [Required(ErrorMessage = "El ID de país es obligatorio")]
         [Range(1, 999, ErrorMessage = "El ID de país debe ser un número positivo")]
         public int id_pais { get; set; }
     }
-
 
     public class VerificarPaisResponseDTO
     {
@@ -152,11 +167,19 @@ namespace Meevent_API.src.Features.Usuarios
         public PaisDTO? Pais { get; set; }
     }
 
-    public class VerificarEmailResponseDTO
+    public class VerificarCiudadDTO
+    {
+        [Required(ErrorMessage = "El ID de ciudad es obligatorio")]
+        [Range(1, 999, ErrorMessage = "El ID de ciudad debe ser un número positivo")]
+        public int id_pais { get; set; }
+    }
+
+    public class VerificarCuidadResponseDTO
     {
         public bool Exitoso { get; set; }
         public string Mensaje { get; set; }
-        public bool CorreoExiste { get; set; }
+        public bool CiudadExiste { get; set; }
+        public CiudadDTO? Ciudad { get; set; }
     }
 
 
@@ -175,3 +198,6 @@ public class UsuarioActivarCuentaResponseDTO
     public string Mensaje { get; set; }
     public bool CuentaActiva { get; set; }
 }
+
+
+

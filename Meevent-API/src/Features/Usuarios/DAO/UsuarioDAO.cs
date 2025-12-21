@@ -38,13 +38,22 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                         CorreoElectronico = dr.GetString(dr.GetOrdinal("correo_electronico")),
                         NumeroTelefono = dr.IsDBNull(dr.GetOrdinal("numero_telefono")) ? null : dr.GetString(dr.GetOrdinal("numero_telefono")),
                         ImagenPerfilUrl = dr.IsDBNull(dr.GetOrdinal("imagen_perfil_url")) ? null : dr.GetString(dr.GetOrdinal("imagen_perfil_url")),
-                        FechaNacimiento = dr.IsDBNull(dr.GetOrdinal("fecha_nacimiento")) ? null : dr.GetDateTime(dr.GetOrdinal("fecha_nacimiento")),
-                        FechaCreacion = dr.GetDateTime(dr.GetOrdinal("fecha_creacion")),
-                        FechaActualizacion = dr.GetDateTime(dr.GetOrdinal("fecha_actualizacion")),
+                        FechaNacimiento = dr.IsDBNull(dr.GetOrdinal("fecha_nacimiento")) ? null: DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_nacimiento"))),
+                        FechaCreacion = DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_creacion"))),
+                        FechaActualizacion = DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_actualizacion"))),
                         EmailVerificado = dr.GetBoolean(dr.GetOrdinal("email_verificado")),
                         CuentaActiva = dr.GetBoolean(dr.GetOrdinal("cuenta_activa")),
                         TipoUsuario = dr.GetString(dr.GetOrdinal("tipo_usuario")),
-                        IdPais = dr.IsDBNull(dr.GetOrdinal("id_pais")) ? 1 : dr.GetInt32(dr.GetOrdinal("id_pais"))
+                        IdPaisNavigation = new Pais
+                        {
+                            NombrePais = dr.GetString(dr.GetOrdinal("nombre_pais"))
+                        },
+                        IdCiudadNavigation = new Ciudad
+                        {
+                            IdCiudad = dr.GetInt32(dr.GetOrdinal("id_ciudad")),
+                            NombreCiudad = dr.GetString(dr.GetOrdinal("nombre_ciudad")),
+                            IdPais = dr.GetInt32(dr.GetOrdinal("id_pais"))
+                        }
                     });
                 }
                 dr.Close();
@@ -69,15 +78,24 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                         IdUsuario = dr.GetInt32(dr.GetOrdinal("id_usuario")),
                         NombreCompleto = dr.GetString(dr.GetOrdinal("nombre_completo")),
                         CorreoElectronico = dr.GetString(dr.GetOrdinal("correo_electronico")),
-                        ContrasenaHash = dr.GetString(dr.GetOrdinal("contrasena_hash")),
                         NumeroTelefono = dr.IsDBNull(dr.GetOrdinal("numero_telefono")) ? null : dr.GetString(dr.GetOrdinal("numero_telefono")),
                         ImagenPerfilUrl = dr.IsDBNull(dr.GetOrdinal("imagen_perfil_url")) ? null : dr.GetString(dr.GetOrdinal("imagen_perfil_url")),
-                        FechaNacimiento = dr.IsDBNull(dr.GetOrdinal("fecha_nacimiento")) ? null : dr.GetDateTime(dr.GetOrdinal("fecha_nacimiento")),
-                        FechaCreacion = dr.GetDateTime(dr.GetOrdinal("fecha_creacion")),
-                        FechaActualizacion = dr.GetDateTime(dr.GetOrdinal("fecha_actualizacion")),
+                        FechaNacimiento = dr.IsDBNull(dr.GetOrdinal("fecha_nacimiento")) ? null : DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_nacimiento"))),
+                        FechaCreacion = DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_creacion"))),
+                        FechaActualizacion = DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_actualizacion"))),
                         EmailVerificado = dr.GetBoolean(dr.GetOrdinal("email_verificado")),
                         CuentaActiva = dr.GetBoolean(dr.GetOrdinal("cuenta_activa")),
-                        TipoUsuario = dr.GetString(dr.GetOrdinal("tipo_usuario"))
+                        TipoUsuario = dr.GetString(dr.GetOrdinal("tipo_usuario")),
+                        IdPaisNavigation = new Pais
+                        {
+                            NombrePais = dr.GetString(dr.GetOrdinal("nombre_pais"))
+                        },
+                        IdCiudadNavigation = new Ciudad
+                        {
+                            IdCiudad = dr.GetInt32(dr.GetOrdinal("id_ciudad")),
+                            NombreCiudad = dr.GetString(dr.GetOrdinal("nombre_ciudad")),
+                            IdPais = dr.GetInt32(dr.GetOrdinal("id_pais"))
+                        }
                     });
                 }
                 dr.Close();
@@ -102,15 +120,24 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                         IdUsuario = dr.GetInt32(dr.GetOrdinal("id_usuario")),
                         NombreCompleto = dr.GetString(dr.GetOrdinal("nombre_completo")),
                         CorreoElectronico = dr.GetString(dr.GetOrdinal("correo_electronico")),
-                        ContrasenaHash = dr.GetString(dr.GetOrdinal("contrasena_hash")),
                         NumeroTelefono = dr.IsDBNull(dr.GetOrdinal("numero_telefono")) ? null : dr.GetString(dr.GetOrdinal("numero_telefono")),
                         ImagenPerfilUrl = dr.IsDBNull(dr.GetOrdinal("imagen_perfil_url")) ? null : dr.GetString(dr.GetOrdinal("imagen_perfil_url")),
-                        FechaNacimiento = dr.IsDBNull(dr.GetOrdinal("fecha_nacimiento")) ? null : dr.GetDateTime(dr.GetOrdinal("fecha_nacimiento")),
-                        FechaCreacion = dr.GetDateTime(dr.GetOrdinal("fecha_creacion")),
-                        FechaActualizacion = dr.GetDateTime(dr.GetOrdinal("fecha_actualizacion")),
+                        FechaNacimiento = dr.IsDBNull(dr.GetOrdinal("fecha_nacimiento")) ? null : DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_nacimiento"))),
+                        FechaCreacion = DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_creacion"))),
+                        FechaActualizacion = DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_actualizacion"))),
                         EmailVerificado = dr.GetBoolean(dr.GetOrdinal("email_verificado")),
                         CuentaActiva = dr.GetBoolean(dr.GetOrdinal("cuenta_activa")),
-                        TipoUsuario = dr.GetString(dr.GetOrdinal("tipo_usuario"))
+                        TipoUsuario = dr.GetString(dr.GetOrdinal("tipo_usuario")),
+                        IdPaisNavigation = new Pais
+                        {
+                            NombrePais = dr.GetString(dr.GetOrdinal("nombre_pais"))
+                        },
+                        IdCiudadNavigation = new Ciudad
+                        {
+                            IdCiudad = dr.GetInt32(dr.GetOrdinal("id_ciudad")),
+                            NombreCiudad = dr.GetString(dr.GetOrdinal("nombre_ciudad")),
+                            IdPais = dr.GetInt32(dr.GetOrdinal("id_pais"))
+                        }
                     });
                 }
                 dr.Close();
@@ -141,9 +168,9 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                 cmd.Parameters.AddWithValue("@fecha_nacimiento", reg.fecha_nacimiento ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@email_verificado", false);
                 cmd.Parameters.AddWithValue("@cuenta_activa", true);
-                cmd.Parameters.AddWithValue("@tipo_usuario",
-                    string.IsNullOrEmpty(reg.tipo_usuario) ? "normal" : reg.tipo_usuario);
+                cmd.Parameters.AddWithValue("@tipo_usuario", string.IsNullOrEmpty(reg.tipo_usuario) ? "normal" : reg.tipo_usuario);
                 cmd.Parameters.AddWithValue("@id_pais", reg.id_pais);
+                cmd.Parameters.AddWithValue("@id_ciudad", reg.id_ciudad);
                 cmd.ExecuteNonQuery();
 
                 return "Usuario registrado correctamente";
@@ -261,6 +288,7 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                 cmd.Parameters.AddWithValue("@tipo_usuario", string.IsNullOrEmpty(usuario.tipo_usuario) ? (object)DBNull.Value : tipoUsuario);
                 cmd.Parameters.AddWithValue("@contrasena_hash", string.IsNullOrEmpty(usuario.contrasena) ? (object)DBNull.Value : contrasenaHash);
                 cmd.Parameters.AddWithValue("@id_pais", usuario.id_pais.HasValue ? usuario.id_pais.Value : (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@id_ciudad", usuario.id_ciudad.HasValue ? usuario.id_ciudad.Value : (object)DBNull.Value);
 
                 int filasAfectadas = cmd.ExecuteNonQuery();
                 if (filasAfectadas > 0)
@@ -298,6 +326,25 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                 SqlCommand cmd = new SqlCommand("usp_VerificarPaisExiste", cn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@id_pais", id_pais);
+
+                cn.Open();
+                object result = cmd.ExecuteScalar();
+
+                if (result != null && result != DBNull.Value)
+                {
+                    return Convert.ToBoolean(result);
+                }
+
+                return false;
+            }
+        }
+        public bool VerificarCiudadExiste(int id_ciudad)
+        {
+            using (SqlConnection cn = new SqlConnection(_cadena))
+            {
+                SqlCommand cmd = new SqlCommand("usp_VerificarCiudadExiste", cn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@id_ciudad", id_ciudad);
 
                 cn.Open();
                 object result = cmd.ExecuteScalar();

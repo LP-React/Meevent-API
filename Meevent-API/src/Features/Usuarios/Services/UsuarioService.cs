@@ -1,4 +1,5 @@
 ﻿using Meevent_API.src.Core.Entities;
+using Meevent_API.src.Features.Paises;
 using Meevent_API.src.Features.Usuarios.DAO;
 using Meevent_API.src.Features.Usuarios.Meevent_API.src.Features.Usuarios;
 
@@ -27,9 +28,21 @@ namespace Meevent_API.src.Features.Usuarios.Service
                     numero_telefono = u.NumeroTelefono,
                     imagen_perfil_url = u.ImagenPerfilUrl,
                     fecha_nacimiento = u.FechaNacimiento,
+                    fecha_creacion = u.FechaCreacion, 
+                    fecha_actualizacion = u.FechaActualizacion, 
                     tipo_usuario = u.TipoUsuario,
-                    id_pais = u.IdPais,
-                    cuenta_activa = u.CuentaActiva 
+                    cuenta_activa = u.CuentaActiva,
+                    jsonCiudad = new CiudadDTO
+                    {
+                        IdCiudad = u.IdCiudadNavigation.IdCiudad,
+                        NombreCiudad = u.IdCiudadNavigation.NombreCiudad,
+                        IdPais = u.IdCiudadNavigation.IdPais,
+
+                        jsonPais = new PaisDTO
+                        {
+                            NombrePais = u.IdPaisNavigation.NombrePais,
+                        }
+                    }
                 }).ToList();
 
                 return new UsuarioListResponseDTO
@@ -71,8 +84,18 @@ namespace Meevent_API.src.Features.Usuarios.Service
                     imagen_perfil_url = usuario.ImagenPerfilUrl,
                     fecha_nacimiento = usuario.FechaNacimiento,
                     tipo_usuario = usuario.TipoUsuario,
-                    id_pais = usuario.IdPais,
-                    cuenta_activa = usuario.CuentaActiva  
+                    cuenta_activa = usuario.CuentaActiva,
+                    jsonCiudad = new CiudadDTO
+                    {
+                        IdCiudad = usuario.IdCiudadNavigation.IdCiudad,
+                        NombreCiudad = usuario.IdCiudadNavigation.NombreCiudad,
+                        IdPais = usuario.IdCiudadNavigation.IdPais,
+
+                        jsonPais = new PaisDTO
+                        {
+                            NombrePais = usuario.IdPaisNavigation.NombrePais,
+                        }
+                    }
                 };
             }
             catch
@@ -100,8 +123,18 @@ namespace Meevent_API.src.Features.Usuarios.Service
                     imagen_perfil_url = usuario.ImagenPerfilUrl,
                     fecha_nacimiento = usuario.FechaNacimiento,
                     tipo_usuario = usuario.TipoUsuario,
-                    id_pais = usuario.IdPais,
-                    cuenta_activa = usuario.CuentaActiva  
+                    cuenta_activa = usuario.CuentaActiva,
+                    jsonCiudad = new CiudadDTO
+                    {
+                        IdCiudad = usuario.IdCiudadNavigation.IdCiudad,
+                        NombreCiudad = usuario.IdCiudadNavigation.NombreCiudad,
+                        IdPais = usuario.IdCiudadNavigation.IdPais,
+
+                        jsonPais = new PaisDTO
+                        {
+                            NombrePais = usuario.IdPaisNavigation.NombrePais,
+                        }
+                    }
                 };
             }
             catch
@@ -177,106 +210,123 @@ namespace Meevent_API.src.Features.Usuarios.Service
                 };
             }
         }
-        public async Task<UsuarioEditarResponseDTO> ActualizarUsuarioAsync(int id_usuario, UsuarioEditarDTO usuario)
+public async Task<UsuarioEditarResponseDTO> ActualizarUsuarioAsync(int id_usuario, UsuarioEditarDTO usuario)
+{
+    try
+    {
+        if (string.IsNullOrEmpty(usuario.nombre_completo) &&
+            string.IsNullOrEmpty(usuario.numero_telefono) &&
+            string.IsNullOrEmpty(usuario.imagen_perfil_url) &&
+            !usuario.fecha_nacimiento.HasValue &&
+            string.IsNullOrEmpty(usuario.tipo_usuario) &&
+            !usuario.email_verificado.HasValue &&
+            string.IsNullOrEmpty(usuario.contrasena) &&
+            !usuario.id_pais.HasValue &&
+            !usuario.id_ciudad.HasValue) 
         {
-            try
+            return new UsuarioEditarResponseDTO
             {
-                if (string.IsNullOrEmpty(usuario.nombre_completo) &&
-                    string.IsNullOrEmpty(usuario.numero_telefono) &&
-                    string.IsNullOrEmpty(usuario.imagen_perfil_url) &&
-                    !usuario.fecha_nacimiento.HasValue &&
-                    string.IsNullOrEmpty(usuario.tipo_usuario) &&
-                    !usuario.email_verificado.HasValue &&
-                    string.IsNullOrEmpty(usuario.contrasena) &&
-                    !usuario.id_pais.HasValue)
-                {
-                    return new UsuarioEditarResponseDTO
-                    {
-                        Exitoso = false,
-                        Mensaje = "Debe proporcionar al menos un campo para actualizar",
-                        UsuarioActualizado = null
-                    };
-                }
+                Exitoso = false,
+                Mensaje = "Debe proporcionar al menos un campo para actualizar",
+                UsuarioActualizado = null
+            };
+        }
 
-                var usuarioExistente = await ObtenerUsuarioPorIdAsync(id_usuario);
+        var usuarioExistente = await ObtenerUsuarioPorIdAsync(id_usuario);
+        if (usuarioExistente == null)
+        {
+            return new UsuarioEditarResponseDTO
+            {
+                Exitoso = false,
+                Mensaje = "Usuario no encontrado",
+                UsuarioActualizado = null
+            };
+        }
 
-                if (usuarioExistente == null)
-                {
-                    return new UsuarioEditarResponseDTO
-                    {
-                        Exitoso = false,
-                        Mensaje = "Usuario no encontrado",
-                        UsuarioActualizado = null
-                    };
-                }
-                if (!usuarioExistente.cuenta_activa)
-                {
-                    return new UsuarioEditarResponseDTO
-                    {
-                        Exitoso = false,
-                        Mensaje = "No se puede editar un usuario con cuenta desactivada",
-                        UsuarioActualizado = null
-                    };
-                }
+        if (!usuarioExistente.cuenta_activa)
+        {
+            return new UsuarioEditarResponseDTO
+            {
+                Exitoso = false,
+                Mensaje = "No se puede editar un usuario con cuenta desactivada",
+                UsuarioActualizado = null
+            };
+        }
 
-                if (!string.IsNullOrEmpty(usuario.tipo_usuario) &&
-                    !new[] { "normal", "artista", "organizador" }.Contains(usuario.tipo_usuario.ToLower()))
-                {
-                    return new UsuarioEditarResponseDTO
-                    {
-                        Exitoso = false,
-                        Mensaje = "Tipo de usuario inválido. Debe ser: normal, artista u organizador",
-                        UsuarioActualizado = null
-                    };
-                }
+        if (!string.IsNullOrEmpty(usuario.tipo_usuario) &&
+            !new[] { "normal", "artista", "organizador" }.Contains(usuario.tipo_usuario.ToLower()))
+        {
+            return new UsuarioEditarResponseDTO
+            {
+                Exitoso = false,
+                Mensaje = "Tipo de usuario inválido. Debe ser: normal, artista u organizador",
+                UsuarioActualizado = null
+            };
+        }
 
-                if (usuario.id_pais.HasValue)
-                {
-                    bool paisExiste = await VerificarPaisExisteAsync(usuario.id_pais.Value);
-                    if (!paisExiste)
-                    {
-                        return new UsuarioEditarResponseDTO
-                        {
-                            Exitoso = false,
-                            Mensaje = $"El país con ID {usuario.id_pais.Value} no existe",
-                            UsuarioActualizado = null
-                        };
-                    }
-                }
-
-                var resultado = await Task.Run(() => _usuarioDAO.ActualizarUsuario(id_usuario, usuario));
-
-                if (resultado.Contains("correctamente"))
-                {
-                    var usuarioActualizado = await ObtenerUsuarioPorIdAsync(id_usuario);
-
-                    return new UsuarioEditarResponseDTO
-                    {
-                        Exitoso = true,
-                        Mensaje = resultado,
-                        UsuarioActualizado = usuarioActualizado
-                    };
-                }
-                else
-                {
-                    return new UsuarioEditarResponseDTO
-                    {
-                        Exitoso = false,
-                        Mensaje = resultado,
-                        UsuarioActualizado = null
-                    };
-                }
-            }
-            catch (Exception ex)
+        if (usuario.id_pais.HasValue)
+        {
+            bool paisExiste = await VerificarPaisExisteAsync(usuario.id_pais.Value);
+            if (!paisExiste)
             {
                 return new UsuarioEditarResponseDTO
                 {
                     Exitoso = false,
-                    Mensaje = $"Error al actualizar usuario: {ex.Message}",
+                    Mensaje = $"El país con ID {usuario.id_pais.Value} no existe",
                     UsuarioActualizado = null
                 };
             }
         }
+
+        // 6. Validar Ciudad (Solo si se envió)
+        if (usuario.id_ciudad.HasValue)
+        {
+            bool ciudadExiste = await VerificarCiudadExisteAsync(usuario.id_ciudad.Value);
+            if (!ciudadExiste)
+            {
+                return new UsuarioEditarResponseDTO
+                {
+                    Exitoso = false,
+                    Mensaje = $"La ciudad con ID {usuario.id_ciudad.Value} no existe",
+                    UsuarioActualizado = null
+                };
+            }
+        }
+
+        var resultado = await Task.Run(() => _usuarioDAO.ActualizarUsuario(id_usuario, usuario));
+
+        if (resultado.Contains("correctamente"))
+        {
+            var usuarioActualizado = await ObtenerUsuarioPorIdAsync(id_usuario);
+
+            return new UsuarioEditarResponseDTO
+            {
+                Exitoso = true,
+                Mensaje = resultado,
+                UsuarioActualizado = usuarioActualizado
+            };
+        }
+        else
+        {
+            return new UsuarioEditarResponseDTO
+            {
+                Exitoso = false,
+                Mensaje = resultado,
+                UsuarioActualizado = null
+            };
+        }
+    }
+    catch (Exception ex)
+    {
+        return new UsuarioEditarResponseDTO
+        {
+            Exitoso = false,
+            Mensaje = $"Error crítico al actualizar usuario: {ex.Message}",
+            UsuarioActualizado = null
+        };
+    }
+}
+
         public async Task<bool> VerificarCorreoExistenteAsync(string correo_electronico)
         {
             try
@@ -300,7 +350,10 @@ namespace Meevent_API.src.Features.Usuarios.Service
                 return false;
             }
         }
-
+        public async Task<bool> VerificarCiudadExisteAsync(int id_ciudad)
+        {
+            return await Task.Run(() => _usuarioDAO.VerificarCiudadExiste(id_ciudad));
+        }
         public async Task<UsuarioActivarCuentaResponseDTO> ActivarDesactivarCuentaAsync(int id_usuario, bool cuenta_activa)
         {
             try
