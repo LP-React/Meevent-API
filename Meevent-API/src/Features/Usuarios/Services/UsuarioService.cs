@@ -83,33 +83,50 @@ namespace Meevent_API.src.Features.Usuarios.Service
             return usuario;
         }
 
-        public async Task<string> RegistrarUsuarioAsync(UsuarioRegistroDTO registro)
+        public async Task<UsuarioDetalleResponseDTO> RegistrarUsuarioAsync(UsuarioRegistroDTO reg)
         {
+            var respuesta = new UsuarioDetalleResponseDTO();
+
             try
             {
-                var tiposValidos = new[] { "normal", "artista", "organizador" };
-                if (!string.IsNullOrEmpty(registro.tipo_usuario) &&
-                    !tiposValidos.Contains(registro.tipo_usuario.ToLower()))
+                // Validamos si el correo ya existe en la BD
+                var usuarioExistente = await _usuarioDAO.GetUsuariosPorCorreo(reg.correo_electronico);
+                if (usuarioExistente != null)
                 {
-                    return "Tipo de usuario inválido.";
+                    respuesta.Exitoso = false;
+                    respuesta.Mensaje = "El correo electrónico ya está registrado.";
+                    return respuesta;
                 }
 
-                if (!await VerificarCiudadExisteAsync(registro.id_ciudad))
-                {
-                    return $"La ciudad con ID {registro.id_ciudad} no existe.";
-                }
+                // Hash de la contraseña
+                string passwordPlano = reg.contrasenia;
+                reg.contrasenia = BCrypt.Net.BCrypt.HashPassword(passwordPlano);
 
-                if (await VerificarCorreoExistenteAsync(registro.correo_electronico))
+                // Crear el usuario
+                string resultadoDAO = await _usuarioDAO.InsertUsuario(reg);
+   
+                if (resultadoDAO == "OK")
                 {
-                    return "El correo electrónico ya está registrado.";
-                }
+                    // Obtener el usuario creado
+                    var usuarioCreado = await ObtenerUsuarioPorCorreoAsync(reg.correo_electronico);
 
-                return await Task.Run(() => _usuarioDAO.InsertUsuario(registro));
+                    respuesta.Exitoso = true;
+                    respuesta.Mensaje = "Tu cuenta ha sido creada con éxito.";
+                    respuesta.Usuario = usuarioCreado;
+                }
+                else
+                {
+                    respuesta.Exitoso = false;
+                    respuesta.Mensaje = resultadoDAO;
+                }
             }
             catch (Exception ex)
             {
-                return $"Error interno al procesar el registro.";
+                respuesta.Exitoso = false;
+                respuesta.Mensaje = "Ocurrió un error inesperado: " + ex.Message;
             }
+
+            return respuesta;
         }
 
         public async Task<LoginResponseDTO> LoginAsync(LoginDTO login)

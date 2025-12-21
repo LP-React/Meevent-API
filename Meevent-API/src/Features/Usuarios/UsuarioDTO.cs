@@ -1,5 +1,4 @@
 ﻿using Meevent_API.src.Features.Paises;
-
 using System.ComponentModel.DataAnnotations;
 
 namespace Meevent_API.src.Features.Usuarios
@@ -43,7 +42,7 @@ namespace Meevent_API.src.Features.Usuarios
         [Required(ErrorMessage = "La contraseña es obligatoria")]
         [MinLength(8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres")]
         [RegularExpression(@"^(?=.*[A-Z])(?=.*\d).+$", ErrorMessage = "La contraseña debe tener al menos una mayúscula y un número")]
-        public string contrasena { get; set; }
+        public string contrasenia { get; set; }
 
         [RegularExpression(@"^\+?\d+$", ErrorMessage = "El número de teléfono solo debe contener números")]
         [StringLength(20)]

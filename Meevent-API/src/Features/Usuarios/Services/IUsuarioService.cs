@@ -3,9 +3,13 @@
     public interface IUsuarioService
     {
         Task<UsuariosListaResponseDTO> ListarUsuariosAsync();
+        
         Task<UsuarioDetalleResponseDTO> ObtenerUsuarioPorIdAsync(int id_usuario);
+        
         Task<UsuarioDetalleDTO> ObtenerUsuarioPorCorreoAsync(string correo_electronico);
-        /*Task<string> RegistrarUsuarioAsync(UsuarioRegistroDTO registro);*/
+        
+        Task<UsuarioDetalleResponseDTO> RegistrarUsuarioAsync(UsuarioRegistroDTO registro);
+
         //Task<LoginResponseDTO> LoginAsync(LoginDTO login);
         //Task<UsuarioEditarResponseDTO> ActualizarUsuarioAsync(int id_usuario, UsuarioEditarDTO usuario);
         Task<bool> VerificarCorreoExistenteAsync(string correo_electronico);

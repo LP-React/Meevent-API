@@ -193,31 +193,47 @@ namespace Meevent_API.src.Features.Usuarios.DAO
             return usuario;
         }
 
-        public string InsertUsuario(UsuarioRegistroDTO reg)
+        public async Task<string> InsertUsuario(UsuarioRegistroDTO reg)
         {
-            using (SqlConnection cn = new SqlConnection(_cadena))
+            string resultado = "";
+
+            try
             {
-                cn.Open();
-                if (VerificarCorreoExistente(reg.correo_electronico)) return "El correo ya está registrado";
+                using (SqlConnection cn = new SqlConnection(_cadena))
+                {
+                    using (SqlCommand cmd = new SqlCommand("usp_CrearUsuario", cn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
 
-                string hash = BCrypt.Net.BCrypt.HashPassword(reg.contrasena);
+                        cmd.Parameters.AddWithValue("@nombre_completo", reg.nombre_completo);
+                        cmd.Parameters.AddWithValue("@correo_electronico", reg.correo_electronico);
+                        cmd.Parameters.AddWithValue("@contrasena_hash", reg.contrasenia);
+                        cmd.Parameters.AddWithValue("@tipo_usuario", (object)reg.tipo_usuario ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@numero_telefono", (object)reg.numero_telefono ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@imagen_perfil_url", (object)reg.imagen_perfil_url ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@fecha_nacimiento", (object)reg.fecha_nacimiento ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@id_ciudad", reg.id_ciudad);
 
-                SqlCommand cmd = new SqlCommand("usp_CrearUsuario", cn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@nombre_completo", reg.nombre_completo);
-                cmd.Parameters.AddWithValue("@correo_electronico", reg.correo_electronico);
-                cmd.Parameters.AddWithValue("@contrasena_hash", hash);
-                cmd.Parameters.AddWithValue("@numero_telefono", reg.numero_telefono ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@imagen_perfil_url", reg.imagen_perfil_url ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@fecha_nacimiento", reg.fecha_nacimiento ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@email_verificado", false);
-                cmd.Parameters.AddWithValue("@cuenta_activa", true);
-                cmd.Parameters.AddWithValue("@tipo_usuario", string.IsNullOrEmpty(reg.tipo_usuario) ? "normal" : reg.tipo_usuario);
-                cmd.Parameters.AddWithValue("@id_ciudad", reg.id_ciudad);
+                        await cn.OpenAsync();
+                        int filasAfectadas = await cmd.ExecuteNonQueryAsync();
 
-                cmd.ExecuteNonQuery();
-                return "Usuario registrado correctamente";
+                        if (filasAfectadas > 0)
+                        {
+                            resultado = "OK";
+                        }
+                        else
+                        {
+                            resultado = "Error: No se pudo insertar el registro.";
+                        }
+                    }
+                }
             }
+            catch (Exception ex)
+            {
+                resultado = "Excepción: " + ex.Message;
+            }
+
+            return resultado;
         }
 
         public string LoginUsuario(LoginDTO login)
@@ -336,6 +352,11 @@ namespace Meevent_API.src.Features.Usuarios.DAO
         }
 
         public bool VerificarPaisExiste(int id_pais)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<bool> IUsuarioDAO.VerificarCorreoExistente(string correo_electronico)
         {
             throw new NotImplementedException();
         }

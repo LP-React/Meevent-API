@@ -56,31 +56,23 @@ namespace Meevent_API.src.Features.Usuarios
             return Ok(usuario);
         }
 
-        /*[HttpPost("registrarUsuario")]
-        public async Task<IActionResult> Registrar([FromBody] UsuarioRegistroDTO registro)
+        [HttpPost("registrarUsuario")]
+        public async Task<IActionResult> Registrar(UsuarioRegistroDTO registro)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var resultado = await _usuarioService.RegistrarUsuarioAsync(registro);
 
-            if (resultado.Contains("correctamente"))
+            if (resultado.Exitoso)
             {
-                return Ok(new
-                {
-                    Exitoso = true,
-                    Mensaje = resultado
-                });
+                return Ok(resultado);
             }
 
-            return BadRequest(new
-            {
-                Exitoso = false,
-                Mensaje = resultado
-            });
+            return BadRequest(resultado);
         }
-        */
-        
+
+
         /*[HttpPost("loginUsuario")]
         public async Task<ActionResult<LoginResponseDTO>> Login([FromBody] LoginDTO login)
         {
