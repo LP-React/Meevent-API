@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+option csharp_namespace = "gRcp_Paises";
+
+package paises;
+
+// ===== Servicio =====
+service ServicioPaises
+{
+	rpc GetAll (Empty) returns (Paises);
+	rpc GetById (PaisRequest) returns (Paises);
+}
+
+// ===== Mensajes =====
+message Empty {}
+
+message PaisRequest
+{
+	int32 idPais = 1;
+}
+
+message Pais
+{
+	int32 idPais = 1;
+	string nombrePais = 2;
+}
+
+message Paises
+{
+	repeated Pais items = 1;
+}

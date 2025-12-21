@@ -1,6 +1,6 @@
 ﻿using Meevent_API.src.Features.Eventos.DAO;
 using Meevent_API.src.Features.Eventos.Services;
-using Meevent_API.src.Features.Paises.DAO;
+﻿using gRcp_Paises;
 using Meevent_API.src.Features.Paises.Services;
 using Meevent_API.src.Features.Paises.Services.Interfaces;
 using Meevent_API.src.Features.Usuarios.DAO;
@@ -21,6 +21,10 @@ builder.Services.AddCors(options =>
         });
 });
 
+builder.Services.AddGrpcClient<ServicioPaises.ServicioPaisesClient>(o =>
+{
+    o.Address = new Uri("https://localhost:7111");
+});
 
 // Add services to the container.
 
@@ -32,7 +36,6 @@ builder.Services.AddSwaggerGen();
 
 // ===== INYECCIÓN DE DEPENDENCIAS =====
 // ---- Registrar DAOs ----
-builder.Services.AddScoped<IPaisDAO, PaisDAO>();
 builder.Services.AddScoped<IUsuarioDAO, UsuarioDAO>();
 // parte de FRANCO
 builder.Services.AddScoped<IEventoDAO, EventoDAO>();
