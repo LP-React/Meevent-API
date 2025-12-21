@@ -65,7 +65,7 @@ namespace Meevent_API.src.Features.Eventos
             return Ok(response);
         }
 
-        [HttpGet("listarEventosCompletos")]
+        [HttpGet("getEventos")]
         public async Task<ActionResult<EventosCompletosListResponseDTO>> ListarEventos(
             int? idPerfilOrganizador,
             int? idSubCategoria,
