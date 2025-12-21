@@ -18,62 +18,39 @@ namespace Meevent_API.src.Features.Eventos.Services
         {
             _eventoDAO = eventoDAO;
         }
-        public async Task<EventoResponseDTO> GetEventoPorSlugAsync(string slug)
+        public async Task<EventoCompletoResponseDTO> GetEventoPorSlugAsync(string slug)
         {
             try
             {
-                // 1. Obtener entidad desde DAO
                 var evento = await _eventoDAO.GetEventoPorSlugAsync(slug);
 
                 if (evento == null)
                 {
-                    return new EventoResponseDTO
+                    return new EventoCompletoResponseDTO
                     {
                         Exitoso = false,
-                        Mensaje = "Evento no encontrado",
+                        Mensaje = "El evento solicitado no existe o el slug es incorrecto.",
                         Evento = null
                     };
                 }
 
-                // 2. Mapear a EventoDetalleDTO
-                var eventoDTO = new EventoDetalleDTO
-                {
-                    TituloEvento = evento.TituloEvento,
-                    DescripcionEvento = evento.DescripcionEvento,
-                    DescripcionCorta = evento.DescripcionCorta,
-                    FechaInicio = evento.FechaInicio,
-                    FechaFin = evento.FechaFin,
-                    EventoGratuito = evento.EventoGratuito,
-                    EventoOnline = evento.EventoOnline,
-                    CapacidadEvento = evento.CapacidadEvento,
-                    SubcategoriaEventoId = evento.SubcategoriaEventoId,
-                    LocalId = evento.LocalId
-                };
-
-                // 3. Retornar respuesta
-                return new EventoResponseDTO
+                return new EventoCompletoResponseDTO
                 {
                     Exitoso = true,
-                    Mensaje = "Evento obtenido correctamente",
-                    Evento = eventoDTO
+                    Mensaje = "Evento obtenido exitosamente.",
+                    Evento = evento
                 };
             }
             catch (Exception ex)
             {
-                return new EventoResponseDTO
+                return new EventoCompletoResponseDTO
                 {
                     Exitoso = false,
-                    Mensaje = $"Error al obtener evento: {ex.Message}",
+                    Mensaje = $"Error interno al procesar la solicitud: {ex.Message}",
                     Evento = null
                 };
             }
         }
-
-
-
-
-
-
 
         public async Task<EventoListResponseDTO> ListarEventosAsync()
         {
@@ -101,9 +78,7 @@ namespace Meevent_API.src.Features.Eventos.Services
             }
         }
 
-        // ============================
         // OBTENER EVENTO POR ID
-        // ============================
         public async Task<EventoResponseDTO?> GetEventoByIdAsync(int idEvento)
         {
             try

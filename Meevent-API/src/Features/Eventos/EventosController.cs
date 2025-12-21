@@ -67,7 +67,7 @@ namespace Meevent_API.src.Features.Eventos
         }
 
         [HttpGet("getslug/{slug}")]
-        public async Task<IActionResult> GetBySlug(string slug)
+        public async Task<ActionResult<EventoCompletoResponseDTO>> GetBySlug(string slug)
         {
             var response = await _eventoService.GetEventoPorSlugAsync(slug);
 
@@ -76,8 +76,6 @@ namespace Meevent_API.src.Features.Eventos
 
             return Ok(response);
         }
-
-
 
         [HttpGet("listarEventosCompletos")]
         public async Task<ActionResult<EventosCompletosListResponseDTO>> ListarEventos(
