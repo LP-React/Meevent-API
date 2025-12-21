@@ -316,18 +316,21 @@ namespace Meevent_API.src.Features.Eventos.DAO
 
                 Ubicacion = new UbicacionDTO
                 {
-                    // Pais
-                    IdPais = dr.GetInt32(39),
-                    NombrePais = dr.GetString(40),
-                    CodigoISO = dr.GetString(41),
-                    // Ciudad
-                    IdCiudad = dr.GetInt32(37),
-                    NombreCiudad = dr.GetString(38),
                     // Local
                     IdLocal = dr.GetInt32(33),
                     NombreLocal = dr.GetString(34),
                     CapacidadLocal = dr.GetInt32(35),
-                    DireccionLocal = dr.IsDBNull(36) ? string.Empty : dr.GetString(36)
+                    DireccionLocal = dr.IsDBNull(36) ? string.Empty : dr.GetString(36),
+                    // Ciudad
+                    IdCiudad = dr.GetInt32(37),
+                    NombreCiudad = dr.GetString(38),
+                    // Pais
+                    IdPais = dr.GetInt32(39),
+                    NombrePais = dr.GetString(40),
+                    CodigoISO = dr.GetString(41),
+
+                    Latitud = dr.GetDecimal(42),
+                    Longitud = dr.GetDecimal(43)
                 }
             };
         }

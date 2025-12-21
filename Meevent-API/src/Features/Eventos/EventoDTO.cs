@@ -206,6 +206,9 @@ namespace Meevent_API.src.Features.Eventos
         public string NombreLocal { get; set; }
         public int CapacidadLocal { get; set; }
         public string DireccionLocal { get; set; }
+
+        public decimal Latitud { get; set; }
+        public decimal Longitud { get; set; }
     }
     
     public class EventoCompletoDTO

@@ -128,7 +128,7 @@ namespace Meevent_API.src.Features.Eventos.Services
                     };
                 }
 
-                if(dto.FechaInicio <= DateTime.Now)
+                if(dto.FechaInicio < DateTime.Now)
                 {
                     return new EventoCompletoResponseDTO
                     {
