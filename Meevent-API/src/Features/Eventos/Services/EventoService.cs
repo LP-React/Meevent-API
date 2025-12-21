@@ -207,11 +207,68 @@ namespace Meevent_API.src.Features.Eventos.Services
         // ACTUALIZAR EVENTO
         public async Task<EventoCompletoResponseDTO> UpdateEventoAsync(int idEvento, EventoActualizarDTO dto)
         {
-            return new EventoCompletoResponseDTO
+            try
             {
-                Exitoso = false,
-                Mensaje = "Funcionalidad no implementada aún."
-            };
+                if (dto.FechaFin <= dto.FechaInicio)
+                {
+                    return new EventoCompletoResponseDTO
+                    {
+                        Exitoso = false,
+                        Mensaje = "La fecha de finalización debe ser posterior a la de inicio."
+                    };
+                }
+
+                if (dto.FechaInicio <= DateTime.Now)
+                {
+                    return new EventoCompletoResponseDTO
+                    {
+                        Exitoso = false,
+                        Mensaje = "La fecha de inicio no puede ser posterior a la fecha actual."
+                    };
+                }
+
+                string slugNuevo = GenerarSlug(dto.TituloEvento);
+
+                var entidad = new Evento
+                {
+                    IdEvento = idEvento,
+                    TituloEvento = dto.TituloEvento,
+                    SlugEvento = slugNuevo,
+                    DescripcionEvento = dto.DescripcionEvento,
+                    DescripcionCorta = dto.DescripcionCorta,
+                    FechaInicio = dto.FechaInicio.ToString("yyyy-MM-ddTHH:mm:sszzz"),
+                    FechaFin = dto.FechaFin.ToString("yyyy-MM-ddTHH:mm:sszzz"),
+                    ZonaHoraria = dto.ZonaHoraria,
+                    EstadoEvento = dto.EstadoEvento,
+                    CapacidadEvento = dto.CapacidadEvento,
+                    EventoGratuito = dto.EventoGratuito,
+                    EventoOnline = dto.EventoOnline,
+                    ImagenPortadaUrl = dto.ImagenPortadaUrl,
+                    SubcategoriaEventoId = dto.SubcategoriaEventoId,
+                    LocalId = dto.LocalId
+                };
+
+                string resultado = await _eventoDAO.updateEventoAsync(entidad);
+
+                return new EventoCompletoResponseDTO
+                {
+                    Exitoso = true,
+                    Mensaje = resultado,
+                    Evento = new EventoCompletoDTO
+                    {
+                        IdEvento = idEvento,
+                        SlugEvento = slugNuevo
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new EventoCompletoResponseDTO
+                {
+                    Exitoso = false,
+                    Mensaje = "Ocurrió un error interno: " + ex.Message
+                };
+            }
         }
 
         private EventoDetalleDTO MapToDetalleDTO(Evento evento)

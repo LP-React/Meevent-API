@@ -138,23 +138,20 @@ namespace Meevent_API.src.Features.Eventos
 
     public class EventoActualizarDTO
     {
-        [Required(ErrorMessage = "El ID del evento es obligatorio para actualizar")]
-        public int IdEvento { get; set; }
-
         // El resto son opcionales
         public string? TituloEvento { get; set; }
         public string? DescripcionEvento { get; set; }
         public string? DescripcionCorta { get; set; }
-        public DateTimeOffset? FechaInicio { get; set; }
-        public DateTimeOffset? FechaFin { get; set; }
+        public DateTime FechaInicio { get; set; }
+        public DateTime FechaFin { get; set; }
         public string? ZonaHoraria { get; set; }
         public string? EstadoEvento { get; set; }
-        public int? CapacidadEvento { get; set; }
-        public bool? EventoGratuito { get; set; }
-        public bool? EventoOnline { get; set; }
-        public string? ImagenPortadaUrl { get; set; }
-        public int? SubcategoriaEventoId { get; set; }
-        public int? LocalId { get; set; }
+        public int CapacidadEvento { get; set; }
+        public bool EventoGratuito { get; set; }
+        public bool EventoOnline { get; set; }
+        public string ImagenPortadaUrl { get; set; }
+        public int SubcategoriaEventoId { get; set; }
+        public int LocalId { get; set; }
     }
 
     public class EventoResponseDTO

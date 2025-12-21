@@ -44,9 +44,7 @@ namespace Meevent_API.src.Features.Eventos
 
         // UPDATE
         [HttpPut("updateEvento/{id}")]
-        public async Task<ActionResult<EventoResponseDTO>> UpdateEvento(
-            int id,
-            [FromBody] EventoActualizarDTO dto)
+        public async Task<ActionResult<EventoCompletoResponseDTO>> UpdateEvento(int id, EventoActualizarDTO dto)
         {
             var response = await _eventoService.UpdateEventoAsync(id, dto);
 

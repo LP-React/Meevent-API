@@ -101,35 +101,41 @@ namespace Meevent_API.src.Features.Eventos.DAO
 
         public async Task<string> updateEventoAsync(Evento reg)
         {
-            using (SqlConnection cn = new SqlConnection(_cadenaConexion))
+            try
             {
-                SqlCommand cmd = new SqlCommand("usp_ActualizarEvento", cn);
-                cmd.CommandType = CommandType.StoredProcedure;
+                using (SqlConnection cn = new SqlConnection(_cadenaConexion))
+                {
+                    SqlCommand cmd = new SqlCommand("usp_ActualizarEvento", cn);
+                    cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("@id_evento", reg.IdEvento);
-                cmd.Parameters.AddWithValue("@titulo_evento", reg.TituloEvento);
-                cmd.Parameters.AddWithValue("@slug_evento", reg.SlugEvento);
-                cmd.Parameters.AddWithValue("@descripcion_evento", reg.DescripcionEvento);
-                cmd.Parameters.AddWithValue("@descripcion_corta", (object)reg.DescripcionCorta ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@fecha_inicio", reg.FechaInicio);
-                cmd.Parameters.AddWithValue("@fecha_fin", reg.FechaFin);
-                cmd.Parameters.AddWithValue("@zona_horaria", reg.ZonaHoraria);
-                cmd.Parameters.AddWithValue("@estado_evento", reg.EstadoEvento);
-                cmd.Parameters.AddWithValue("@capacidad_evento", reg.CapacidadEvento);
-                cmd.Parameters.AddWithValue("@evento_gratuito", reg.EventoGratuito);
-                cmd.Parameters.AddWithValue("@evento_online", reg.EventoOnline);
-                cmd.Parameters.AddWithValue("@imagen_portada_url", (object)reg.ImagenPortadaUrl ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@perfil_organizador_id", reg.PerfilOrganizadorId);
-                cmd.Parameters.AddWithValue("@subcategoria_evento_id", reg.SubcategoriaEventoId);
-                cmd.Parameters.AddWithValue("@local_id", reg.LocalId);
+                    cmd.Parameters.AddWithValue("@id_evento", reg.IdEvento);
+                    cmd.Parameters.AddWithValue("@titulo_evento", reg.TituloEvento);
+                    cmd.Parameters.AddWithValue("@slug_evento", reg.SlugEvento);
+                    cmd.Parameters.AddWithValue("@descripcion_evento", (object)reg.DescripcionEvento ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@descripcion_corta", (object)reg.DescripcionCorta ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@fecha_inicio", DateTime.Parse(reg.FechaInicio));
+                    cmd.Parameters.AddWithValue("@fecha_fin", DateTime.Parse(reg.FechaFin));
+                    cmd.Parameters.AddWithValue("@zona_horaria", reg.ZonaHoraria);
+                    cmd.Parameters.AddWithValue("@estado_evento", reg.EstadoEvento);
+                    cmd.Parameters.AddWithValue("@capacidad_evento", reg.CapacidadEvento);
+                    cmd.Parameters.AddWithValue("@evento_gratuito", reg.EventoGratuito);
+                    cmd.Parameters.AddWithValue("@evento_online", reg.EventoOnline);
+                    cmd.Parameters.AddWithValue("@imagen_portada_url", (object)reg.ImagenPortadaUrl ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@subcategoria_evento_id", reg.SubcategoriaEventoId);
+                    cmd.Parameters.AddWithValue("@local_id", reg.LocalId);
 
-                await cn.OpenAsync();
-                // ExecuteScalar porque el SP hace un SELECT @@ROWCOUNT
-                var rowsAffected = await cmd.ExecuteScalarAsync();
+                    await cn.OpenAsync();
 
-                return Convert.ToInt32(rowsAffected) > 0
-                    ? "Actualizado correctamente"
-                    : "No se encontró el evento para actualizar";
+                    int rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+                    return rowsAffected > 0
+                        ? "Evento actualizado correctamente."
+                        : "No se realizaron cambios o el evento no existe.";
+                }
+            }
+            catch (Exception ex)
+            {
+                return $"Error al actualizar: {ex.Message}";
             }
         }
 
