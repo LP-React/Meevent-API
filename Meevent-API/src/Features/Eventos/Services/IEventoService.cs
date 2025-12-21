@@ -5,9 +5,8 @@
     {
         public interface IEventoService
         {
-            Task<EventoListResponseDTO> ListarEventosAsync();
             Task<EventoCompletoResponseDTO?> GetEventoPorSlugAsync(string slug);
-            Task<EventoResponseDTO?> GetEventoByIdAsync(int idEvento);
+            Task<EventoCompletoResponseDTO?> GetEventoByIdAsync(int idEvento);
             Task<EventoCompletoResponseDTO> InsertEventoAsync(EventoCrearDTO eventoDto);
             Task<EventoCompletoResponseDTO> UpdateEventoAsync(int idEvento, EventoActualizarDTO eventoDto);
 

@@ -4,8 +4,7 @@ namespace Meevent_API.src.Features.Eventos.DAO
 {
     public interface IEventoDAO
     {
-        Task<List<EventoListadoDTO>> ListarEventosAsync();
-        Task<Evento?> GetEventoPorIdAsync(int idEvento);
+        Task<EventoCompletoDTO?> GetEventoPorIdAsync(int idEvento);
         Task<EventoCompletoDTO?> GetEventoPorSlugAsync(string slugEvento);
         Task<string> insertEventoAsync(Evento reg);
         Task<string> updateEventoAsync(Evento reg);

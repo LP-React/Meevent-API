@@ -18,18 +18,6 @@ namespace Meevent_API.src.Features.Eventos
         {
             _eventoService = eventoService;
         }
-
-        [HttpGet("getEventos")] public async Task<ActionResult<EventoListResponseDTO>> GetEventos()
-        {
-            var resultado = await _eventoService.ListarEventosAsync();
-
-            if (!resultado.Exitoso)
-            {
-                return StatusCode(500, resultado);
-            }
-
-            return Ok(resultado);
-        }
         
         [HttpPost("insertEvento")]
         public async Task<ActionResult<EventoCompletoResponseDTO>> InsertEvento(EventoCrearDTO dto)

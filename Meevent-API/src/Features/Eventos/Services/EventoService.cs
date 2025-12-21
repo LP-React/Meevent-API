@@ -52,34 +52,8 @@ namespace Meevent_API.src.Features.Eventos.Services
             }
         }
 
-        public async Task<EventoListResponseDTO> ListarEventosAsync()
-        {
-            try
-            {
-                var eventos = await _eventoDAO.ListarEventosAsync();
-
-                return new EventoListResponseDTO
-                {
-                    Exitoso = true,
-                    Mensaje = "Eventos obtenidos correctamente",
-                    Total_Eventos = eventos.Count,
-                    Eventos = eventos
-                };
-            }
-            catch (Exception ex)
-            {
-                return new EventoListResponseDTO
-                {
-                    Exitoso = false,
-                    Mensaje = $"Error al obtener eventos: {ex.Message}",
-                    Total_Eventos = 0,
-                    Eventos = new List<EventoListadoDTO>()
-                };
-            }
-        }
-
         // OBTENER EVENTO POR ID
-        public async Task<EventoResponseDTO?> GetEventoByIdAsync(int idEvento)
+        public async Task<EventoCompletoResponseDTO?> GetEventoByIdAsync(int idEvento)
         {
             try
             {
@@ -87,7 +61,7 @@ namespace Meevent_API.src.Features.Eventos.Services
 
                 if (evento == null)
                 {
-                    return new EventoResponseDTO
+                    return new EventoCompletoResponseDTO
                     {
                         Exitoso = false,
                         Mensaje = "Evento no encontrado",
@@ -95,16 +69,16 @@ namespace Meevent_API.src.Features.Eventos.Services
                     };
                 }
 
-                return new EventoResponseDTO
+                return new EventoCompletoResponseDTO
                 {
                     Exitoso = true,
                     Mensaje = "Evento obtenido correctamente",
-                    Evento = MapToDetalleDTO(evento)
+                    Evento = evento
                 };
             }
             catch (Exception ex)
             {
-                return new EventoResponseDTO
+                return new EventoCompletoResponseDTO
                 {
                     Exitoso = false,
                     Mensaje = $"Error al obtener evento: {ex.Message}",
@@ -112,8 +86,6 @@ namespace Meevent_API.src.Features.Eventos.Services
                 };
             }
         }
-
-
 
         // INSERTAR NUEVO EVENTO
         public async Task<EventoCompletoResponseDTO> InsertEventoAsync(EventoCrearDTO dto)

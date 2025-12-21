@@ -12,53 +12,6 @@ namespace Meevent_API.src.Features.Eventos.DAO
             _cadenaConexion = new ConfigurationBuilder().AddJsonFile("appsettings.json").
                 Build().GetConnectionString("MeeventDB");
         }
-        public async Task<List<EventoListadoDTO>> ListarEventosAsync()
-        {
-            var eventos = new List<EventoListadoDTO>();
-
-            using (SqlConnection cn = new SqlConnection(_cadenaConexion))
-            using (SqlCommand cmd = new SqlCommand("usp_ListarEventos", cn))
-            {
-                cmd.CommandType = CommandType.StoredProcedure;
-                await cn.OpenAsync();
-
-                using (SqlDataReader dr = await cmd.ExecuteReaderAsync())
-                {
-                    while (await dr.ReadAsync())
-                    {
-                        eventos.Add(new EventoListadoDTO
-                        {
-                            IdEvento = dr.GetInt32(dr.GetOrdinal("id_evento")),
-                            TituloEvento = dr.GetString(dr.GetOrdinal("titulo_evento")),
-                            SlugEvento = dr.GetString(dr.GetOrdinal("slug_evento")),
-                            DescripcionCorta = dr.IsDBNull(dr.GetOrdinal("descripcion_corta"))
-                                ? null
-                                : dr.GetString(dr.GetOrdinal("descripcion_corta")),
-
-                            FechaInicio = dr.GetDateTimeOffset(5).ToString("yyyy-MM-dd HH:mm:ss"),
-                            FechaFin = dr.GetDateTimeOffset(6).ToString("yyyy-MM-dd HH:mm:ss"),
-
-                            ZonaHoraria = dr["zona_horaria"].ToString()!,
-                            EstadoEvento = dr["estado_evento"].ToString()!,
-                            EventoGratuito = Convert.ToBoolean(dr["evento_gratuito"]),
-                            EventoOnline = Convert.ToBoolean(dr["evento_online"]),
-
-                            ImagenPortadaUrl = dr["imagen_portada_url"] == DBNull.Value
-                                ? null
-                                : dr["imagen_portada_url"].ToString(),
-                            NombreOrganizador = dr["nombre_organizador"].ToString()!,
-                            NombreCategoria = dr["nombre_categoria"].ToString()!,
-                            NombreSubcategoria = dr["nombre_subcategoria"].ToString()!,
-                            NombreLocal = dr["nombre_local"] == DBNull.Value
-                                ? null
-                                : dr["nombre_local"].ToString()
-                        });
-                    }
-                }
-            }
-
-            return eventos;
-        }
 
         public async Task<string> insertEventoAsync(Evento reg)
         {
@@ -139,9 +92,9 @@ namespace Meevent_API.src.Features.Eventos.DAO
             }
         }
 
-        public async Task<Evento?> GetEventoPorIdAsync(int idEvento)
+        public async Task<EventoCompletoDTO?> GetEventoPorIdAsync(int idEvento)
         {
-            Evento? evento = null;
+            EventoCompletoDTO? evento = null;
 
             using (SqlConnection cn = new SqlConnection(_cadenaConexion))
             {
@@ -158,36 +111,14 @@ namespace Meevent_API.src.Features.Eventos.DAO
                         {
                             if (await dr.ReadAsync())
                             {
-                                evento = new Evento
-                                {
-                                    IdEvento = Convert.ToInt32(dr["id_evento"]),
-                                    TituloEvento = dr["titulo_evento"].ToString()!,
-                                    SlugEvento = dr["slug_evento"].ToString()!,
-                                    DescripcionEvento = dr["descripcion_evento"].ToString()!,
-                                    DescripcionCorta = dr["descripcion_corta"] == DBNull.Value
-                                        ? null
-                                        : dr["descripcion_corta"].ToString(),
-                                    FechaInicio = dr.GetDateTimeOffset(dr.GetOrdinal("fecha_inicio")).ToString("yyyy-MM-dd HH:mm:ss"),
-                                    FechaFin = dr.GetDateTimeOffset(dr.GetOrdinal("fecha_fin")).ToString("yyyy-MM-dd HH:mm:ss"),
-                                    ZonaHoraria = dr["zona_horaria"].ToString()!,
-                                    EstadoEvento = dr["estado_evento"].ToString()!,
-                                    CapacidadEvento = Convert.ToInt32(dr["capacidad_evento"]),
-                                    EventoGratuito = Convert.ToBoolean(dr["evento_gratuito"]),
-                                    EventoOnline = Convert.ToBoolean(dr["evento_online"]),
-                                    ImagenPortadaUrl = dr["imagen_portada_url"] == DBNull.Value
-                                        ? null
-                                        : dr["imagen_portada_url"].ToString(),
-                                    PerfilOrganizadorId = Convert.ToInt32(dr["perfil_organizador_id"]),
-                                    SubcategoriaEventoId = Convert.ToInt32(dr["subcategoria_evento_id"]),
-                                    LocalId = Convert.ToInt32(dr["local_id"])
-                                };
+                                evento = MapearEventoCompleto(dr);
                             }
                         }
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    throw;
+                    throw new Exception("Error al obtener evento por ID", ex);
                 }
             }
 
