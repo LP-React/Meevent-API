@@ -1,9 +1,5 @@
 ﻿using Meevent_API.src.Core.Entities;
 using Meevent_API.src.Features.Eventos.DAO;
-using Meevent_API.src.Features.Paises;
-using Meevent_API.src.Features.Paises.DAO;
-using Microsoft.Data.SqlClient;
-using System.Data;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Globalization;
