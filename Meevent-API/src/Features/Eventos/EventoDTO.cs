@@ -189,7 +189,16 @@ namespace Meevent_API.src.Features.Eventos
         public string DireccionLocal { get; set; }
         public CiudadDTO Ciudad { get; set; }
     }
-
+    public class EstadisticasEventoDTO
+    {
+        public int TotalSeguidores { get; set; }
+        public double? CalificacionPromedio { get; set; }
+        public int TotalResenas { get; set; }
+        public decimal? PrecioMinimo { get; set; }
+        public decimal? PrecioMaximo { get; set; }
+        public int EntradasVendidas { get; set; } = 0;
+        public int EntradasDisponibles { get; set; } = 0;
+    }
     public class EventoCompletoDTO
     {
         // Datos básicos del evento
@@ -215,6 +224,7 @@ namespace Meevent_API.src.Features.Eventos
         public OrganizadorDTO Organizador { get; set; }
         public SubcategoriaEventoDTO Subcategoria { get; set; }
         public LocalDTO Local { get; set; }
+        public EstadisticasEventoDTO Estadisticas { get; set; }
     }
 
     public class EventoCompletoResponseDTO

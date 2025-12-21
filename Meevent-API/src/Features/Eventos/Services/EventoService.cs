@@ -7,7 +7,7 @@ using System.Data;
 
 namespace Meevent_API.src.Features.Eventos.Services
 {
-    public class EventoService:IEventoService
+    public class EventoService : IEventoService
     {
         private readonly IEventoDAO _eventoDAO;
 
@@ -259,7 +259,7 @@ namespace Meevent_API.src.Features.Eventos.Services
         public async Task<EventoCompletoListResponseDTO> ListarEventosCompletosAsync(
             int? idOrganizador,
             int? idSubCategoria,
-            int? idLocal, 
+            int? idLocal,
             bool? eventoGratuito,
             bool? eventoOnline,
             string? estadoEvento,
@@ -270,12 +270,15 @@ namespace Meevent_API.src.Features.Eventos.Services
             {
                 var eventos = await _eventoDAO.ListarEventosCompletosAsync(
                     idOrganizador, idSubCategoria, idLocal,
-                    eventoGratuito,eventoOnline,estadoEvento,
-                    fchDesde,fchHasta);
+                    eventoGratuito, eventoOnline, estadoEvento,
+                    fchDesde, fchHasta);
 
                 var listaEventos = eventos.ToList();
 
-
+                foreach (var evento in listaEventos)
+                {
+                    AsignarEstados(evento);
+                }
 
                 return new EventoCompletoListResponseDTO
                 {
@@ -299,6 +302,82 @@ namespace Meevent_API.src.Features.Eventos.Services
             }
         }
 
-    }
 
+
+        private void AsignarEstados(EventoCompletoDTO evento)
+        {
+            // ESTADO PARA ADMINISTRADOR
+            // Estados posibles: borrador, publicado, cancelado, finalizado, eliminado
+
+            evento.EstadoEventoAdmin = evento.EstadoEvento switch
+            {
+                "borrador" => "borrador",
+                "publicado" => "publicado",
+                "cancelado" => "eliminado",
+                "finalizado" => "finalizado",
+                _ => "borrador"
+            };
+
+            // Parsear las fechas del evento (vienen como string)
+            DateTime fechaInicio;
+            DateTime fechaFin;
+
+            try
+            {
+                // Intentar parsear las fechas
+                // Formato esperado: "yyyy-MM-dd HH:mm:ss" o "yyyy-MM-ddTHH:mm:ss"
+                if (!DateTime.TryParse(evento.FechaInicio, out fechaInicio))
+                {
+                    evento.EstadoEventoCliente = "próximo"; // Default si hay error
+                    return;
+                }
+
+                if (!DateTime.TryParse(evento.FechaFin, out fechaFin))
+                {
+                    evento.EstadoEventoCliente = "próximo"; // Default si hay error
+                    return;
+                }
+            }
+            catch
+            {
+                evento.EstadoEventoCliente = "próximo";
+                return;
+            }
+
+            var ahora = DateTime.Now;
+
+            // Si el evento no está publicado, no mostramos estado al cliente
+            if (evento.EstadoEvento != "publicado")
+            {
+                evento.EstadoEventoCliente = "no disponible";
+                return;
+            }
+
+            // Lógica para determinar estado del cliente
+            if (ahora < fechaInicio)
+            {
+                // El evento aún no ha comenzado
+                // Verificar si está agotado
+                if (evento.Estadisticas != null &&
+                    evento.Estadisticas.EntradasVendidas >= evento.CapacidadEvento)
+                {
+                    evento.EstadoEventoCliente = "agotado";
+                }
+                else
+                {
+                    evento.EstadoEventoCliente = "próximo";
+                }
+            }
+            else if (ahora >= fechaInicio && ahora <= fechaFin)
+            {
+                // El evento está en curso
+                evento.EstadoEventoCliente = "en curso";
+            }
+            else // ahora > fechaFin 
+            {
+                // El evento ya finalizó
+                evento.EstadoEventoCliente = "finalizado";
+            }
+        }
+    }
 }
