@@ -34,6 +34,8 @@ namespace Meevent_API.src.Features.Eventos.Services
                     };
                 }
 
+                AsignarEstados(evento);
+
                 return new EventoCompletoResponseDTO
                 {
                     Exitoso = true,
@@ -68,6 +70,8 @@ namespace Meevent_API.src.Features.Eventos.Services
                         Evento = null
                     };
                 }
+
+                AsignarEstados(evento);
 
                 return new EventoCompletoResponseDTO
                 {
