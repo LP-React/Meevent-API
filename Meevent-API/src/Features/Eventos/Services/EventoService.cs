@@ -4,6 +4,9 @@ using Meevent_API.src.Features.Paises;
 using Meevent_API.src.Features.Paises.DAO;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace Meevent_API.src.Features.Eventos.Services
 {
@@ -137,106 +140,79 @@ namespace Meevent_API.src.Features.Eventos.Services
 
 
 
-        // ============================
-        // INSERTAR EVENTO
-        // ============================
-        public async Task<EventoResponseDTO> InsertEventoAsync(EventoDetalleDTO dto)
-        {
-            var evento = new Evento
-            {
-                TituloEvento = dto.TituloEvento,
-                SlugEvento = dto.SlugEvento,
-                DescripcionEvento = dto.DescripcionEvento,
-                DescripcionCorta = dto.DescripcionCorta,
-                FechaInicio = dto.FechaInicio,
-                FechaFin = dto.FechaFin,
-                EventoGratuito = dto.EventoGratuito,
-                EventoOnline = dto.EventoOnline,
-                CapacidadEvento = dto.CapacidadEvento,
-                SubcategoriaEventoId = dto.SubcategoriaEventoId,
-                LocalId = dto.LocalId,
-                PerfilOrganizadorId = dto.PerfilOrganizadorId
-
-            };
-
-            string mensaje = await _eventoDAO.insertEventoAsync(evento);
-
-            return new EventoResponseDTO
-            {
-                Exitoso = true,
-                Mensaje = mensaje,
-                Evento = new EventoDetalleDTO
-                {
-                    TituloEvento = evento.TituloEvento,
-                    SlugEvento = evento.SlugEvento,
-                    DescripcionEvento = evento.DescripcionEvento,
-                    DescripcionCorta = evento.DescripcionCorta,
-                    FechaInicio = evento.FechaInicio,
-                    FechaFin = evento.FechaFin,
-                    EventoGratuito = evento.EventoGratuito,
-                    EventoOnline = evento.EventoOnline,
-                    CapacidadEvento = evento.CapacidadEvento,
-                    SubcategoriaEventoId = evento.SubcategoriaEventoId,
-                    LocalId = evento.LocalId,
-                }
-            };
-        }
-
-
-
-        // ============================
-        // ACTUALIZAR EVENTO
-        // ============================
-        public async Task<EventoResponseDTO> UpdateEventoAsync(int idEvento, EventoActualizarDTO dto)
+        // INSERTAR NUEVO EVENTO
+        public async Task<EventoCompletoResponseDTO> InsertEventoAsync(EventoCrearDTO dto)
         {
             try
             {
-                var evento = await _eventoDAO.GetEventoPorIdAsync(idEvento);
-
-                if (evento == null)
+                if (dto.FechaFin <= dto.FechaInicio)
                 {
-                    return new EventoResponseDTO
-                    {
+                    return new EventoCompletoResponseDTO { 
                         Exitoso = false,
-                        Mensaje = "Evento no encontrado",
-                        Evento = null
+                        Mensaje = "La fecha de finalización debe ser posterior a la de inicio." 
                     };
                 }
 
-                evento.TituloEvento = dto.TituloEvento;
-                evento.SlugEvento = dto.SlugEvento;
-                evento.DescripcionEvento = dto.DescripcionEvento;
-                evento.DescripcionCorta = dto.DescripcionCorta;
+                if(dto.FechaInicio <= DateTime.Now)
+                {
+                    return new EventoCompletoResponseDTO
+                    {
+                        Exitoso = false,
+                        Mensaje = "La fecha de inicio no puede ser posterior a la fecha actual."
+                    };
+                }
 
-                evento.FechaInicio = dto.FechaInicio;
-                evento.FechaFin = dto.FechaFin;
-                evento.EventoGratuito = dto.EventoGratuito;
-                evento.EventoOnline = dto.EventoOnline;
-                evento.CapacidadEvento = dto.CapacidadEvento;
-                evento.SubcategoriaEventoId = dto.SubcategoriaEventoId;
-                evento.LocalId = dto.LocalId;
+                    string slugGenerado = GenerarSlug(dto.TituloEvento);
 
-                await _eventoDAO.updateEventoAsync(evento);
+                var entidad = new Evento
+                {
+                    TituloEvento = dto.TituloEvento.Trim(),
+                    SlugEvento = slugGenerado,
+                    DescripcionEvento = dto.DescripcionEvento,
+                    DescripcionCorta = dto.DescripcionCorta,
+                    FechaInicio = dto.FechaInicio.ToString("yyyy-MM-ddTHH:mm:sszzz"),
+                    FechaFin = dto.FechaFin.ToString("yyyy-MM-ddTHH:mm:sszzz"),
+                    ZonaHoraria = dto.ZonaHoraria,
+                    CapacidadEvento = dto.CapacidadEvento,
+                    EventoGratuito = dto.EventoGratuito,
+                    EventoOnline = dto.EventoOnline,
+                    ImagenPortadaUrl = dto.ImagenPortadaUrl,
+                    PerfilOrganizadorId = dto.PerfilOrganizadorId,
+                    SubcategoriaEventoId = dto.SubcategoriaEventoId,
+                    LocalId = dto.LocalId,
+                    EstadoEvento = dto.EstadoEvento,
+                };
 
-                return new EventoResponseDTO
+                string mensajeResultado = await _eventoDAO.insertEventoAsync(entidad);
+
+                return new EventoCompletoResponseDTO
                 {
                     Exitoso = true,
-                    Mensaje = "Evento actualizado correctamente",
-                    Evento = MapToDetalleDTO(evento)
+                    Mensaje = mensajeResultado,
+                    Evento = new EventoCompletoDTO
+                    {
+                        TituloEvento = dto.TituloEvento,
+                        SlugEvento = slugGenerado
+                    }
                 };
             }
             catch (Exception ex)
             {
-                return new EventoResponseDTO
-                {
-                    Exitoso = false,
-                    Mensaje = $"Error al actualizar evento: {ex.Message}",
-                    Evento = null
+                return new EventoCompletoResponseDTO { 
+                    Exitoso = false, Mensaje = "Ocurrió un error interno: " + ex.Message 
                 };
             }
         }
 
-
+        // ACTUALIZAR EVENTO
+        public async Task<EventoCompletoResponseDTO> UpdateEventoAsync(int idEvento, EventoActualizarDTO dto)
+        {
+            return new EventoCompletoResponseDTO
+            {
+                Exitoso = false,
+                Mensaje = "Funcionalidad no implementada aún."
+            };
+        }
 
         private EventoDetalleDTO MapToDetalleDTO(Evento evento)
         {
@@ -368,6 +344,41 @@ namespace Meevent_API.src.Features.Eventos.Services
                 // El evento ya finalizó
                 evento.EstadoEventoCliente = "finalizado";
             }
+        }
+
+        private string GenerarSlug(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value)) 
+                return string.Empty;
+
+            // Convertir a minúsculas y quitar espacios en los extremos
+            value = value.ToLowerInvariant().Trim();
+
+            // Normalizar: Esto separa las letras de sus acentos (á -> a + ´)
+            string normalizedString = value.Normalize(NormalizationForm.FormD);
+            StringBuilder sb = new StringBuilder();
+
+            foreach (char c in normalizedString)
+            {
+                // Solo conservamos lo que NO sea un acento/marca
+                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                {
+                    sb.Append(c);
+                }
+            }
+
+            // Volvemos a normalizar y limpiamos con Regex
+            string result = sb.ToString().Normalize(NormalizationForm.FormC);
+
+            // Cambiar espacios por guiones y quitar caracteres raros (deja solo letras, números y guiones)
+            result = Regex.Replace(result, @"[^a-z0-9\s-]", "");
+            result = Regex.Replace(result, @"\s+", "-").Trim('-');
+
+            // Evitar guiones dobles (--)
+            result = Regex.Replace(result, @"-{2,}", "-");
+
+            return result;
         }
     }
 }

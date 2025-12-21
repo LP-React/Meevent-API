@@ -8,8 +8,8 @@
             Task<EventoListResponseDTO> ListarEventosAsync();
             Task<EventoResponseDTO?> GetEventoPorSlugAsync(string slug);
             Task<EventoResponseDTO?> GetEventoByIdAsync(int idEvento);
-            Task<EventoResponseDTO> InsertEventoAsync(EventoDetalleDTO eventoDto);
-            Task<EventoResponseDTO> UpdateEventoAsync(int idEvento, EventoActualizarDTO eventoDto);
+            Task<EventoCompletoResponseDTO> InsertEventoAsync(EventoCrearDTO eventoDto);
+            Task<EventoCompletoResponseDTO> UpdateEventoAsync(int idEvento, EventoActualizarDTO eventoDto);
 
             // Otros métodos relacionados con eventos pueden ser añadidos aquí
             Task<EventosCompletosListResponseDTO> ListarEventosCompletosAsync(

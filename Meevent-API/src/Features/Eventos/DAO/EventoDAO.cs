@@ -62,89 +62,76 @@ namespace Meevent_API.src.Features.Eventos.DAO
 
         public async Task<string> insertEventoAsync(Evento reg)
         {
-            string mensaje = "";
-
-            using (SqlConnection cn = new SqlConnection(_cadenaConexion))
+            try
             {
-                try
+                using (SqlConnection cn = new SqlConnection(_cadenaConexion))
                 {
-                    using SqlCommand cmd = new SqlCommand("usp_InsertarEvento", cn);
+                    SqlCommand cmd = new SqlCommand("usp_InsertarEvento", cn);
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     cmd.Parameters.AddWithValue("@titulo_evento", reg.TituloEvento);
                     cmd.Parameters.AddWithValue("@slug_evento", reg.SlugEvento);
                     cmd.Parameters.AddWithValue("@descripcion_evento", reg.DescripcionEvento);
-                    cmd.Parameters.AddWithValue("@descripcion_corta", reg.DescripcionCorta ?? (object)DBNull.Value);
-                    cmd.Parameters.Add("@fecha_inicio", SqlDbType.DateTimeOffset).Value = DateTimeOffset.Parse(reg.FechaInicio);
-                    cmd.Parameters.Add("@fecha_fin", SqlDbType.DateTimeOffset).Value = DateTimeOffset.Parse(reg.FechaFin);
+                    cmd.Parameters.AddWithValue("@descripcion_corta", (object)reg.DescripcionCorta ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@fecha_inicio", DateTime.Parse(reg.FechaInicio));
+                    cmd.Parameters.AddWithValue("@fecha_fin", DateTime.Parse(reg.FechaFin));
                     cmd.Parameters.AddWithValue("@zona_horaria", reg.ZonaHoraria);
                     cmd.Parameters.AddWithValue("@estado_evento", reg.EstadoEvento);
                     cmd.Parameters.AddWithValue("@capacidad_evento", reg.CapacidadEvento);
                     cmd.Parameters.AddWithValue("@evento_gratuito", reg.EventoGratuito);
                     cmd.Parameters.AddWithValue("@evento_online", reg.EventoOnline);
-                    cmd.Parameters.AddWithValue("@imagen_portada_url", reg.ImagenPortadaUrl ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@imagen_portada_url", (object)reg.ImagenPortadaUrl ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("@perfil_organizador_id", reg.PerfilOrganizadorId);
                     cmd.Parameters.AddWithValue("@subcategoria_evento_id", reg.SubcategoriaEventoId);
                     cmd.Parameters.AddWithValue("@local_id", reg.LocalId);
 
                     await cn.OpenAsync();
+                    int filasAffected = await cmd.ExecuteNonQueryAsync();
 
-                    int i = await cmd.ExecuteNonQueryAsync();
-
-                    mensaje = $"Se insertó correctamente el evento. Filas afectadas: {i}";
-                }
-                catch (Exception ex)
-                {
-                    mensaje = ex.Message;
+                    return filasAffected > 0
+                        ? "Registro insertado correctamente en la base de datos."
+                        : "No se pudo insertar el registro, verifique los datos.";
                 }
             }
-
-            return mensaje;
+            catch (Exception ex)
+            {
+                return $"Error inesperado: {ex.Message}";
+            }
         }
 
         public async Task<string> updateEventoAsync(Evento reg)
         {
-            string mensaje = "";
-
             using (SqlConnection cn = new SqlConnection(_cadenaConexion))
             {
-                try
-                {
-                    using SqlCommand cmd = new SqlCommand("usp_ActualizarEvento", cn);
-                    cmd.CommandType = CommandType.StoredProcedure;
+                SqlCommand cmd = new SqlCommand("usp_ActualizarEvento", cn);
+                cmd.CommandType = CommandType.StoredProcedure;
 
-                    // Parámetros para actualizar (sin PerfilOrganizadorId)
-                    cmd.Parameters.AddWithValue("@id_evento", reg.IdEvento);
-                    cmd.Parameters.AddWithValue("@titulo_evento", reg.TituloEvento);
-                    cmd.Parameters.AddWithValue("@slug_evento", reg.SlugEvento);
-                    cmd.Parameters.AddWithValue("@descripcion_evento", reg.DescripcionEvento);
-                    cmd.Parameters.AddWithValue("@descripcion_corta", reg.DescripcionCorta ?? (object)DBNull.Value);
-                    cmd.Parameters.Add("@fecha_inicio", SqlDbType.DateTimeOffset).Value = DateTimeOffset.Parse(reg.FechaInicio);
-                    cmd.Parameters.Add("@fecha_fin", SqlDbType.DateTimeOffset).Value = DateTimeOffset.Parse(reg.FechaFin);
-                    cmd.Parameters.AddWithValue("@zona_horaria", reg.ZonaHoraria);
-                    cmd.Parameters.AddWithValue("@estado_evento", reg.EstadoEvento);
-                    cmd.Parameters.AddWithValue("@capacidad_evento", reg.CapacidadEvento);
-                    cmd.Parameters.AddWithValue("@evento_gratuito", reg.EventoGratuito);
-                    cmd.Parameters.AddWithValue("@evento_online", reg.EventoOnline);
-                    cmd.Parameters.AddWithValue("@imagen_portada_url", reg.ImagenPortadaUrl ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@subcategoria_evento_id", reg.SubcategoriaEventoId);
-                    cmd.Parameters.AddWithValue("@local_id", reg.LocalId);
+                cmd.Parameters.AddWithValue("@id_evento", reg.IdEvento);
+                cmd.Parameters.AddWithValue("@titulo_evento", reg.TituloEvento);
+                cmd.Parameters.AddWithValue("@slug_evento", reg.SlugEvento);
+                cmd.Parameters.AddWithValue("@descripcion_evento", reg.DescripcionEvento);
+                cmd.Parameters.AddWithValue("@descripcion_corta", (object)reg.DescripcionCorta ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@fecha_inicio", reg.FechaInicio);
+                cmd.Parameters.AddWithValue("@fecha_fin", reg.FechaFin);
+                cmd.Parameters.AddWithValue("@zona_horaria", reg.ZonaHoraria);
+                cmd.Parameters.AddWithValue("@estado_evento", reg.EstadoEvento);
+                cmd.Parameters.AddWithValue("@capacidad_evento", reg.CapacidadEvento);
+                cmd.Parameters.AddWithValue("@evento_gratuito", reg.EventoGratuito);
+                cmd.Parameters.AddWithValue("@evento_online", reg.EventoOnline);
+                cmd.Parameters.AddWithValue("@imagen_portada_url", (object)reg.ImagenPortadaUrl ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@perfil_organizador_id", reg.PerfilOrganizadorId);
+                cmd.Parameters.AddWithValue("@subcategoria_evento_id", reg.SubcategoriaEventoId);
+                cmd.Parameters.AddWithValue("@local_id", reg.LocalId);
 
-                    await cn.OpenAsync();
-                    int i = await cmd.ExecuteNonQueryAsync();
+                await cn.OpenAsync();
+                // ExecuteScalar porque el SP hace un SELECT @@ROWCOUNT
+                var rowsAffected = await cmd.ExecuteScalarAsync();
 
-                    mensaje = $"Se ha actualizado {i} evento(s)";
-                }
-                catch (Exception ex)
-                {
-                    mensaje = ex.Message;
-                }
+                return Convert.ToInt32(rowsAffected) > 0
+                    ? "Actualizado correctamente"
+                    : "No se encontró el evento para actualizar";
             }
-
-            return mensaje;
         }
-
-
 
         public async Task<Evento?> GetEventoPorIdAsync(int idEvento)
         {
@@ -201,8 +188,6 @@ namespace Meevent_API.src.Features.Eventos.DAO
             return evento;
         }
 
-
-
         public async Task<Evento?> GetEventoPorSlugAsync(string slugEvento)
         {
             Evento? evento = null;
@@ -244,11 +229,6 @@ namespace Meevent_API.src.Features.Eventos.DAO
                 }
             }
             return evento;
-        }
-
-        public Task<string> deleteEventoAsync(int id)
-        {
-            throw new NotImplementedException();
         }
 
         // Otros métodos relacionados con eventos pueden ser implementados aquí

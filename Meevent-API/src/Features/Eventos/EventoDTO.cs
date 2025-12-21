@@ -95,39 +95,68 @@ namespace Meevent_API.src.Features.Eventos
         [Range(1, int.MaxValue, ErrorMessage = "El perfil del organizador debe ser válido")]
         public int PerfilOrganizadorId { get; set; } 
     }
-    public class EventoActualizarDTO
+    public class EventoCrearDTO
     {
-        [StringLength(250, ErrorMessage = "El título no puede exceder 250 caracteres")]
-        [MinLength(3, ErrorMessage = "El título debe tener al menos 3 caracteres")]
-        public string TituloEvento { get; set; } = null!;
+        [Required(ErrorMessage = "El título es obligatorio")]
+        [StringLength(250)]
+        public string TituloEvento { get; set; } = string.Empty;
 
-        [StringLength(5000, ErrorMessage = "La descripción no puede exceder 5000 caracteres")]
-        [MinLength(10, ErrorMessage = "La descripción debe tener al menos 10 caracteres")]
-        public string DescripcionEvento { get; set; } = null!;
+        [Required]
+        public string DescripcionEvento { get; set; } = string.Empty;
 
-        [StringLength(250, ErrorMessage = "El slug no puede exceder 250 caracteres")]
-        public string SlugEvento { get; set; } = null!;
-
-        [StringLength(500, ErrorMessage = "La descripción corta no puede exceder 500 caracteres")]
         public string? DescripcionCorta { get; set; }
 
-        public string FechaInicio { get; set; } = null!;
+        [Required]
+        public DateTime FechaInicio { get; set; }
 
-        public string FechaFin { get; set; } = null!;
+        [Required]
+        public DateTime FechaFin { get; set; }
 
-        public bool EventoGratuito { get; set; }
-        public bool EventoOnline { get; set; }
+        public string ZonaHoraria { get; set; } = "UTC-5";
 
-        [Range(1, int.MaxValue, ErrorMessage = "La capacidad debe ser mayor a 0")]
+        [Required]
         public int CapacidadEvento { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "La subcategoría debe ser válida")]
+        [Required]
+        public bool EventoGratuito { get; set; }
+        [Required]
+        public bool EventoOnline { get; set; }
+
+        public string EstadoEvento { get; set; } = "borrador";
+
+        public string? ImagenPortadaUrl { get; set; }
+
+        [Required]
+        public int PerfilOrganizadorId { get; set; }
+
+        [Required]
         public int SubcategoriaEventoId { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "El local debe ser válido")]
+        [Required]
         public int LocalId { get; set; }
-
     }
+
+    public class EventoActualizarDTO
+    {
+        [Required(ErrorMessage = "El ID del evento es obligatorio para actualizar")]
+        public int IdEvento { get; set; }
+
+        // El resto son opcionales
+        public string? TituloEvento { get; set; }
+        public string? DescripcionEvento { get; set; }
+        public string? DescripcionCorta { get; set; }
+        public DateTimeOffset? FechaInicio { get; set; }
+        public DateTimeOffset? FechaFin { get; set; }
+        public string? ZonaHoraria { get; set; }
+        public string? EstadoEvento { get; set; }
+        public int? CapacidadEvento { get; set; }
+        public bool? EventoGratuito { get; set; }
+        public bool? EventoOnline { get; set; }
+        public string? ImagenPortadaUrl { get; set; }
+        public int? SubcategoriaEventoId { get; set; }
+        public int? LocalId { get; set; }
+    }
+
     public class EventoResponseDTO
     {
         public bool Exitoso { get; set; }

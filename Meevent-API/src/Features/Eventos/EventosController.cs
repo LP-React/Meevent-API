@@ -30,9 +30,9 @@ namespace Meevent_API.src.Features.Eventos
 
             return Ok(resultado);
         }
+        
         [HttpPost("insertEvento")]
-        public async Task<ActionResult<EventoResponseDTO>> InsertEvento(
-            [FromBody] EventoDetalleDTO dto)
+        public async Task<ActionResult<EventoCompletoResponseDTO>> InsertEvento(EventoCrearDTO dto)
         {
             var response = await _eventoService.InsertEventoAsync(dto);
 
