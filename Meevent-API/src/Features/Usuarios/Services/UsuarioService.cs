@@ -28,6 +28,7 @@ namespace Meevent_API.src.Features.Usuarios.Service
             try
             {
                 var lista = await _usuarioDAO.GetUsuarios();
+                
 
                 respuesta.Exitoso = true;
                 respuesta.Mensaje = lista.Any() ? "Usuarios recuperados correctamente" : "No hay usuarios registrados";
@@ -263,15 +264,19 @@ namespace Meevent_API.src.Features.Usuarios.Service
             }
         }
 
-        public async Task<bool> CambiarContraseniaAsync(int id_usuario, UsuarioCambiarPasswordDTO dto)
+        public async Task<bool> ActualizarPasswordServiceAsync(int id_usuario, UsuarioCambiarPasswordDTO dto)
         {
             try
             {
-                return await _usuarioDAO.CambiarContraseniaAsync(id_usuario, dto);
+                if (string.IsNullOrWhiteSpace(dto.contrasenia)) return false;
+
+                string hash = BCrypt.Net.BCrypt.HashPassword(dto.contrasenia);
+
+                return await _usuarioDAO.CambiarContraseniaAsync(id_usuario, hash);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new Exception("Error al cambiar la contraseña.", ex);
+                return false;
             }
         }
     }
