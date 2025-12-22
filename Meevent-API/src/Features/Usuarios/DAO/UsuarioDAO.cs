@@ -407,17 +407,20 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                 return Convert.ToBoolean(cmd.ExecuteScalar());
             }
         }
-        
-        public bool VerificarCiudadExiste(int id_ciudad)
+
+        public async Task<bool> VerificarCiudadExisteAsync(int id_ciudad)
         {
             using (SqlConnection cn = new SqlConnection(_cadena))
             {
                 SqlCommand cmd = new SqlCommand("usp_VerificarCiudadExiste", cn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@id_ciudad", id_ciudad);
-                cn.Open();
-                return Convert.ToBoolean(cmd.ExecuteScalar());
+
+                await cn.OpenAsync();
+                var resultado = await cmd.ExecuteScalarAsync();
+                return resultado != null && Convert.ToBoolean(resultado);
             }
         }
+    
     }
 }

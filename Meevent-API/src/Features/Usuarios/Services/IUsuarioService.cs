@@ -11,10 +11,13 @@
         Task<UsuarioDetalleResponseDTO> RegistrarUsuarioAsync(UsuarioRegistroDTO registro);
 
         Task<LoginResponseDTOE> LoginAsync(LoginDTO login);
+        
         //Task<UsuarioEditarResponseDTO> ActualizarUsuarioAsync(int id_usuario, UsuarioEditarDTO usuario);
+        
         Task<bool> VerificarCorreoExistenteAsync(string correo_electronico);
-        Task<bool> VerificarPaisExisteAsync(int id_pais);
-        Task<bool> VerificarCiudadExisteAsync(int id_ciudad);
+        
+        Task<bool> CiudadExisteAsync(int id_ciudad);
+        
         //Task<UsuarioActivarCuentaResponseDTO> ActivarDesactivarCuentaAsync(int id_usuario, bool cuenta_activa);
 
 

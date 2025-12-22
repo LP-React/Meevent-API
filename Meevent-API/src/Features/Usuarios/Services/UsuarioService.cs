@@ -91,12 +91,21 @@ namespace Meevent_API.src.Features.Usuarios.Service
             {
                 // Verificar si el correo ya está registrado
                 bool yaExiste = await _usuarioDAO.VerificarCorreoExistenteAsync(reg.correo_electronico);
-                if (!yaExiste)
+                if (yaExiste)
                 {
-                    respuesta.Exitoso = false;
+                    respuesta.Exitoso = yaExiste;
                     respuesta.Mensaje = "El correo electrónico ya está registrado.";
                     return respuesta;
                 }
+
+                bool ciudadExiste = await _usuarioDAO.VerificarCiudadExisteAsync(reg.id_ciudad);
+                if (!ciudadExiste)
+                {
+                    respuesta.Exitoso = ciudadExiste;
+                    respuesta.Mensaje = "La ciudad que ingreso no se encuentra disponible.";
+                    return respuesta;
+                }
+
 
                 // Hash de la contraseña antes de guardarla
                 reg.contrasenia = BCrypt.Net.BCrypt.HashPassword(reg.contrasenia);
@@ -281,8 +290,17 @@ namespace Meevent_API.src.Features.Usuarios.Service
         
         public async Task<bool> VerificarPaisExisteAsync(int id)
             => await Task.Run(() => _usuarioDAO.VerificarPaisExiste(id));
-        public async Task<bool> VerificarCiudadExisteAsync(int id) 
-            => await Task.Run(() => _usuarioDAO.VerificarCiudadExiste(id));
+        public async Task<bool> CiudadExisteAsync(int id_ciudad)
+        {
+            try
+            {
+                return await _usuarioDAO.VerificarCiudadExisteAsync(id_ciudad);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al consultar la ciudad.", ex);
+            }
+        }
 
         public async Task<UsuarioActivarCuentaResponseDTO> ActivarDesactivarCuentaAsync(int id, bool estado)
         {
