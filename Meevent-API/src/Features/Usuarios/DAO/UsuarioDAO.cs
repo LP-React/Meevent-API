@@ -47,6 +47,8 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                                 imagen_perfil_url = dr.IsDBNull(5) ? null : dr.GetString(5),
                                 fecha_nacimiento = dr.IsDBNull(6) ? (DateTime?)null : dr.GetDateTime(6),
                                 email_verificado = dr.GetBoolean(7),
+                                cuenta_activa = dr.GetBoolean(33),
+                                contrasena_hash = dr.GetString(34),
 
                                 Ubicacion = new UbicacionDTO
                                 {
@@ -123,7 +125,8 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                             imagen_perfil_url = dr.IsDBNull(5) ? null : dr.GetString(5),
                             fecha_nacimiento = dr.IsDBNull(6) ? (DateTime?)null : dr.GetDateTime(6),
                             email_verificado = dr.GetBoolean(7),
-                            // cuenta_activa es el índice 8
+                            cuenta_activa = dr.GetBoolean(33),
+                            contrasena_hash = dr.GetString(34),
 
                             // Tabla Ubicación (9-13)
                             Ubicacion = new UbicacionDTO
@@ -201,6 +204,8 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                             imagen_perfil_url = dr.IsDBNull(5) ? null : dr.GetString(5),
                             fecha_nacimiento = dr.IsDBNull(6) ? (DateTime?)null : dr.GetDateTime(6),
                             email_verificado = dr.GetBoolean(7),
+                            cuenta_activa = dr.GetBoolean(33),
+                            contrasena_hash = dr.GetString(34),
 
                             Ubicacion = new UbicacionDTO
                             {
@@ -226,8 +231,6 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                                 tiktok_url = dr.IsDBNull(21) ? null : dr.GetString(21)
                             };
                         }
-
-                        // Perfil Organizador (Índices 22-32)
                         if (usuario.tipo_usuario == "organizador" && !dr.IsDBNull(22))
                         {
                             usuario.PerfilOrganizador = new PerfilOrganizadorDTO
@@ -354,72 +357,85 @@ namespace Meevent_API.src.Features.Usuarios.DAO
             }
         }
 
-        public async Task<UsuarioLoginResponseDTO?> ObtenerUsuarioLogin(string correo)
+        public async Task<UsuarioDetalleDTO?> ObtenerUsuarioLogin(string correo)
         {
-            UsuarioLoginResponseDTO? user = null;
-
             using (SqlConnection cn = new SqlConnection(_cadena))
             {
-                using (SqlCommand cmd = new SqlCommand("usp_Obtener_usuario_login", cn))
+                SqlCommand cmd = new SqlCommand("usp_Obtener_usuario_login", cn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@correo", correo);
+
+                await cn.OpenAsync();
+
+                using (var dr = await cmd.ExecuteReaderAsync())
                 {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@correo", correo);
-
-                    await cn.OpenAsync();
-                    using (var dr = await cmd.ExecuteReaderAsync())
+                    if (await dr.ReadAsync())
                     {
-                        if (await dr.ReadAsync())
+                        var usuario = new UsuarioDetalleDTO
                         {
-                            user = new UsuarioLoginResponseDTO
+                            // Tabla Usuarios (0-8)
+                            id_usuario = dr.GetInt32(0),
+                            nombre_completo = dr.GetString(1),
+                            tipo_usuario = dr.GetString(2),
+                            correo_electronico = dr.GetString(3),
+                            numero_telefono = dr.IsDBNull(4) ? null : dr.GetString(4),
+                            imagen_perfil_url = dr.IsDBNull(5) ? null : dr.GetString(5),
+                            fecha_nacimiento = dr.IsDBNull(6) ? (DateTime?)null : dr.GetDateTime(6),
+                            email_verificado = dr.GetBoolean(7),
+                            cuenta_activa = dr.GetBoolean(33),
+                            contrasena_hash = dr.GetString(34),
+
+                            // Tabla Ubicación (9-13)
+                            Ubicacion = new UbicacionDTO
                             {
-                                id_usuario = dr.GetInt32(0),
-                                nombre_completo = dr.GetString(1),
-                                correo_electronico = dr.GetString(2),
-                                contrasena_hash = dr.GetString(3),
-                                tipo_usuario = dr.GetString(4),
-                                imagen_perfil_url = dr.IsDBNull(5) ? null : dr.GetString(5),
-                                cuenta_activa = dr.GetBoolean(25)
+                                id_ciudad = dr.GetInt32(9),
+                                nombre_ciudad = dr.GetString(10),
+                                id_pais = dr.GetInt32(11),
+                                nombre_pais = dr.GetString(12),
+                                codigo_iso = dr.GetString(13)
+                            }
+                        };
+
+                        // Perfil Artista (14-21)
+                        if (usuario.tipo_usuario == "artista" && !dr.IsDBNull(14))
+                        {
+                            usuario.PerfilArtista = new PerfilArtistaDTO
+                            {
+                                id_perfil_artista = dr.GetInt32(14),
+                                nombre_artistico = dr.IsDBNull(15) ? null : dr.GetString(15),
+                                biografia_artista = dr.IsDBNull(16) ? null : dr.GetString(16),
+                                genero_musical = dr.IsDBNull(17) ? null : dr.GetString(17),
+                                sitio_web = dr.IsDBNull(18) ? null : dr.GetString(18),
+                                facebook_url = dr.IsDBNull(19) ? null : dr.GetString(19),
+                                instagram_url = dr.IsDBNull(20) ? null : dr.GetString(20),
+                                tiktok_url = dr.IsDBNull(21) ? null : dr.GetString(21)
                             };
-
-                            // --- MAPEO DE PERFIL ARTISTA (Inicia en índice 6) ---
-                            if (user.tipo_usuario == "artista" && !dr.IsDBNull(6))
-                            {
-                                user.PerfilArtista = new PerfilArtistaDTO
-                                {
-                                    id_perfil_artista = dr.GetInt32(6),
-                                    nombre_artistico = dr.GetString(7),
-                                    biografia_artista = dr.IsDBNull(8) ? null : dr.GetString(8),
-                                    genero_musical = dr.IsDBNull(9) ? null : dr.GetString(9),
-                                    sitio_web = dr.IsDBNull(10) ? null : dr.GetString(10),
-                                    facebook_url = dr.IsDBNull(11) ? null : dr.GetString(11),
-                                    instagram_url = dr.IsDBNull(12) ? null : dr.GetString(12),
-                                    tiktok_url = dr.IsDBNull(13) ? null : dr.GetString(13)
-                                };
-                            }
-
-                            // --- MAPEO DE PERFIL ORGANIZADOR (Inicia en índice 14) ---
-                            else if (user.tipo_usuario == "organizador" && !dr.IsDBNull(14))
-                            {
-                                user.PerfilOrganizador = new PerfilOrganizadorDTO
-                                {
-                                    id_perfil_organizador = dr.GetInt32(14),
-                                    nombre_organizador = dr.GetString(15),
-                                    descripcion_organizador = dr.IsDBNull(16) ? null : dr.GetString(16),
-                                    direccion_organizador = dr.IsDBNull(17) ? null : dr.GetString(17),
-                                    telefono_contacto = dr.IsDBNull(18) ? null : dr.GetString(18),
-                                    sitio_web = dr.IsDBNull(19) ? null : dr.GetString(19),
-                                    logo_url = dr.IsDBNull(20) ? null : dr.GetString(20),
-                                    facebook_url = dr.IsDBNull(21) ? null : dr.GetString(21),
-                                    instagram_url = dr.IsDBNull(22) ? null : dr.GetString(22),
-                                    tiktok_url = dr.IsDBNull(23) ? null : dr.GetString(23),
-                                    twitter_url = dr.IsDBNull(24) ? null : dr.GetString(24)
-                                };
-                            }
                         }
+
+                        // Perfil Organizador (22-32)
+                        if (usuario.tipo_usuario == "organizador" && !dr.IsDBNull(22))
+                        {
+                            usuario.PerfilOrganizador = new PerfilOrganizadorDTO
+                            {
+                                id_perfil_organizador = dr.GetInt32(22),
+                                nombre_organizador = dr.GetString(23),
+                                descripcion_organizador = dr.IsDBNull(24) ? null : dr.GetString(24),
+                                direccion_organizador = dr.IsDBNull(25) ? null : dr.GetString(25),
+                                telefono_contacto = dr.IsDBNull(26) ? null : dr.GetString(26),
+                                sitio_web = dr.IsDBNull(27) ? null : dr.GetString(27),
+                                logo_url = dr.IsDBNull(28) ? null : dr.GetString(28),
+                                facebook_url = dr.IsDBNull(29) ? null : dr.GetString(29),
+                                instagram_url = dr.IsDBNull(30) ? null : dr.GetString(30),
+                                tiktok_url = dr.IsDBNull(31) ? null : dr.GetString(31),
+                                twitter_url = dr.IsDBNull(32) ? null : dr.GetString(32)
+                            };
+                        }
+
+                        return usuario;
                     }
                 }
             }
-            return user;
+            return null; // Si no encuentra al usuario
         }
 
         public string ActivarDesactivarCuenta(int id_usuario, bool cuenta_activa)

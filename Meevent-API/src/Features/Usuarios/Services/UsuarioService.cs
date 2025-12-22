@@ -179,7 +179,7 @@ namespace Meevent_API.src.Features.Usuarios.Service
             catch (Exception ex)
             {
                 response.Exitoso = false;
-                response.Mensaje = "Ocurrió un error inesperado durante el inicio de sesión.";
+                response.Mensaje = $"Ocurrió un error inesperado durante el inicio de sesión : { ex.Message }";
             }
 
             return response;

@@ -200,7 +200,7 @@ namespace Meevent_API.src.Features.Usuarios
     {
         public bool Exitoso { get; set; }
         public string Mensaje { get; set; } = null!;
-        public UsuarioLoginResponseDTO? Usuario { get; set; }
+        public UsuarioDetalleDTO? Usuario { get; set; }
     }
 
     public class LoginResponseDTO
@@ -344,6 +344,9 @@ namespace Meevent_API.src.Features.Usuarios
         public string? imagen_perfil_url { get; set; }
         public DateTime? fecha_nacimiento { get; set; }
         public bool email_verificado { get; set; }
+        public bool cuenta_activa { get; set; }
+        [JsonIgnore]
+        public string contrasena_hash { get; set; } = null!;
 
         // Objeto Anidado para Ciudad y País
         public UbicacionDTO Ubicacion { get; set; } = null!;
