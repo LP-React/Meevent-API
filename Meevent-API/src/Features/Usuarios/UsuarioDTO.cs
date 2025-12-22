@@ -121,7 +121,7 @@ namespace Meevent_API.src.Features.Usuarios
     {
         public bool Exitoso { get; set; }
         public string Mensaje { get; set; }
-        public UsuarioUpdateResponseDTO UsuarioActualizado { get; set; }
+        public UsuarioDetalleDTO UsuarioActualizado { get; set; }
     }
 
     // DTO para el login de usuarios
@@ -301,59 +301,62 @@ namespace Meevent_API.src.Features.Usuarios
         public CiudadDTO? Ciudad { get; set; }
     }
 
+    public class UsuarioActivarCuentaDTO
+    {
+        [Required(ErrorMessage = "El estado de la cuenta es obligatorio")]
+        public bool cuenta_activa { get; set; }
 
+    }
 
-}
-public class UsuarioActivarCuentaDTO
-{
-    [Required(ErrorMessage = "El estado de la cuenta es obligatorio")]
-    public bool cuenta_activa { get; set; }
+    public class UsuarioActivarCuentaResponseDTO
+    {
+        public bool Exitoso { get; set; }
+        public string Mensaje { get; set; }
+        public bool CuentaActiva { get; set; }
+    }
 
-}
+    // DTO para la ubicación (Ciudad y País)
+    public class UbicacionDTO
+    {
+        public int id_ciudad { get; set; }
+        public string nombre_ciudad { get; set; } = null!;
+        public int id_pais { get; set; }
+        public string nombre_pais { get; set; } = null!;
+        public string codigo_iso { get; set; } = null!;
+    }
 
-public class UsuarioActivarCuentaResponseDTO
-{
-    public bool Exitoso { get; set; }
-    public string Mensaje { get; set; }
-    public bool CuentaActiva { get; set; }
-}
+    // DTO para detalles completos del usuario 
+    public class UsuarioDetalleDTO
+    {
+        // Datos básicos del usuario
+        public int id_usuario { get; set; }
+        public string nombre_completo { get; set; } = null!;
+        public string tipo_usuario { get; set; } = null!;
+        public string correo_electronico { get; set; } = null!;
+        public string? numero_telefono { get; set; }
+        public string? imagen_perfil_url { get; set; }
+        public DateTime? fecha_nacimiento { get; set; }
+        public bool email_verificado { get; set; }
 
+        // Objeto Anidado para Ciudad y País
+        public UbicacionDTO Ubicacion { get; set; } = null!;
 
-// DTO para detalles completos del usuario 
+        // Perfiles condicionales
+        public PerfilArtistaDTO? PerfilArtista { get; set; }
+        public PerfilOrganizadorDTO? PerfilOrganizador { get; set; }
+    }
 
-public class UsuarioDetalleDTO
-{
-    // Datos básicos del usuario
-    public int id_usuario { get; set; }
-    public string nombre_completo { get; set; }
-    public string tipo_usuario { get; set; }
-    public string correo_electronico { get; set; }
-    public string? numero_telefono { get; set; }
-    public string? imagen_perfil_url { get; set; }
-    public DateTime? fecha_nacimiento { get; set; }
-    public bool email_verificado { get; set; }
-    public bool cuenta_activa { get; set; }
+    public class UsuarioDetalleResponseDTO
+    {
+        public bool Exitoso { get; set; }
+        public string Mensaje { get; set; }
+        public UsuarioDetalleDTO Usuario { get; set; }
+    }
 
-    // Información de Ciudad
-    public int id_ciudad { get; set; }
-    public string nombre_ciudad { get; set; }
-
-    // Información de País
-    public int id_pais { get; set; }
-    public string nombre_pais { get; set; }
-    public string codigo_iso { get; set; }
-}
-
-public class UsuarioDetalleResponseDTO
-{
-    public bool Exitoso { get; set; }
-    public string Mensaje { get; set; }
-    public UsuarioDetalleDTO Usuario { get; set; }
-}
-
-public class UsuariosListaResponseDTO
-{
-    public bool Exitoso { get; set; }
-    public string Mensaje { get; set; }
-    public IEnumerable<UsuarioDetalleDTO> Usuarios { get; set; }
+    public class UsuariosListaResponseDTO
+    {
+        public bool Exitoso { get; set; }
+        public string Mensaje { get; set; }
+        public IEnumerable<UsuarioDetalleDTO> Usuarios { get; set; }
+    }
 }

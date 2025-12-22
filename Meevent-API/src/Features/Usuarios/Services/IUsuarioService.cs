@@ -12,7 +12,7 @@
 
         Task<LoginResponseDTOE> LoginAsync(LoginDTO login);
 
-        Task<UsuarioDetalleResponseDTO> ActualizarPerfilAsync(UsuarioUpdateDTO dto);
+        Task<UpdateResponseDTO> ActualizarPerfilAsync(UsuarioUpdateDTO dto);
 
         Task<bool> VerificarCorreoExistenteAsync(string correo_electronico);
         

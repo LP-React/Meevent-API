@@ -185,9 +185,9 @@ namespace Meevent_API.src.Features.Usuarios.Service
             return response;
         }
 
-        public async Task<UsuarioDetalleResponseDTO> ActualizarPerfilAsync(UsuarioUpdateDTO dto)
+        public async Task<UpdateResponseDTO> ActualizarPerfilAsync(UsuarioUpdateDTO dto)
         {
-            var response = new UsuarioDetalleResponseDTO();
+            var response = new UpdateResponseDTO();
 
             if (dto.id_ciudad.HasValue)
             {
@@ -204,12 +204,11 @@ namespace Meevent_API.src.Features.Usuarios.Service
 
             if (resultado == "OK")
             {
-                // Obtener el usuario recién actualizado para devolverlo en la respuesta
-                var usuarioActualizado = await _usuarioDAO.GetUsuariosPorId(dto.id_usuario);
+                var usuario = await _usuarioDAO.GetUsuariosPorId(dto.id_usuario);
 
                 response.Exitoso = true;
                 response.Mensaje = "Perfil actualizado correctamente.";
-                response.Usuario = usuarioActualizado;
+                response.UsuarioActualizado = usuario;
             }
             else
             {

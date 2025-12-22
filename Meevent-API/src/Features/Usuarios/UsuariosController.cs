@@ -16,7 +16,7 @@ namespace Meevent_API.src.Features.Usuarios
         }
 
         [HttpGet("ListarUsuarios")]
-        public async Task<ActionResult<UsuarioListResponseDTO>> GetAllUsuariosAsync()
+        public async Task<IActionResult> GetAllUsuariosAsync()
         {
             var resultado = await _usuarioService.ListarUsuariosAsync();
 
@@ -29,7 +29,7 @@ namespace Meevent_API.src.Features.Usuarios
         }
 
         [HttpGet("buscar/{id}")]
-        public async Task<ActionResult<UsuarioDetalleResponseDTO>> GetByIdUsuario(int id)
+        public async Task<IActionResult> GetByIdUsuario(int id)
         {
             var resultado = await _usuarioService.ObtenerUsuarioPorIdAsync(id);
 
@@ -42,7 +42,7 @@ namespace Meevent_API.src.Features.Usuarios
         }
 
         [HttpGet("buscar-por-correo/{correo}")]
-        public async Task<ActionResult<UsuarioDetalleDTO>> GetPorCorreo(string correo)
+        public async Task<IActionResult> GetPorCorreo(string correo)
         {
             var usuario = await _usuarioService.ObtenerUsuarioPorCorreoAsync(correo);
 
@@ -94,7 +94,7 @@ namespace Meevent_API.src.Features.Usuarios
         }
 
         [HttpPatch("editarUsuario/")]
-        public async Task<ActionResult<UsuarioEditarResponseDTO>> ActualizarPerfil(int id, UsuarioUpdateDTO dto)
+        public async Task<IActionResult> ActualizarPerfil(int id, UsuarioUpdateDTO dto)
         {
             dto.id_usuario = id;
 
