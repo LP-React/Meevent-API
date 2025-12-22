@@ -232,8 +232,6 @@ namespace Meevent_API.src.Features.Usuarios.Service
             }
         }
 
-        public async Task<bool> VerificarPaisExisteAsync(int id)
-            => await Task.Run(() => _usuarioDAO.VerificarPaisExiste(id));
         public async Task<bool> CiudadExisteAsync(int id_ciudad)
         {
             try
@@ -264,7 +262,12 @@ namespace Meevent_API.src.Features.Usuarios.Service
             }
         }
 
-        public async Task<bool> ActualizarPasswordServiceAsync(int id_usuario, UsuarioCambiarPasswordDTO dto)
+        public Task<bool> ActualizarPasswordServiceAsync(int id_usuario, UsuarioCambiarPasswordDTO dto)
+        {
+            throw new NotImplementedException();
+        }
+
+        /*public async Task<bool> ActualizarPasswordServiceAsync(int id_usuario, UsuarioCambiarPasswordDTO dto)
         {
             try
             {
@@ -278,6 +281,6 @@ namespace Meevent_API.src.Features.Usuarios.Service
             {
                 return false;
             }
-        }
+        }*/
     }
 }

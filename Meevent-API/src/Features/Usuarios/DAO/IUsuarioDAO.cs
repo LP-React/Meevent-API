@@ -9,11 +9,11 @@ namespace Meevent_API.src.Features.Usuarios.DAO
         Task<UsuarioDetalleDTO> GetUsuariosPorCorreo(string correo_electronico);
         Task<string> InsertUsuario(UsuarioRegistroDTO reg);
         Task<string> ActualizarUsuarioAsync(UsuarioUpdateDTO dto);
-        Task<UsuarioDetalleDTO?> ObtenerUsuarioLogin(string correo);
+        Task<UsuarioLoginResponseDTO?> ObtenerUsuarioLogin(string correo);
         Task<bool> VerificarCorreoExistenteAsync(string correo_electronico);
         bool VerificarPaisExiste(int id_pais);
         Task<bool> VerificarCiudadExisteAsync(int id_ciudad);
         string ActivarDesactivarCuenta(int id_usuario, bool cuenta_activa);
-        Task<bool> CambiarContraseniaAsync(int id_usuario, string nuevaContraseniaHash);
+        Task<bool> CambiarContraseniaAsync(int id_usuario, UsuarioCambiarPasswordDTO dto);
     }
 }
