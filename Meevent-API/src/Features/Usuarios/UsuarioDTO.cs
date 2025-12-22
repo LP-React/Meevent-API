@@ -50,7 +50,6 @@ namespace Meevent_API.src.Features.Usuarios
 
         public string? imagen_perfil_url { get; set; }
 
-        [Required(ErrorMessage = "La fecha de nacimiento es obligatoria")]
         public DateTime? fecha_nacimiento { get; set; }
 
         [RegularExpression("^(normal|artista|organizador)$",
@@ -59,6 +58,15 @@ namespace Meevent_API.src.Features.Usuarios
 
         [Required(ErrorMessage = "La ciudad es obligatoria")]
         public int id_ciudad { get; set; } = 1;
+
+        // Campos para Artista (Opcionales)
+        public string? nombre_artistico { get; set; }
+        public string? biografia_artista { get; set; }
+        public string? genero_musical { get; set; }
+
+        // Campos para Organizador (Opcionales)
+        public string? nombre_organizador { get; set; }
+        public string? descripcion_organizador { get; set; }
     }
 
     public class LoginDTO

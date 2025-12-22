@@ -196,27 +196,37 @@ namespace Meevent_API.src.Features.Usuarios.DAO
         public async Task<string> InsertUsuario(UsuarioRegistroDTO reg)
         {
             string resultado = "";
-
             try
             {
                 using (SqlConnection cn = new SqlConnection(_cadena))
                 {
-                    using (SqlCommand cmd = new SqlCommand("usp_CrearUsuario", cn))
+                    using (SqlCommand cmd = new SqlCommand("usp_RegistrarUsuarioCompleto", cn))
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
 
+                        // Datos base del Usuario
                         cmd.Parameters.AddWithValue("@nombre_completo", reg.nombre_completo);
                         cmd.Parameters.AddWithValue("@correo_electronico", reg.correo_electronico);
                         cmd.Parameters.AddWithValue("@contrasena_hash", reg.contrasenia);
-                        cmd.Parameters.AddWithValue("@tipo_usuario", (object)reg.tipo_usuario ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@tipo_usuario", (object)reg.tipo_usuario ?? "normal");
+                        cmd.Parameters.AddWithValue("@id_ciudad", reg.id_ciudad);
                         cmd.Parameters.AddWithValue("@numero_telefono", (object)reg.numero_telefono ?? DBNull.Value);
                         cmd.Parameters.AddWithValue("@imagen_perfil_url", (object)reg.imagen_perfil_url ?? DBNull.Value);
                         cmd.Parameters.AddWithValue("@fecha_nacimiento", (object)reg.fecha_nacimiento ?? DBNull.Value);
-                        cmd.Parameters.AddWithValue("@id_ciudad", reg.id_ciudad);
+
+                        // Datos específicos de Artista
+                        cmd.Parameters.AddWithValue("@nombre_artistico", (object)reg.nombre_artistico ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@biografia_artista", (object)reg.biografia_artista ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@genero_musical", (object)reg.genero_musical ?? DBNull.Value);
+
+                        // Datos específicos de Organizador
+                        cmd.Parameters.AddWithValue("@nombre_organizador", (object)reg.nombre_organizador ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@descripcion_organizador", (object)reg.descripcion_organizador ?? DBNull.Value);
 
                         await cn.OpenAsync();
                         int filasAfectadas = await cmd.ExecuteNonQueryAsync();
 
+                        // Importante: Si insertó en dos tablas, filasAfectadas será > 1
                         if (filasAfectadas > 0)
                         {
                             resultado = "OK";
@@ -334,6 +344,7 @@ namespace Meevent_API.src.Features.Usuarios.DAO
             }
         }
         */
+        
         public bool VerificarCiudadExiste(int id_ciudad)
         {
             using (SqlConnection cn = new SqlConnection(_cadena))

@@ -89,7 +89,7 @@ namespace Meevent_API.src.Features.Usuarios.Service
 
             try
             {
-                // Validamos si el correo ya existe en la BD
+                // Verificar si el correo ya está registrado
                 var usuarioExistente = await _usuarioDAO.GetUsuariosPorCorreo(reg.correo_electronico);
                 if (usuarioExistente != null)
                 {
@@ -98,20 +98,19 @@ namespace Meevent_API.src.Features.Usuarios.Service
                     return respuesta;
                 }
 
-                // Hash de la contraseña
-                string passwordPlano = reg.contrasenia;
-                reg.contrasenia = BCrypt.Net.BCrypt.HashPassword(passwordPlano);
+                // Hash de la contraseña antes de guardarla
+                reg.contrasenia = BCrypt.Net.BCrypt.HashPassword(reg.contrasenia);
 
-                // Crear el usuario
+                // Insertar el nuevo usuario
                 string resultadoDAO = await _usuarioDAO.InsertUsuario(reg);
-   
+
                 if (resultadoDAO == "OK")
                 {
-                    // Obtener el usuario creado
-                    var usuarioCreado = await ObtenerUsuarioPorCorreoAsync(reg.correo_electronico);
+                    // Obtener el usuario recién creado para devolverlo en la respuesta
+                    var usuarioCreado = await _usuarioDAO.GetUsuariosPorCorreo(reg.correo_electronico);
 
                     respuesta.Exitoso = true;
-                    respuesta.Mensaje = "Tu cuenta ha sido creada con éxito.";
+                    respuesta.Mensaje = "¡Registro exitoso!";
                     respuesta.Usuario = usuarioCreado;
                 }
                 else
@@ -123,7 +122,7 @@ namespace Meevent_API.src.Features.Usuarios.Service
             catch (Exception ex)
             {
                 respuesta.Exitoso = false;
-                respuesta.Mensaje = "Ocurrió un error inesperado: " + ex.Message;
+                respuesta.Mensaje = "Error crítico en el Service: " + ex.Message;
             }
 
             return respuesta;
