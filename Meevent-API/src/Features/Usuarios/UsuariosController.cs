@@ -133,7 +133,7 @@ namespace Meevent_API.src.Features.Usuarios
             }
         }
 
-        /*[HttpPatch("activarCuenta/{id}")]
+        [HttpPatch("activarCuenta/{id}")]
         public async Task<IActionResult> ActivarCuenta(int id, [FromBody] UsuarioActivarCuentaDTO estado)
         {
             if (id <= 0)
@@ -156,6 +156,5 @@ namespace Meevent_API.src.Features.Usuarios
                 return BadRequest(respuesta);
             }
         }
-        */
     }
 }

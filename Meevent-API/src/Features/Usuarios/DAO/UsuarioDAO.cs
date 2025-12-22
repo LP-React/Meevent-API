@@ -20,11 +20,6 @@ namespace Meevent_API.src.Features.Usuarios.DAO
             _cadena = configuration.GetConnectionString("MeeventDB");
         }
 
-        public string ActivarDesactivarCuenta(int id_usuario, bool cuenta_activa)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<IEnumerable<UsuarioDetalleDTO>> GetUsuarios()
          {
             var lista = new List<UsuarioDetalleDTO>();
@@ -426,7 +421,7 @@ namespace Meevent_API.src.Features.Usuarios.DAO
             return user;
         }
 
-        /* public string ActivarDesactivarCuenta(int id_usuario, bool cuenta_activa)
+        public string ActivarDesactivarCuenta(int id_usuario, bool cuenta_activa)
          {
              using (SqlConnection cn = new SqlConnection(_cadena))
              {
@@ -437,7 +432,7 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                  cmd.Parameters.AddWithValue("@cuenta_activa", cuenta_activa);
                  return cmd.ExecuteNonQuery() > 0 ? (cuenta_activa ? "Cuenta activada exitosamente" : "Cuenta desactivada exitosamente") : "No se pudo actualizar el estado";
              }
-         }*/
+         }
 
         public async Task<bool> VerificarCorreoExistenteAsync(string correo_electronico)
         {

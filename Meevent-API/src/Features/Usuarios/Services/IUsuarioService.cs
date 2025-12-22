@@ -18,7 +18,7 @@
         
         Task<bool> CiudadExisteAsync(int id_ciudad);
         
-        //Task<UsuarioActivarCuentaResponseDTO> ActivarDesactivarCuentaAsync(int id_usuario, bool cuenta_activa);
+        Task<UsuarioActivarCuentaResponseDTO> ActivarDesactivarCuentaAsync(int id_usuario, bool cuenta_activa);
 
 
     }
