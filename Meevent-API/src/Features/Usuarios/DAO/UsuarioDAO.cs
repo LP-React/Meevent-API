@@ -126,7 +126,7 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                             fecha_nacimiento = dr.IsDBNull(6) ? (DateTime?)null : dr.GetDateTime(6),
                             email_verificado = dr.GetBoolean(7),
                             cuenta_activa = dr.GetBoolean(8),
-                            contrasena_hash = dr.GetString(34),
+                            contrasena_hash = dr.GetString(33),
                             // Tabla Ubicación (9-13)
                             Ubicacion = new UbicacionDTO
                             {
