@@ -246,9 +246,72 @@ namespace Meevent_API.src.Features.Usuarios.DAO
             return resultado;
         }
 
-        public string LoginUsuario(LoginDTO login)
+        public async Task<UsuarioLoginResponseDTO?> ObtenerUsuarioLogin(string correo)
         {
-            throw new NotImplementedException();
+            UsuarioLoginResponseDTO? user = null;
+
+            using (SqlConnection cn = new SqlConnection(_cadena))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_Obtener_usuario_login", cn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@correo", correo);
+
+                    await cn.OpenAsync();
+                    using (var dr = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await dr.ReadAsync())
+                        {
+                            user = new UsuarioLoginResponseDTO
+                            {
+                                id_usuario = dr.GetInt32(0),
+                                nombre_completo = dr.GetString(1),
+                                correo_electronico = dr.GetString(2),
+                                contrasena_hash = dr.GetString(3),
+                                tipo_usuario = dr.GetString(4),
+                                imagen_perfil_url = dr.IsDBNull(5) ? null : dr.GetString(5),
+                                cuenta_activa = dr.GetBoolean(25)
+                            };
+
+                            // --- MAPEO DE PERFIL ARTISTA (Inicia en índice 6) ---
+                            if (user.tipo_usuario == "artista" && !dr.IsDBNull(6))
+                            {
+                                user.PerfilArtista = new PerfilArtistaDTO
+                                {
+                                    id_perfil_artista = dr.GetInt32(6),
+                                    nombre_artistico = dr.GetString(7),
+                                    biografia_artista = dr.IsDBNull(8) ? null : dr.GetString(8),
+                                    genero_musical = dr.IsDBNull(9) ? null : dr.GetString(9),
+                                    sitio_web = dr.IsDBNull(10) ? null : dr.GetString(10),
+                                    facebook_url = dr.IsDBNull(11) ? null : dr.GetString(11),
+                                    instagram_url = dr.IsDBNull(12) ? null : dr.GetString(12),
+                                    tiktok_url = dr.IsDBNull(13) ? null : dr.GetString(13)
+                                };
+                            }
+
+                            // --- MAPEO DE PERFIL ORGANIZADOR (Inicia en índice 14) ---
+                            else if (user.tipo_usuario == "organizador" && !dr.IsDBNull(14))
+                            {
+                                user.PerfilOrganizador = new PerfilOrganizadorDTO
+                                {
+                                    id_perfil_organizador = dr.GetInt32(14),
+                                    nombre_organizador = dr.GetString(15),
+                                    descripcion_organizador = dr.IsDBNull(16) ? null : dr.GetString(16),
+                                    direccion_organizador = dr.IsDBNull(17) ? null : dr.GetString(17),
+                                    telefono_contacto = dr.IsDBNull(18) ? null : dr.GetString(18),
+                                    sitio_web = dr.IsDBNull(19) ? null : dr.GetString(19),
+                                    logo_url = dr.IsDBNull(20) ? null : dr.GetString(20),
+                                    facebook_url = dr.IsDBNull(21) ? null : dr.GetString(21),
+                                    instagram_url = dr.IsDBNull(22) ? null : dr.GetString(22),
+                                    tiktok_url = dr.IsDBNull(23) ? null : dr.GetString(23),
+                                    twitter_url = dr.IsDBNull(24) ? null : dr.GetString(24)
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            return user;
         }
 
         /*public string LoginUsuario(LoginDTO login)
@@ -344,7 +407,7 @@ namespace Meevent_API.src.Features.Usuarios.DAO
             }
         }
         */
-        
+
         public bool VerificarCiudadExiste(int id_ciudad)
         {
             using (SqlConnection cn = new SqlConnection(_cadena))

@@ -128,51 +128,52 @@ namespace Meevent_API.src.Features.Usuarios.Service
             return respuesta;
         }
 
-        public async Task<LoginResponseDTO> LoginAsync(LoginDTO login)
+        public async Task<LoginResponseDTOE> LoginAsync(LoginDTO login)
         {
+            var response = new LoginResponseDTOE();
 
-            return new LoginResponseDTO 
-            { 
-                Exitoso = false, 
-                Mensaje = "Servicio de login no disponible temporalmente" 
-            };
-
-            /*try
+            try
             {
-                if (string.IsNullOrEmpty(login.contrasena) || string.IsNullOrEmpty(login.correo_electronico))
+                var usuario = await _usuarioDAO.ObtenerUsuarioLogin(login.correo_electronico);
+
+                // Existe el correo en la base de datos?
+                if (usuario == null)
                 {
-                    return new LoginResponseDTO { Exitoso = false, Mensaje = "Correo o contraseña incorrectos" };
+                    response.Exitoso = false;
+                    response.Mensaje = "El correo electrónico o contraseña es incorrecta.";
+                    return response;
                 }
 
-                string token;
-                try
+                // Verificamos si la cuenta está activa
+                if (!usuario.cuenta_activa) 
                 {
-                    token = await Task.Run(() => _usuarioDAO.LoginUsuario(login));
-                }
-                catch (Exception)
-                {
-                    return new LoginResponseDTO { Exitoso = false, Mensaje = "Correo o contraseña incorrectos" };
+                    response.Exitoso = false;
+                    response.Mensaje = "Tu cuenta está deshabilitada. Por favor, contacta al correo : ayuda@meevent.com";
+                    return response;
                 }
 
-                if (string.IsNullOrEmpty(token) || token.Contains("incorrecto") || token.Contains("no existe"))
+                // Verificamos si la contraseña ingresada coincide con el Hash de la BD
+                bool esValida = BCrypt.Net.BCrypt.Verify(login.contrasenia, usuario.contrasena_hash);
+
+                if (!esValida)
                 {
-                    return new LoginResponseDTO { Exitoso = false, Mensaje = "Correo o contraseña incorrectos" };
+                    response.Exitoso = false;
+                    response.Mensaje = "Correo o Contraseña incorrecta. Inténtelo de nuevo.";
+                    return response;
                 }
 
-                var usuarioDTO = await ObtenerUsuarioPorCorreoAsync(login.correo_electronico);
-
-                return new LoginResponseDTO
-                {
-                    Exitoso = true,
-                    Mensaje = "Login exitoso",
-                    Token = token,
-                    Usuario = usuarioDTO
-                };
+                // Si llegamos aquí, las credenciales son correctas
+                response.Exitoso = true;
+                response.Mensaje = $"Bienvenido, {usuario.nombre_completo}";
+                response.Usuario = usuario;
             }
             catch (Exception ex)
             {
-                return new LoginResponseDTO { Exitoso = false, Mensaje = "Correo o contraseña incorrectos" };
-            }*/
+                response.Exitoso = false;
+                response.Mensaje = "Ocurrió un error inesperado durante el inicio de sesión.";
+            }
+
+            return response;
         }
 
         /*public async Task<UsuarioEditarResponseDTO> ActualizarUsuarioAsync(int id_usuario, UsuarioEditarDTO usuario)

@@ -1,5 +1,7 @@
 ﻿using Meevent_API.src.Features.Paises;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Meevent_API.src.Features.Usuarios
 {
@@ -28,6 +30,7 @@ namespace Meevent_API.src.Features.Usuarios
         public IEnumerable<UsuarioDTO> Usuarios { get; set; }
     }
 
+    // DTO para el registro de usuarios
     public class UsuarioRegistroDTO
     {
         [Required(ErrorMessage = "El nombre completo es obligatorio")]
@@ -69,6 +72,7 @@ namespace Meevent_API.src.Features.Usuarios
         public string? descripcion_organizador { get; set; }
     }
 
+    // DTO para el login de usuarios
     public class LoginDTO
     {
         [Required(ErrorMessage = "El correo es obligatorio")]
@@ -76,7 +80,68 @@ namespace Meevent_API.src.Features.Usuarios
         public string correo_electronico { get; set; }
 
         [Required(ErrorMessage = "La contraseña es obligatoria")]
-        public string contrasena { get; set; }
+        public string contrasenia { get; set; }
+    }
+
+    // DTO para el perfil de artista
+    public class PerfilArtistaDTO
+    {
+        public int id_perfil_artista { get; set; }
+        public string nombre_artistico { get; set; } = null!;
+        public string? biografia_artista { get; set; }
+        public string? genero_musical { get; set; }
+        public string? sitio_web { get; set; }
+        public string? facebook_url { get; set; }
+        public string? instagram_url { get; set; }
+        public string? tiktok_url { get; set; }
+    }
+
+    // DTO para el perfil de organizador
+    public class PerfilOrganizadorDTO
+    {
+        public int id_perfil_organizador { get; set; }
+        public string nombre_organizador { get; set; } = null!;
+        public string? descripcion_organizador { get; set; }
+        public string? direccion_organizador { get; set; }
+        public string? telefono_contacto { get; set; }
+        public string? sitio_web { get; set; }
+        public string? logo_url { get; set; }
+        public string? facebook_url { get; set; }
+        public string? instagram_url { get; set; }
+        public string? tiktok_url { get; set; }
+        public string? twitter_url { get; set; }
+    }
+
+    // DTO para la respuesta del login
+    public class UsuarioLoginResponseDTO
+    {
+        public int id_usuario { get; set; }
+        public string nombre_completo { get; set; } = null!;
+        public string correo_electronico { get; set; } = null!;
+        public string tipo_usuario { get; set; } = null!;
+        public string imagen_perfil_url { get; set; } = null!;
+        public bool cuenta_activa { get; set; }
+
+        // El Hash se queda en el DAO/Service, no se envía al cliente
+        [JsonIgnore]
+        public string contrasena_hash { get; set; } = null!;
+
+        // Perfil Artista
+        public string? nombre_artistico { get; set; }
+        public string? genero_musical { get; set; }
+
+        // Perfil Organizador
+        public string? nombre_organizador { get; set; }
+        public string? descripcion_organizador { get; set; }
+        public PerfilArtistaDTO? PerfilArtista { get; set; }
+        public PerfilOrganizadorDTO? PerfilOrganizador { get; set; }
+    }
+
+    public class LoginResponseDTOE
+    {
+        public bool Exitoso { get; set; }
+        public string Mensaje { get; set; } = null!;
+        public UsuarioLoginResponseDTO? Usuario { get; set; }
     }
 
     public class LoginResponseDTO

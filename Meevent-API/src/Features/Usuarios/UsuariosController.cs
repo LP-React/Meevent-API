@@ -73,19 +73,25 @@ namespace Meevent_API.src.Features.Usuarios
         }
 
 
-        /*[HttpPost("loginUsuario")]
-        public async Task<ActionResult<LoginResponseDTO>> Login([FromBody] LoginDTO login)
+        [HttpPost("loginUsuario")]
+        public async Task<IActionResult> Login(LoginDTO login)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                return BadRequest(new { exitoso = false, mensaje = "Datos de entrada inválidos" });
+            }
 
-            var respuesta = await _usuarioService.LoginAsync(login);
+            var resultado = await _usuarioService.LoginAsync(login);
 
-            if (!respuesta.Exitoso)
-                return Unauthorized(respuesta);
-
-            return Ok(respuesta);
-        }*/
+            if (resultado.Exitoso)
+            {
+                return Ok(resultado);
+            }
+            else
+            {
+                return Unauthorized(resultado);
+            }
+        }
 
         /*[HttpPatch("editarUsuario/{id}")]
         public async Task<ActionResult<UsuarioEditarResponseDTO>> EditarUsuario(int id, [FromBody] UsuarioEditarDTO usuario)

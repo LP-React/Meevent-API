@@ -8,7 +8,7 @@ namespace Meevent_API.src.Features.Usuarios.DAO
         Task<UsuarioDetalleDTO> GetUsuariosPorId(int id_usuario);
         Task<UsuarioDetalleDTO> GetUsuariosPorCorreo(string correo_electronico);
         Task<string> InsertUsuario(UsuarioRegistroDTO reg);
-        string LoginUsuario(LoginDTO login);
+        Task<UsuarioLoginResponseDTO?> ObtenerUsuarioLogin(string correo);
         string ActualizarUsuario(int id_usuario, UsuarioEditarDTO usuario);
         Task<bool> VerificarCorreoExistente(string correo_electronico);
         bool VerificarPaisExiste(int id_pais);
