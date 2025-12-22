@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Meevent_API.src.Features.Usuarios.Service;
+﻿using Meevent_API.src.Features.Usuarios.Service;
+using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace Meevent_API.src.Features.Usuarios
 {
@@ -15,91 +16,160 @@ namespace Meevent_API.src.Features.Usuarios
         }
 
         [HttpGet("ListarUsuarios")]
-        public async Task<ActionResult<UsuarioListResponseDTO>> Get()
+        public async Task<IActionResult> GetAllUsuariosAsync()
         {
-            var respuesta = await _usuarioService.ObtenerUsuariosAsync();
+            var resultado = await _usuarioService.ListarUsuariosAsync();
 
-            if (!respuesta.Exitoso)
-                return StatusCode(500, respuesta);
+            if (!resultado.Exitoso)
+            {
+                return StatusCode(500, resultado);
+            }
 
-            return Ok(respuesta);
+            return Ok(resultado);
         }
 
-        [HttpGet("Buscar{id}")]
-        public async Task<ActionResult<UsuarioDTO>> Get(int id)
+        [HttpGet("buscar/{id}")]
+        public async Task<IActionResult> GetByIdUsuario(int id)
         {
-            var usuario = await _usuarioService.ObtenerUsuarioPorIdAsync(id);
+            var resultado = await _usuarioService.ObtenerUsuarioPorIdAsync(id);
 
-            if (usuario == null)
-                return NotFound(new { Mensaje = "Usuario no encontrado" });
+            if (!resultado.Exitoso)
+            {
+                return NotFound(resultado);
+            }
 
-            return Ok(usuario);
+            return Ok(resultado);
         }
 
-        [HttpGet("Buscar-Por-correo/{correo}")]
-        public async Task<ActionResult<UsuarioDTO>> GetPorCorreo(string correo)
+        [HttpGet("buscar-por-correo/{correo}")]
+        public async Task<IActionResult> GetPorCorreo(string correo)
         {
             var usuario = await _usuarioService.ObtenerUsuarioPorCorreoAsync(correo);
 
             if (usuario == null)
-                return NotFound(new { Mensaje = "Usuario no encontrado" });
+            {
+                return NotFound(new { 
+                        Mensaje = "El usuario no existe." 
+                    });
+            }
 
             return Ok(usuario);
         }
 
         [HttpPost("registrarUsuario")]
-        public async Task<IActionResult> Registrar([FromBody] UsuarioRegistroDTO registro)
+        public async Task<IActionResult> Registrar(UsuarioRegistroDTO registro)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var resultado = await _usuarioService.RegistrarUsuarioAsync(registro);
 
-            if (resultado.Contains("ya está registrado"))
-                return BadRequest(new { Exitoso = false, Mensaje = resultado });
+            if (resultado.Exitoso)
+            {
+                return Ok(resultado);
+            }
 
-            if (resultado.Contains("Error"))
-                return StatusCode(500, new { Exitoso = false, Mensaje = resultado });
-
-            return Ok(new { Exitoso = true, Mensaje = resultado });
+            return BadRequest(resultado);
         }
+
 
         [HttpPost("loginUsuario")]
-        public async Task<ActionResult<LoginResponseDTO>> Login([FromBody] LoginDTO login)
+        public async Task<IActionResult> Login(LoginDTO login)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                return BadRequest(new { exitoso = false, mensaje = "Datos de entrada inválidos" });
+            }
 
-            var respuesta = await _usuarioService.LoginAsync(login);
+            var resultado = await _usuarioService.LoginAsync(login);
 
-            if (!respuesta.Exitoso)
-                return Unauthorized(respuesta);
-
-            return Ok(respuesta);
+            if (resultado.Exitoso)
+            {
+                return Ok(resultado);
+            }
+            else
+            {
+                return Unauthorized(resultado);
+            }
         }
 
-        [HttpPut("editarUsuario")]
-        public async Task<ActionResult<UsuarioEditarResponseDTO>> EditarUsuario([FromBody] UsuarioEditarDTO usuario)
+        [HttpPatch("editarUsuario/")]
+        public async Task<IActionResult> ActualizarPerfil(int id, UsuarioUpdateDTO dto)
         {
+            dto.id_usuario = id;
+
+            if (dto.id_usuario <= 0)
+            {
+                return BadRequest(new { exitoso = false, mensaje = "ID de usuario no válido." });
+            }
+
+            var resultado = await _usuarioService.ActualizarPerfilAsync(dto);
+
+            if (resultado.Exitoso)
+            {
+                return Ok(resultado);
+            }
+
+            return BadRequest(resultado);
+        }
+
+        [HttpGet("verificarEmail/{correo}")]
+        public async Task<ActionResult<bool>> VerificarEmail(string correo)
+        {
+            if (string.IsNullOrEmpty(correo))
+                return BadRequest("El correo electrónico es requerido");
+
+            if (!new EmailAddressAttribute().IsValid(correo))
+                return BadRequest("Formato de correo inválido");
+
+            try
+            {
+                bool existe = await _usuarioService.VerificarCorreoExistenteAsync(correo);
+                return Ok(existe);  
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al verificar correo: {ex.Message}");
+            }
+        }
+
+        [HttpPatch("activarCuenta/{id}")]
+        public async Task<IActionResult> ActivarCuenta(int id, [FromBody] UsuarioActivarCuentaDTO estado)
+        {
+            if (id <= 0)
+                return BadRequest(new { Mensaje = "ID de usuario inválido" });
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (usuario.id_usuario <= 0)
-                return BadRequest(new { Mensaje = "ID de usuario inválido" });
+            var respuesta = await _usuarioService.ActivarDesactivarCuentaAsync(id, estado.cuenta_activa);
 
-            var respuesta = await _usuarioService.ActualizarUsuarioAsync(usuario);
-
-            if (!respuesta.Exitoso)
+            if (respuesta.Exitoso)
+            {
+                return Ok(respuesta);
+            }
+            else
             {
                 if (respuesta.Mensaje.Contains("no encontrado"))
                     return NotFound(respuesta);
 
                 return BadRequest(respuesta);
             }
-
-            return Ok(respuesta);
         }
 
+        [HttpPut("cambiar-password/{id}")]
+        public async Task<IActionResult> CambiarPassword(int id, [FromBody] UsuarioCambiarPasswordDTO dto)
+        {
+            if (dto == null) return BadRequest("Datos inválidos");
 
+            bool exito = await _usuarioService.ActualizarPasswordServiceAsync(id, dto);
+
+            if (exito)
+            {
+                return Ok(new { mensaje = "La contraseña ha sido actualizada correctamente." });
+            }
+
+            return BadRequest(new { mensaje = "No se pudo realizar el cambio. Verifique que el usuario exista." });
+        }
     }
 }

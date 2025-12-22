@@ -1,15 +1,25 @@
-﻿
-using Meevent_API.src.Features.Usuarios;
-
-namespace Meevent_API.src.Features.Usuarios.Service
+﻿namespace Meevent_API.src.Features.Usuarios.Service
 {
     public interface IUsuarioService
     {
-        Task<UsuarioListResponseDTO> ObtenerUsuariosAsync();
-        Task<UsuarioDTO> ObtenerUsuarioPorIdAsync(int id_usuario);
-        Task<UsuarioDTO> ObtenerUsuarioPorCorreoAsync(string correo_electronico);
-        Task<string> RegistrarUsuarioAsync(UsuarioRegistroDTO registro);
-        Task<LoginResponseDTO> LoginAsync(LoginDTO login);
-        Task<UsuarioEditarResponseDTO> ActualizarUsuarioAsync(UsuarioEditarDTO usuario);
+        Task<UsuariosListaResponseDTO> ListarUsuariosAsync();
+        
+        Task<UsuarioDetalleResponseDTO> ObtenerUsuarioPorIdAsync(int id_usuario);
+        
+        Task<UsuarioDetalleDTO> ObtenerUsuarioPorCorreoAsync(string correo_electronico);
+        
+        Task<UsuarioDetalleResponseDTO> RegistrarUsuarioAsync(UsuarioRegistroDTO registro);
+
+        Task<LoginResponseDTOE> LoginAsync(LoginDTO login);
+
+        Task<UpdateResponseDTO> ActualizarPerfilAsync(UsuarioUpdateDTO dto);
+
+        Task<bool> VerificarCorreoExistenteAsync(string correo_electronico);
+        
+        Task<bool> CiudadExisteAsync(int id_ciudad);
+        
+        Task<UsuarioActivarCuentaResponseDTO> ActivarDesactivarCuentaAsync(int id_usuario, bool cuenta_activa);
+
+        Task<bool> ActualizarPasswordServiceAsync(int id_usuario, UsuarioCambiarPasswordDTO dto);
     }
 }

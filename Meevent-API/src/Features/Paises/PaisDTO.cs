@@ -6,6 +6,13 @@
         public int IdPais { get; set; }
         public string NombrePais { get; set; }
 
+
+    }
+    public class PaisJDTO
+    {
+        public string NombrePais { get; set; }
+
+
     }
 
     // DTO para respuestas con metadata adicional

@@ -1,6 +1,5 @@
 ﻿namespace Meevent_API.src.Core.Entities
 {
-    // Meevent_API.src.Core.Entities/Usuario.cs
     using System.ComponentModel.DataAnnotations.Schema;
 
     namespace Meevent_API.src.Core.Entities
@@ -26,13 +25,13 @@
             public string? ImagenPerfilUrl { get; set; }
 
             [Column("fecha_nacimiento")]
-            public DateTime? FechaNacimiento { get; set; }
+            public DateOnly? FechaNacimiento { get; set; }
 
             [Column("fecha_creacion")]
-            public DateTime FechaCreacion { get; set; }
+            public DateOnly FechaCreacion { get; set; }
 
             [Column("fecha_actualizacion")]
-            public DateTime FechaActualizacion { get; set; }
+            public DateOnly FechaActualizacion { get; set; }
 
             [Column("email_verificado")]
             public bool EmailVerificado { get; set; }
@@ -41,7 +40,15 @@
             public bool CuentaActiva { get; set; }
 
             [Column("tipo_usuario")]
-            public string TipoUsuario { get; set; } = "normal";
+            public string TipoUsuario { get; set; } = "normal"; 
+
+            [Column("id_pais")]
+            public int IdPais { get; set; } = 1;
+
+            [Column("id_ciudad")]
+            public int IdCiudad { get; set; } = 1;
+            public Pais? IdPaisNavigation { get; set; }
+            public Ciudad? IdCiudadNavigation { get; set; }
         }
     }
 }

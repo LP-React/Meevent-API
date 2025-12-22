@@ -1,6 +1,5 @@
 ﻿using Meevent_API.src.Core.Entities;
 using Meevent_API.src.Core.Entities.Meevent_API.src.Core.Entities;
-using Meevent_API.src.Features.Usuarios;
 using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
 using System.Data;
@@ -13,260 +12,498 @@ namespace Meevent_API.src.Features.Usuarios.DAO
     public class UsuarioDAO : IUsuarioDAO
     {
         private readonly string _cadena;
+        private readonly IConfiguration _configuration;
 
         public UsuarioDAO(IConfiguration configuration)
         {
+            _configuration = configuration;
             _cadena = configuration.GetConnectionString("MeeventDB");
         }
 
-        public IEnumerable<Usuario> GetUsuarios()
-        {
-            List<Usuario> temporal = new List<Usuario>();
+        public async Task<IEnumerable<UsuarioDetalleDTO>> GetUsuarios()
+         {
+            var lista = new List<UsuarioDetalleDTO>();
+
             using (SqlConnection cn = new SqlConnection(_cadena))
             {
-                SqlCommand cmd = new SqlCommand("usp_ListarUsuarios", cn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cn.Open();
-                SqlDataReader dr = cmd.ExecuteReader();
-                while (dr.Read())
+                using (SqlCommand cmd = new SqlCommand("usp_ListarUsuarios", cn))
                 {
-                    temporal.Add(new Usuario
-                    {
-                        IdUsuario = dr.GetInt32(dr.GetOrdinal("id_usuario")),
-                        NombreCompleto = dr.GetString(dr.GetOrdinal("nombre_completo")),
-                        CorreoElectronico = dr.GetString(dr.GetOrdinal("correo_electronico")),
-                        ContrasenaHash = dr.GetString(dr.GetOrdinal("contrasena_hash")),
-                        NumeroTelefono = dr.IsDBNull(dr.GetOrdinal("numero_telefono")) ? null : dr.GetString(dr.GetOrdinal("numero_telefono")),
-                        ImagenPerfilUrl = dr.IsDBNull(dr.GetOrdinal("imagen_perfil_url")) ? null : dr.GetString(dr.GetOrdinal("imagen_perfil_url")),
-                        FechaNacimiento = dr.IsDBNull(dr.GetOrdinal("fecha_nacimiento")) ? null : dr.GetDateTime(dr.GetOrdinal("fecha_nacimiento")),
-                        FechaCreacion = dr.GetDateTime(dr.GetOrdinal("fecha_creacion")),
-                        FechaActualizacion = dr.GetDateTime(dr.GetOrdinal("fecha_actualizacion")),
-                        EmailVerificado = dr.GetBoolean(dr.GetOrdinal("email_verificado")),
-                        CuentaActiva = dr.GetBoolean(dr.GetOrdinal("cuenta_activa")),
-                        TipoUsuario = dr.GetString(dr.GetOrdinal("tipo_usuario"))
-                    });
-                }
-                dr.Close();
-            }
-            return temporal;
-        }
+                    cmd.CommandType = CommandType.StoredProcedure;
 
-        public IEnumerable<Usuario> GetUsuariosPorId(int id_usuario)
-        {
-            List<Usuario> temporal = new List<Usuario>();
-            using (SqlConnection cn = new SqlConnection(_cadena))
-            {
-                SqlCommand cmd = new SqlCommand("usp_UsuarioPorId", cn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@id_usuario", id_usuario);
-                cn.Open();
-                SqlDataReader dr = cmd.ExecuteReader();
-                while (dr.Read())
-                {
-                    temporal.Add(new Usuario
-                    {
-                        IdUsuario = dr.GetInt32(dr.GetOrdinal("id_usuario")),
-                        NombreCompleto = dr.GetString(dr.GetOrdinal("nombre_completo")),
-                        CorreoElectronico = dr.GetString(dr.GetOrdinal("correo_electronico")),
-                        ContrasenaHash = dr.GetString(dr.GetOrdinal("contrasena_hash")),
-                        NumeroTelefono = dr.IsDBNull(dr.GetOrdinal("numero_telefono")) ? null : dr.GetString(dr.GetOrdinal("numero_telefono")),
-                        ImagenPerfilUrl = dr.IsDBNull(dr.GetOrdinal("imagen_perfil_url")) ? null : dr.GetString(dr.GetOrdinal("imagen_perfil_url")),
-                        FechaNacimiento = dr.IsDBNull(dr.GetOrdinal("fecha_nacimiento")) ? null : dr.GetDateTime(dr.GetOrdinal("fecha_nacimiento")),
-                        FechaCreacion = dr.GetDateTime(dr.GetOrdinal("fecha_creacion")),
-                        FechaActualizacion = dr.GetDateTime(dr.GetOrdinal("fecha_actualizacion")),
-                        EmailVerificado = dr.GetBoolean(dr.GetOrdinal("email_verificado")),
-                        CuentaActiva = dr.GetBoolean(dr.GetOrdinal("cuenta_activa")),
-                        TipoUsuario = dr.GetString(dr.GetOrdinal("tipo_usuario"))
-                    });
-                }
-                dr.Close();
-            }
-            return temporal;
-        }
+                    await cn.OpenAsync();
 
-        public IEnumerable<Usuario> GetUsuariosPorCorreo(string correo_electronico)
+                    using (SqlDataReader dr = await cmd.ExecuteReaderAsync())
+                    {
+                        // Usamos while para recorrer todas las filas devueltas
+                        while (await dr.ReadAsync())
+                        {
+                            var usuario = new UsuarioDetalleDTO
+                            {
+                                id_usuario = dr.GetInt32(0),
+                                nombre_completo = dr.GetString(1),
+                                tipo_usuario = dr.GetString(2),
+                                correo_electronico = dr.GetString(3),
+                                numero_telefono = dr.IsDBNull(4) ? null : dr.GetString(4),
+                                imagen_perfil_url = dr.IsDBNull(5) ? null : dr.GetString(5),
+                                fecha_nacimiento = dr.IsDBNull(6) ? (DateTime?)null : dr.GetDateTime(6),
+                                email_verificado = dr.GetBoolean(7),
+                                cuenta_activa = dr.GetBoolean(33),
+                                contrasena_hash = dr.GetString(34),
+
+                                Ubicacion = new UbicacionDTO
+                                {
+                                    id_ciudad = dr.GetInt32(9),
+                                    nombre_ciudad = dr.GetString(10),
+                                    id_pais = dr.GetInt32(11),
+                                    nombre_pais = dr.GetString(12),
+                                    codigo_iso = dr.GetString(13)
+                                }
+                            };
+
+                            if (usuario.tipo_usuario == "artista" && !dr.IsDBNull(14))
+                            {
+                                usuario.PerfilArtista = new PerfilArtistaDTO
+                                {
+                                    id_perfil_artista = dr.GetInt32(14),
+                                    nombre_artistico = dr.IsDBNull(15) ? null : dr.GetString(15),
+                                    biografia_artista = dr.IsDBNull(16) ? null : dr.GetString(16),
+                                    genero_musical = dr.IsDBNull(17) ? null : dr.GetString(17),
+                                    sitio_web = dr.IsDBNull(18) ? null : dr.GetString(18),
+                                    facebook_url = dr.IsDBNull(19) ? null : dr.GetString(19),
+                                    instagram_url = dr.IsDBNull(20) ? null : dr.GetString(20),
+                                    tiktok_url = dr.IsDBNull(21) ? null : dr.GetString(21)
+                                };
+                            }
+
+                            if (usuario.tipo_usuario == "organizador" && !dr.IsDBNull(22))
+                            {
+                                usuario.PerfilOrganizador = new PerfilOrganizadorDTO
+                                {
+                                    id_perfil_organizador = dr.GetInt32(22),
+                                    nombre_organizador = dr.GetString(23),
+                                    descripcion_organizador = dr.IsDBNull(24) ? null : dr.GetString(24),
+                                    direccion_organizador = dr.IsDBNull(25) ? null : dr.GetString(25),
+                                    telefono_contacto = dr.IsDBNull(26) ? null : dr.GetString(26),
+                                    sitio_web = dr.IsDBNull(27) ? null : dr.GetString(27),
+                                    logo_url = dr.IsDBNull(28) ? null : dr.GetString(28),
+                                    facebook_url = dr.IsDBNull(29) ? null : dr.GetString(29),
+                                    instagram_url = dr.IsDBNull(30) ? null : dr.GetString(30),
+                                    tiktok_url = dr.IsDBNull(31) ? null : dr.GetString(31),
+                                    twitter_url = dr.IsDBNull(32) ? null : dr.GetString(32)
+                                };
+                            }
+
+                            lista.Add(usuario);
+                        }
+                    }
+                }
+            }
+            return lista;
+        }
+        
+        public async Task<UsuarioDetalleDTO> GetUsuariosPorCorreo(string correo_electronico)
         {
-            List<Usuario> temporal = new List<Usuario>();
             using (SqlConnection cn = new SqlConnection(_cadena))
             {
                 SqlCommand cmd = new SqlCommand("usp_UsuarioPorCorreo", cn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@correo_electronico", correo_electronico);
-                cn.Open();
-                SqlDataReader dr = cmd.ExecuteReader();
-                while (dr.Read())
+                await cn.OpenAsync();
+
+                using (var dr = await cmd.ExecuteReaderAsync())
                 {
-                    temporal.Add(new Usuario
+                    if (await dr.ReadAsync())
                     {
-                        IdUsuario = dr.GetInt32(dr.GetOrdinal("id_usuario")),
-                        NombreCompleto = dr.GetString(dr.GetOrdinal("nombre_completo")),
-                        CorreoElectronico = dr.GetString(dr.GetOrdinal("correo_electronico")),
-                        ContrasenaHash = dr.GetString(dr.GetOrdinal("contrasena_hash")),
-                        NumeroTelefono = dr.IsDBNull(dr.GetOrdinal("numero_telefono")) ? null : dr.GetString(dr.GetOrdinal("numero_telefono")),
-                        ImagenPerfilUrl = dr.IsDBNull(dr.GetOrdinal("imagen_perfil_url")) ? null : dr.GetString(dr.GetOrdinal("imagen_perfil_url")),
-                        FechaNacimiento = dr.IsDBNull(dr.GetOrdinal("fecha_nacimiento")) ? null : dr.GetDateTime(dr.GetOrdinal("fecha_nacimiento")),
-                        FechaCreacion = dr.GetDateTime(dr.GetOrdinal("fecha_creacion")),
-                        FechaActualizacion = dr.GetDateTime(dr.GetOrdinal("fecha_actualizacion")),
-                        EmailVerificado = dr.GetBoolean(dr.GetOrdinal("email_verificado")),
-                        CuentaActiva = dr.GetBoolean(dr.GetOrdinal("cuenta_activa")),
-                        TipoUsuario = dr.GetString(dr.GetOrdinal("tipo_usuario"))
-                    });
+                        var usuario = new UsuarioDetalleDTO
+                        {
+                            // Tabla Usuarios (0-8)
+                            id_usuario = dr.GetInt32(0),
+                            nombre_completo = dr.GetString(1),
+                            tipo_usuario = dr.GetString(2),
+                            correo_electronico = dr.GetString(3),
+                            numero_telefono = dr.IsDBNull(4) ? null : dr.GetString(4),
+                            imagen_perfil_url = dr.IsDBNull(5) ? null : dr.GetString(5),
+                            fecha_nacimiento = dr.IsDBNull(6) ? (DateTime?)null : dr.GetDateTime(6),
+                            email_verificado = dr.GetBoolean(7),
+                            cuenta_activa = dr.GetBoolean(33),
+                            contrasena_hash = dr.GetString(34),
+
+                            // Tabla Ubicación (9-13)
+                            Ubicacion = new UbicacionDTO
+                            {
+                                id_ciudad = dr.GetInt32(9),
+                                nombre_ciudad = dr.GetString(10),
+                                id_pais = dr.GetInt32(11),
+                                nombre_pais = dr.GetString(12),
+                                codigo_iso = dr.GetString(13)
+                            }
+                        };
+
+                        // Perfil Artista (14-21)
+                        if (usuario.tipo_usuario == "artista" && !dr.IsDBNull(14))
+                        {
+                            usuario.PerfilArtista = new PerfilArtistaDTO
+                            {
+                                id_perfil_artista = dr.GetInt32(14),
+                                nombre_artistico = dr.IsDBNull(15) ? null : dr.GetString(15),
+                                biografia_artista = dr.IsDBNull(16) ? null : dr.GetString(16),
+                                genero_musical = dr.IsDBNull(17) ? null : dr.GetString(17),
+                                sitio_web = dr.IsDBNull(18) ? null : dr.GetString(18),
+                                facebook_url = dr.IsDBNull(19) ? null : dr.GetString(19),
+                                instagram_url = dr.IsDBNull(20) ? null : dr.GetString(20),
+                                tiktok_url = dr.IsDBNull(21) ? null : dr.GetString(21)
+                            };
+                        }
+
+                        // Perfil Organizador (22-32)
+                        if (usuario.tipo_usuario == "organizador" && !dr.IsDBNull(22))
+                        {
+                            usuario.PerfilOrganizador = new PerfilOrganizadorDTO
+                            {
+                                id_perfil_organizador = dr.GetInt32(22),
+                                nombre_organizador = dr.GetString(23),
+                                descripcion_organizador = dr.IsDBNull(24) ? null : dr.GetString(24),
+                                direccion_organizador = dr.IsDBNull(25) ? null : dr.GetString(25),
+                                telefono_contacto = dr.IsDBNull(26) ? null : dr.GetString(26),
+                                sitio_web = dr.IsDBNull(27) ? null : dr.GetString(27),
+                                logo_url = dr.IsDBNull(28) ? null : dr.GetString(28),
+                                facebook_url = dr.IsDBNull(29) ? null : dr.GetString(29),
+                                instagram_url = dr.IsDBNull(30) ? null : dr.GetString(30),
+                                tiktok_url = dr.IsDBNull(31) ? null : dr.GetString(31),
+                                twitter_url = dr.IsDBNull(32) ? null : dr.GetString(32)
+                            };
+                        }
+
+                        return usuario;
+                    }
                 }
-                dr.Close();
             }
-            return temporal;
+            return null;
         }
 
-        public string InsertUsuario(UsuarioRegistroDTO reg)
+        public async Task<UsuarioDetalleDTO?> GetUsuariosPorId(int id_usuario)
         {
             using (SqlConnection cn = new SqlConnection(_cadena))
             {
-                cn.Open();
-
-                SqlCommand validar = new SqlCommand(
-                    "SELECT COUNT(*) FROM usuarios WHERE correo_electronico=@correo", cn);
-                validar.Parameters.AddWithValue("@correo", reg.correo_electronico);
-
-                int existe = (int)validar.ExecuteScalar();
-                if (existe > 0)
-                    return "El correo ya está registrado";
-
-                string hash = BCrypt.Net.BCrypt.HashPassword(reg.contrasena);
-
-                SqlCommand cmd = new SqlCommand("usp_CrearUsuario", cn);
+                SqlCommand cmd = new SqlCommand("usp_UsuarioPorId", cn);
                 cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@id_usuario", id_usuario);
+                await cn.OpenAsync();
 
-                cmd.Parameters.AddWithValue("@nombre_completo", reg.nombre_completo);
-                cmd.Parameters.AddWithValue("@correo_electronico", reg.correo_electronico);
-                cmd.Parameters.AddWithValue("@contrasena_hash", hash);
-                cmd.Parameters.AddWithValue("@numero_telefono", reg.numero_telefono ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@imagen_perfil_url", reg.imagen_perfil_url ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@fecha_nacimiento", reg.fecha_nacimiento ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@email_verificado", false);
-                cmd.Parameters.AddWithValue("@cuenta_activa", true);
-                cmd.Parameters.AddWithValue("@tipo_usuario", "normal");
-
-                cmd.ExecuteNonQuery();
-
-                return "Usuario registrado correctamente";
-            }
-        }
-
-        public string LoginUsuario(LoginDTO login)
-        {
-            using (SqlConnection cn = new SqlConnection(_cadena))
-            {
-                cn.Open();
-
-                SqlCommand cmd = new SqlCommand("usp_UsuarioPorCorreo", cn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@correo_electronico", login.correo_electronico);
-
-                SqlDataReader dr = cmd.ExecuteReader();
-
-                Usuario usuario = null;
-
-                if (dr.Read())
+                using (var dr = await cmd.ExecuteReaderAsync())
                 {
-                    usuario = new Usuario
+                    if (await dr.ReadAsync())
                     {
-                        IdUsuario = dr.GetInt32(dr.GetOrdinal("id_usuario")),
-                        NombreCompleto = dr.GetString(dr.GetOrdinal("nombre_completo")),
-                        CorreoElectronico = dr.GetString(dr.GetOrdinal("correo_electronico")),
-                        ContrasenaHash = dr.GetString(dr.GetOrdinal("contrasena_hash")),
-                        TipoUsuario = dr.GetString(dr.GetOrdinal("tipo_usuario"))
-                    };
+                        var usuario = new UsuarioDetalleDTO
+                        {
+                            id_usuario = dr.GetInt32(0),
+                            nombre_completo = dr.GetString(1),
+                            tipo_usuario = dr.GetString(2),
+                            correo_electronico = dr.GetString(3),
+                            numero_telefono = dr.IsDBNull(4) ? null : dr.GetString(4),
+                            imagen_perfil_url = dr.IsDBNull(5) ? null : dr.GetString(5),
+                            fecha_nacimiento = dr.IsDBNull(6) ? (DateTime?)null : dr.GetDateTime(6),
+                            email_verificado = dr.GetBoolean(7),
+                            cuenta_activa = dr.GetBoolean(33),
+                            contrasena_hash = dr.GetString(34),
+
+                            Ubicacion = new UbicacionDTO
+                            {
+                                id_ciudad = dr.GetInt32(9),
+                                nombre_ciudad = dr.GetString(10),
+                                id_pais = dr.GetInt32(11),
+                                nombre_pais = dr.GetString(12),
+                                codigo_iso = dr.GetString(13)
+                            }
+                        };
+
+                        if (usuario.tipo_usuario == "artista" && !dr.IsDBNull(14))
+                        {
+                            usuario.PerfilArtista = new PerfilArtistaDTO
+                            {
+                                id_perfil_artista = dr.GetInt32(14),
+                                nombre_artistico = dr.IsDBNull(15) ? null : dr.GetString(15),
+                                biografia_artista = dr.IsDBNull(16) ? null : dr.GetString(16),
+                                genero_musical = dr.IsDBNull(17) ? null : dr.GetString(17),
+                                sitio_web = dr.IsDBNull(18) ? null : dr.GetString(18),
+                                facebook_url = dr.IsDBNull(19) ? null : dr.GetString(19),
+                                instagram_url = dr.IsDBNull(20) ? null : dr.GetString(20),
+                                tiktok_url = dr.IsDBNull(21) ? null : dr.GetString(21)
+                            };
+                        }
+                        if (usuario.tipo_usuario == "organizador" && !dr.IsDBNull(22))
+                        {
+                            usuario.PerfilOrganizador = new PerfilOrganizadorDTO
+                            {
+                                id_perfil_organizador = dr.GetInt32(22),
+                                nombre_organizador = dr.GetString(23),
+                                descripcion_organizador = dr.IsDBNull(24) ? null : dr.GetString(24),
+                                direccion_organizador = dr.IsDBNull(25) ? null : dr.GetString(25),
+                                telefono_contacto = dr.IsDBNull(26) ? null : dr.GetString(26),
+                                logo_url = dr.IsDBNull(28) ? null : dr.GetString(28),
+                                facebook_url = dr.IsDBNull(29) ? null : dr.GetString(29),
+                                instagram_url = dr.IsDBNull(30) ? null : dr.GetString(30),
+                                tiktok_url = dr.IsDBNull(31) ? null : dr.GetString(31),
+                                twitter_url = dr.IsDBNull(32) ? null : dr.GetString(32)
+                            };
+                        }
+
+                        return usuario;
+                    }
                 }
-                dr.Close();
+            }
+            return null;
+        }
 
-                if (usuario == null)
-                    return "Correo o contraseña incorrectos";
-
-                bool valido = BCrypt.Net.BCrypt.Verify(login.contrasena, usuario.ContrasenaHash);
-                if (!valido)
-                    return "Correo o contraseña incorrectos";
-
-                var config = new ConfigurationBuilder()
-                    .AddJsonFile("appsettings.json")
-                    .Build();
-
-                var key = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(config["Jwt:Key"])
-                );
-
-                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-                var claims = new[]
+        public async Task<string> InsertUsuario(UsuarioRegistroDTO reg)
+        {
+            string resultado = "";
+            try
+            {
+                using (SqlConnection cn = new SqlConnection(_cadena))
                 {
-                    new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString()),
-                    new Claim(ClaimTypes.Email, usuario.CorreoElectronico),
-                    new Claim(ClaimTypes.Role, usuario.TipoUsuario)
-                };
+                    using (SqlCommand cmd = new SqlCommand("usp_RegistrarUsuarioCompleto", cn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
 
-                var token = new JwtSecurityToken(
-                    issuer: config["Jwt:Issuer"],
-                    audience: config["Jwt:Audience"],
-                    claims: claims,
-                    expires: DateTime.Now.AddMinutes(300),
-                    signingCredentials: creds
-                );
+                        // Datos base del Usuario
+                        cmd.Parameters.AddWithValue("@nombre_completo", reg.nombre_completo);
+                        cmd.Parameters.AddWithValue("@correo_electronico", reg.correo_electronico);
+                        cmd.Parameters.AddWithValue("@contrasena_hash", reg.contrasenia);
+                        cmd.Parameters.AddWithValue("@tipo_usuario", (object)reg.tipo_usuario ?? "normal");
+                        cmd.Parameters.AddWithValue("@id_ciudad", reg.id_ciudad);
+                        cmd.Parameters.AddWithValue("@numero_telefono", (object)reg.numero_telefono ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@imagen_perfil_url", (object)reg.imagen_perfil_url ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@fecha_nacimiento", (object)reg.fecha_nacimiento ?? DBNull.Value);
 
-                string jwt = new JwtSecurityTokenHandler().WriteToken(token);
-                return jwt;
+                        // Datos específicos de Artista
+                        cmd.Parameters.AddWithValue("@nombre_artistico", (object)reg.nombre_artistico ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@biografia_artista", (object)reg.biografia_artista ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@genero_musical", (object)reg.genero_musical ?? DBNull.Value);
+
+                        // Datos específicos de Organizador
+                        cmd.Parameters.AddWithValue("@nombre_organizador", (object)reg.nombre_organizador ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@descripcion_organizador", (object)reg.descripcion_organizador ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@telefono_contacto", (object)reg.telefono_contacto ?? DBNull.Value);
+
+                        await cn.OpenAsync();
+                        int filasAfectadas = await cmd.ExecuteNonQueryAsync();
+
+                        // Importante: Si insertó en dos tablas, filasAfectadas será > 1
+                        if (filasAfectadas > 0)
+                        {
+                            resultado = "OK";
+                        }
+                        else
+                        {
+                            resultado = "Error: No se pudo insertar el registro.";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                resultado = "Excepción: " + ex.Message;
+            }
+
+            return resultado;
+        }
+
+        public async Task<string> ActualizarUsuarioAsync(UsuarioUpdateDTO dto)
+        {
+            try
+            {
+                using (SqlConnection cn = new SqlConnection(_cadena))
+                {
+                    SqlCommand cmd = new SqlCommand("usp_ActualizarUsuarioCompleto", cn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@id_usuario", dto.id_usuario);
+
+                    cmd.Parameters.AddWithValue("@nombre_completo", (object)dto.nombre_completo ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@id_ciudad", (object)dto.id_ciudad ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@numero_telefono", (object)dto.numero_telefono ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@imagen_perfil_url", (object)dto.imagen_perfil_url ?? DBNull.Value);
+
+                    cmd.Parameters.AddWithValue("@nombre_artistico", (object)dto.nombre_artistico ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@biografia_artista", (object)dto.biografia_artista ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@genero_musical", (object)dto.genero_musical ?? DBNull.Value);
+
+                    cmd.Parameters.AddWithValue("@nombre_organizador", (object)dto.nombre_organizador ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@descripcion_organizador", (object)dto.descripcion_organizador ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@telefono_contacto", (object)dto.telefono_contacto ?? DBNull.Value);
+
+                    await cn.OpenAsync();
+                    int filasAfectadas = await cmd.ExecuteNonQueryAsync();
+
+                    if (filasAfectadas > 0)
+                    {
+                        return "OK";
+                    }
+                    else
+                    {
+                        return "No se encontró el usuario o no se realizaron cambios.";
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                // Captura errores específicos de SQL (como violaciones de FK si cambian la ciudad a una inválida)
+                return "Error de Base de Datos: " + ex.Message;
+            }
+            catch (Exception ex)
+            {
+                return "Error: " + ex.Message;
             }
         }
 
-
-        public string ActualizarUsuario(UsuarioEditarDTO usuario)
+        public async Task<UsuarioDetalleDTO?> ObtenerUsuarioLogin(string correo)
         {
             using (SqlConnection cn = new SqlConnection(_cadena))
             {
-                cn.Open();
-                var usuarioActual = GetUsuariosPorId(usuario.id_usuario).FirstOrDefault();
-
-                if (usuarioActual == null)
-                    return "Usuario no encontrado";
-                string contrasenaHash = usuarioActual.ContrasenaHash;
-
-                if (!string.IsNullOrEmpty(usuario.contrasena))
-                {
-                    contrasenaHash = BCrypt.Net.BCrypt.HashPassword(usuario.contrasena);
-                }
-
-                if (!string.IsNullOrEmpty(usuario.tipo_usuario) &&
-                    !new[] { "normal", "artista", "organizador" }.Contains(usuario.tipo_usuario.ToLower()))
-                {
-                    return "Tipo de usuario inválido. Debe ser: normal, artista u organizador";
-                }
-
-                string tipoUsuario = !string.IsNullOrEmpty(usuario.tipo_usuario)
-                    ? usuario.tipo_usuario.ToLower()
-                    : usuarioActual.TipoUsuario;
-
-                bool emailVerificado = usuario.email_verificado ?? usuarioActual.EmailVerificado;
-                bool cuentaActiva = usuario.cuenta_activa ?? usuarioActual.CuentaActiva;
-
-                SqlCommand cmd = new SqlCommand("usp_ActualizarUsuario", cn);
+                SqlCommand cmd = new SqlCommand("usp_Obtener_usuario_login", cn);
                 cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@correo", correo);
 
-                cmd.Parameters.AddWithValue("@id_usuario", usuario.id_usuario);
-                cmd.Parameters.AddWithValue("@nombre_completo", usuario.nombre_completo);
-                cmd.Parameters.AddWithValue("@contrasena_hash", contrasenaHash);
-                cmd.Parameters.AddWithValue("@numero_telefono", usuario.numero_telefono ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@imagen_perfil_url", usuario.imagen_perfil_url ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@fecha_nacimiento", usuario.fecha_nacimiento ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@email_verificado", emailVerificado);
-                cmd.Parameters.AddWithValue("@cuenta_activa", cuentaActiva);
-                cmd.Parameters.AddWithValue("@tipo_usuario", tipoUsuario);
+                await cn.OpenAsync();
 
-                int filasAfectadas = cmd.ExecuteNonQuery();
+                using (var dr = await cmd.ExecuteReaderAsync())
+                {
+                    if (await dr.ReadAsync())
+                    {
+                        var usuario = new UsuarioDetalleDTO
+                        {
+                            // Tabla Usuarios (0-8)
+                            id_usuario = dr.GetInt32(0),
+                            nombre_completo = dr.GetString(1),
+                            tipo_usuario = dr.GetString(2),
+                            correo_electronico = dr.GetString(3),
+                            numero_telefono = dr.IsDBNull(4) ? null : dr.GetString(4),
+                            imagen_perfil_url = dr.IsDBNull(5) ? null : dr.GetString(5),
+                            fecha_nacimiento = dr.IsDBNull(6) ? (DateTime?)null : dr.GetDateTime(6),
+                            email_verificado = dr.GetBoolean(7),
+                            cuenta_activa = dr.GetBoolean(33),
+                            contrasena_hash = dr.GetString(34),
 
-                if (filasAfectadas > 0)
-                    return "Usuario actualizado correctamente";
-                else
-                    return "No se pudo actualizar el usuario";
+                            // Tabla Ubicación (9-13)
+                            Ubicacion = new UbicacionDTO
+                            {
+                                id_ciudad = dr.GetInt32(9),
+                                nombre_ciudad = dr.GetString(10),
+                                id_pais = dr.GetInt32(11),
+                                nombre_pais = dr.GetString(12),
+                                codigo_iso = dr.GetString(13)
+                            }
+                        };
+
+                        // Perfil Artista (14-21)
+                        if (usuario.tipo_usuario == "artista" && !dr.IsDBNull(14))
+                        {
+                            usuario.PerfilArtista = new PerfilArtistaDTO
+                            {
+                                id_perfil_artista = dr.GetInt32(14),
+                                nombre_artistico = dr.IsDBNull(15) ? null : dr.GetString(15),
+                                biografia_artista = dr.IsDBNull(16) ? null : dr.GetString(16),
+                                genero_musical = dr.IsDBNull(17) ? null : dr.GetString(17),
+                                sitio_web = dr.IsDBNull(18) ? null : dr.GetString(18),
+                                facebook_url = dr.IsDBNull(19) ? null : dr.GetString(19),
+                                instagram_url = dr.IsDBNull(20) ? null : dr.GetString(20),
+                                tiktok_url = dr.IsDBNull(21) ? null : dr.GetString(21)
+                            };
+                        }
+
+                        // Perfil Organizador (22-32)
+                        if (usuario.tipo_usuario == "organizador" && !dr.IsDBNull(22))
+                        {
+                            usuario.PerfilOrganizador = new PerfilOrganizadorDTO
+                            {
+                                id_perfil_organizador = dr.GetInt32(22),
+                                nombre_organizador = dr.GetString(23),
+                                descripcion_organizador = dr.IsDBNull(24) ? null : dr.GetString(24),
+                                direccion_organizador = dr.IsDBNull(25) ? null : dr.GetString(25),
+                                telefono_contacto = dr.IsDBNull(26) ? null : dr.GetString(26),
+                                sitio_web = dr.IsDBNull(27) ? null : dr.GetString(27),
+                                logo_url = dr.IsDBNull(28) ? null : dr.GetString(28),
+                                facebook_url = dr.IsDBNull(29) ? null : dr.GetString(29),
+                                instagram_url = dr.IsDBNull(30) ? null : dr.GetString(30),
+                                tiktok_url = dr.IsDBNull(31) ? null : dr.GetString(31),
+                                twitter_url = dr.IsDBNull(32) ? null : dr.GetString(32)
+                            };
+                        }
+
+                        return usuario;
+                    }
+                }
+            }
+            return null; // Si no encuentra al usuario
+        }
+
+        public string ActivarDesactivarCuenta(int id_usuario, bool cuenta_activa)
+         {
+             using (SqlConnection cn = new SqlConnection(_cadena))
+             {
+                 cn.Open();
+                 SqlCommand cmd = new SqlCommand("usp_EditarCuentaActiva", cn);
+                 cmd.CommandType = CommandType.StoredProcedure;
+                 cmd.Parameters.AddWithValue("@id_usuario", id_usuario);
+                 cmd.Parameters.AddWithValue("@cuenta_activa", cuenta_activa);
+                 return cmd.ExecuteNonQuery() > 0 ? (cuenta_activa ? "Cuenta activada exitosamente" : "Cuenta desactivada exitosamente") : "No se pudo actualizar el estado";
+             }
+         }
+
+        public async Task<bool> VerificarCorreoExistenteAsync(string correo_electronico)
+        {
+            using (SqlConnection cn = new SqlConnection(_cadena))
+            {
+                SqlCommand cmd = new SqlCommand("usp_VerificarCorreo", cn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@correo_electronico", correo_electronico);
+                await cn.OpenAsync();
+                var resultado = await cmd.ExecuteScalarAsync();
+                return Convert.ToBoolean(resultado);
             }
         }
 
+        public bool VerificarPaisExiste(int id_pais)
+        {
+            using (SqlConnection cn = new SqlConnection(_cadena))
+            {
+                SqlCommand cmd = new SqlCommand("usp_VerificarPaisExiste", cn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@id_pais", id_pais);
+                cn.OpenAsync();
+                return Convert.ToBoolean(cmd.ExecuteScalar());
+            }
+        }
+
+        public async Task<bool> VerificarCiudadExisteAsync(int id_ciudad)
+        {
+            using (SqlConnection cn = new SqlConnection(_cadena))
+            {
+                SqlCommand cmd = new SqlCommand("usp_VerificarCiudadExiste", cn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@id_ciudad", id_ciudad);
+
+                await cn.OpenAsync();
+                var resultado = await cmd.ExecuteScalarAsync();
+                return resultado != null && Convert.ToBoolean(resultado);
+            }
+        }
+
+        public async Task<bool> CambiarContraseniaAsync(int id_usuario, string nuevaContraseniaHash)
+        {
+            using (SqlConnection cn = new SqlConnection(_cadena))
+            {
+                SqlCommand cmd = new SqlCommand("usp_Cambiar_contrasenia_usuario", cn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@id_usuario", id_usuario);
+                cmd.Parameters.AddWithValue("@contrasenia", nuevaContraseniaHash);
+
+                await cn.OpenAsync();
+                int filasAfectadas = await cmd.ExecuteNonQueryAsync();
+
+                return filasAfectadas > 0;
+            }
+        }
     }
 }
