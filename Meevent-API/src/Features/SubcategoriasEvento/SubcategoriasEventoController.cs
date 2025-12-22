@@ -14,28 +14,65 @@ namespace Meevent_API.src.Features.SubcategoriasEvento
             _service = service;
         }
 
-        [HttpGet]
-        public IActionResult Get()
-            => Ok(_service.GetSubcategoriasEvento());
+        [HttpGet("ListarSubCategorias")]
+        public async Task<ActionResult<SubcategoriaEventoListResponseDTO>> Get()
+        {
+            var response = await _service.ObtenerSubcategoriasAsync();
+            return Ok(response);
+        }
 
-        [HttpGet("categoria/{categoriaId}")]
-        public IActionResult GetPorCategoria(int categoriaId)
-            => Ok(_service.GetSubcategoriasPorCategoria(categoriaId));
+        [HttpGet("BuscarSubCategorias/{id}")]
+        public async Task<ActionResult<SubcategoriaEventoOperacionResponseDTO>> Get(int id)
+        {
+            var subcategoria = await _service.ObtenerSubcategoriaPorIdAsync(id);
 
-        [HttpGet("{id}")]
-        public IActionResult Get(int id)
-            => Ok(_service.GetSubcategoriaEventoPorId(id));
+            if (subcategoria == null)
+            {
+                return NotFound(new { Exitoso = false, Mensaje = "Subcategoría no encontrada" });
+            }
 
-        [HttpPost]
-        public IActionResult Post([FromBody] SubcategoriaEventoDTO dto)
-            => Ok(_service.CrearSubcategoriaEvento(dto));
+            return Ok(new SubcategoriaEventoOperacionResponseDTO
+            {
+                Exitoso = true,
+                Mensaje = "Subcategoría encontrada",
+                Subcategoria = new SubcategoriaEventoDetalleDTO
+                {
+                    IdSubcategoriaEvento = subcategoria.IdSubcategoriaEvento,
+                    NombreSubcategoria = subcategoria.NombreSubcategoria,
+                    SlugSubcategoria = subcategoria.SlugSubcategoria,
+                    CategoriaEventoId = subcategoria.CategoriaEventoId,
+                    Estado = subcategoria.Estado
+                }
+            });
+        }
 
-        [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] SubcategoriaEventoDTO dto)
-            => Ok(_service.ActualizarSubcategoriaEvento(id, dto));
+        [HttpPost("RegistrarSubCategoria")]
+        public async Task<IActionResult> Post([FromBody] SubcategoriaEventoCrearDTO dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
-            => Ok(_service.EliminarSubcategoriaEvento(id));
+            var mensaje = await _service.RegistrarSubcategoriaAsync(dto);
+            return Ok(new { Exitoso = true, Mensaje = mensaje });
+        }
+
+        [HttpPatch("EditarSubCategoria/{id}")]
+        public async Task<ActionResult<SubcategoriaEventoOperacionResponseDTO>> Patch(int id, [FromBody] SubcategoriaEventoEditarDTO dto)
+        {
+            var response = await _service.ActualizarSubcategoriaAsync(id, dto);
+
+            if (!response.Exitoso) return NotFound(response);
+
+            return Ok(response);
+        }
+
+        [HttpPatch("ActivarEstado_Desctivar/{id}")]
+        public async Task<ActionResult<SubcategoriaCambiarEstadoResponseDTO>> PatchEstado(int id, [FromBody] SubcategoriaCambiarEstadoDTO dto)
+        {
+            var response = await _service.ActivarDesactivarSubcategoriaAsync(id, dto.Estado);
+
+            if (!response.Exitoso) return BadRequest(response);
+
+            return Ok(response);
+        }
     }
 }

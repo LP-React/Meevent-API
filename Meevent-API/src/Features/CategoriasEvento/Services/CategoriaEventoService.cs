@@ -4,7 +4,6 @@ namespace Meevent_API.src.Features.CategoriasEvento.Services
 {
     public class CategoriaEventoService : ICategoriaEventoService
     {
-
         private readonly ICategoriaEventoDAO _dao;
 
         public CategoriaEventoService(ICategoriaEventoDAO dao)
@@ -12,31 +11,68 @@ namespace Meevent_API.src.Features.CategoriasEvento.Services
             _dao = dao;
         }
 
-        public IEnumerable<CategoriaEventoDTO> GetCategoriasEvento()
+        public async Task<CategoriaEventoListResponseDTO> ObtenerCategoriasAsync()
         {
-            return _dao.GetCategoriasEvento();
+            var lista = await Task.Run(() => _dao.GetCategorias());
+
+            return new CategoriaEventoListResponseDTO
+            {
+                Exitoso = true,
+                Mensaje = "Listado obtenido correctamente",
+                TotalCategoriasEvento = lista.Count(),
+                CategoriasEvento = lista
+            };
         }
 
-        public CategoriaEventoDTO? GetCategoriaEventoPorId(int id_categoria_evento)
+        public async Task<CategoriaEventoDTO> ObtenerCategoriaPorIdAsync(int id_categoria_evento)
         {
-            return _dao.GetCategoriaEventoPorId(id_categoria_evento);
+            var lista = await Task.Run(() => _dao.GetCategoriaPorId(id_categoria_evento));
+            return lista.FirstOrDefault();
         }
 
-        public string CrearCategoriaEvento(CategoriaEventoDTO categoria)
+        public async Task<string> RegistrarCategoriaAsync(CategoriaEventoCrearDTO registro)
         {
-            return _dao.CrearCategoriaEvento(categoria);
+            return await Task.Run(() => _dao.InsertCategoria(registro));
         }
 
-        public string ActualizarCategoriaEvento(int id_categoria_evento, CategoriaEventoDTO categoria)
+        public async Task<CategoriaEventoOperacionResponseDTO> ActualizarCategoriaAsync(
+            int id_categoria_evento,
+            CategoriaEventoEditarDTO categoria)
         {
-            return _dao.ActualizarCategoriaEvento(id_categoria_evento, categoria);
+            string resultado = await Task.Run(() =>
+                _dao.UpdateCategoria(id_categoria_evento, categoria));
+
+            var categoriaActualizada = await ObtenerCategoriaPorIdAsync(id_categoria_evento);
+
+            return new CategoriaEventoOperacionResponseDTO
+            {
+                Exitoso = !resultado.Contains("Error") && categoriaActualizada != null,
+                Mensaje = resultado,
+                Categoria = categoriaActualizada != null
+                    ? new CategoriaEventoDetalleDTO
+                    {
+                        IdCategoriaEvento = categoriaActualizada.IdCategoriaEvento,
+                        NombreCategoria = categoriaActualizada.NombreCategoria,
+                        SlugCategoria = categoriaActualizada.SlugCategoria,
+                        Estado = categoriaActualizada.Estado
+                    }
+                    : null
+            };
         }
 
-        public string EliminarCategoriaEvento(int id_categoria_evento)
+        public async Task<CategoriaCambiarEstadoResponseDTO> ActivarDesactivarCategoriaAsync(
+            int id_categoria_evento,
+            bool estado)
         {
-            return _dao.EliminarCategoriaEvento(id_categoria_evento);
+            string resultado = await Task.Run(() =>
+                _dao.CambiarEstado(id_categoria_evento, estado));
+
+            return new CategoriaCambiarEstadoResponseDTO
+            {
+                Exitoso = !resultado.Contains("Error"),
+                Mensaje = resultado,
+                Estado = estado
+            };
         }
-
-
-    } 
+    }
 }

@@ -2,11 +2,20 @@
 {
     public interface ICategoriaEventoService
     {
-        IEnumerable<CategoriaEventoDTO> GetCategoriasEvento();
-        CategoriaEventoDTO? GetCategoriaEventoPorId(int id_categoria_evento);
-        string CrearCategoriaEvento(CategoriaEventoDTO categoria);
-        string ActualizarCategoriaEvento(int id_categoria_evento, CategoriaEventoDTO categoria);
-        string EliminarCategoriaEvento(int id_categoria_evento);
-    }
+        Task<CategoriaEventoListResponseDTO> ObtenerCategoriasAsync();
 
+        Task<CategoriaEventoDTO> ObtenerCategoriaPorIdAsync(int id_categoria_evento);
+
+        Task<string> RegistrarCategoriaAsync(CategoriaEventoCrearDTO registro);
+
+        Task<CategoriaEventoOperacionResponseDTO> ActualizarCategoriaAsync(
+            int id_categoria_evento,
+            CategoriaEventoEditarDTO categoria
+        );
+
+        Task<CategoriaCambiarEstadoResponseDTO> ActivarDesactivarCategoriaAsync(
+            int id_categoria_evento,
+            bool estado
+        );
+    }
 }

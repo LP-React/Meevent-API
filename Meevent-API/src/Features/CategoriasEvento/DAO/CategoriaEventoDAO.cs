@@ -1,5 +1,4 @@
-﻿using Meevent_API.src.Features.CategoriasEvento;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using System.Data;
 
 namespace Meevent_API.src.Features.CategoriasEvento.DAO
@@ -7,16 +6,13 @@ namespace Meevent_API.src.Features.CategoriasEvento.DAO
     public class CategoriaEventoDAO : ICategoriaEventoDAO
     {
         private readonly string _cadena;
-        private readonly IConfiguration _configuration;
 
         public CategoriaEventoDAO(IConfiguration configuration)
         {
-            _configuration = configuration;
             _cadena = configuration.GetConnectionString("MeeventDB");
         }
 
-        // LISTAR
-        public IEnumerable<CategoriaEventoDTO> GetCategoriasEvento()
+        public IEnumerable<CategoriaEventoDTO> GetCategorias()
         {
             List<CategoriaEventoDTO> lista = new();
 
@@ -34,50 +30,42 @@ namespace Meevent_API.src.Features.CategoriasEvento.DAO
                         IdCategoriaEvento = dr.GetInt32(dr.GetOrdinal("id_categoria_evento")),
                         NombreCategoria = dr.GetString(dr.GetOrdinal("nombre_categoria")),
                         SlugCategoria = dr.GetString(dr.GetOrdinal("slug_categoria")),
-                        IconoUrl = dr.IsDBNull(dr.GetOrdinal("icono_url"))
-                                    ? ""
-                                    : dr.GetString(dr.GetOrdinal("icono_url"))
+                        Estado = dr.GetBoolean(dr.GetOrdinal("estado"))
                     });
                 }
-                dr.Close();
             }
 
             return lista;
         }
 
-        // BUSCAR POR ID
-        public CategoriaEventoDTO? GetCategoriaEventoPorId(int id_categoria_evento)
+        public IEnumerable<CategoriaEventoDTO> GetCategoriaPorId(int id_categoria_evento)
         {
-            CategoriaEventoDTO? categoria = null;
+            List<CategoriaEventoDTO> lista = new();
 
             using (SqlConnection cn = new SqlConnection(_cadena))
             {
                 SqlCommand cmd = new SqlCommand("sp_categorias_evento_buscar", cn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@id_categoria_evento", id_categoria_evento);
-
                 cn.Open();
+
                 SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
+                while (dr.Read())
                 {
-                    categoria = new CategoriaEventoDTO
+                    lista.Add(new CategoriaEventoDTO
                     {
                         IdCategoriaEvento = dr.GetInt32(dr.GetOrdinal("id_categoria_evento")),
                         NombreCategoria = dr.GetString(dr.GetOrdinal("nombre_categoria")),
                         SlugCategoria = dr.GetString(dr.GetOrdinal("slug_categoria")),
-                        IconoUrl = dr.IsDBNull(dr.GetOrdinal("icono_url"))
-                                    ? ""
-                                    : dr.GetString(dr.GetOrdinal("icono_url"))
-                    };
+                        Estado = dr.GetBoolean(dr.GetOrdinal("estado"))
+                    });
                 }
-                dr.Close();
             }
 
-            return categoria;
+            return lista;
         }
 
-        // CREAR
-        public string CrearCategoriaEvento(CategoriaEventoDTO categoria)
+        public string InsertCategoria(CategoriaEventoCrearDTO reg)
         {
             try
             {
@@ -85,80 +73,65 @@ namespace Meevent_API.src.Features.CategoriasEvento.DAO
                 {
                     SqlCommand cmd = new SqlCommand("sp_categorias_evento_insert", cn);
                     cmd.CommandType = CommandType.StoredProcedure;
-
-                    cmd.Parameters.AddWithValue("@nombre_categoria", categoria.NombreCategoria);
-                    cmd.Parameters.AddWithValue("@slug_categoria", categoria.SlugCategoria);
-                    cmd.Parameters.AddWithValue("@icono_url",
-                        string.IsNullOrEmpty(categoria.IconoUrl)
-                        ? (object)DBNull.Value
-                        : categoria.IconoUrl);
+                    cmd.Parameters.AddWithValue("@nombre_categoria", reg.NombreCategoria);
+                    cmd.Parameters.AddWithValue("@slug_categoria", reg.SlugCategoria);
 
                     cn.Open();
                     cmd.ExecuteNonQuery();
-
-                    return "Categoría creada correctamente";
+                    return "Categoría registrada correctamente";
                 }
             }
             catch (Exception ex)
             {
-                return $"Error al crear categoría: {ex.Message}";
+                return $"Error al crear: {ex.Message}";
             }
         }
 
-        // ACTUALIZAR
-        public string ActualizarCategoriaEvento(int id_categoria_evento, CategoriaEventoDTO categoria)
+        public string UpdateCategoria(int id_categoria_evento, CategoriaEventoEditarDTO reg)
         {
             try
             {
+                var actual = GetCategoriaPorId(id_categoria_evento).FirstOrDefault();
+                if (actual == null) return "No se encontró la categoría para actualizar";
+
                 using (SqlConnection cn = new SqlConnection(_cadena))
                 {
                     SqlCommand cmd = new SqlCommand("sp_categorias_evento_update", cn);
                     cmd.CommandType = CommandType.StoredProcedure;
-
                     cmd.Parameters.AddWithValue("@id_categoria_evento", id_categoria_evento);
-                    cmd.Parameters.AddWithValue("@nombre_categoria", categoria.NombreCategoria);
-                    cmd.Parameters.AddWithValue("@slug_categoria", categoria.SlugCategoria);
-                    cmd.Parameters.AddWithValue("@icono_url",
-                        string.IsNullOrEmpty(categoria.IconoUrl)
-                        ? (object)DBNull.Value
-                        : categoria.IconoUrl);
+                    cmd.Parameters.AddWithValue("@nombre_categoria", reg.NombreCategoria ?? actual.NombreCategoria);
+                    cmd.Parameters.AddWithValue("@slug_categoria", reg.SlugCategoria ?? actual.SlugCategoria);
 
                     cn.Open();
-                    int filas = cmd.ExecuteNonQuery();
-
-                    return filas > 0
-                        ? "Categoría actualizada correctamente"
-                        : "No se encontró la categoría";
+                    cmd.ExecuteNonQuery();
+                    return "Datos actualizados correctamente";
                 }
             }
             catch (Exception ex)
             {
-                return $"Error al actualizar categoría: {ex.Message}";
+                return $"Error al actualizar: {ex.Message}";
             }
         }
 
-        // ELIMINAR
-        public string EliminarCategoriaEvento(int id_categoria_evento)
+        public string CambiarEstado(int id_categoria_evento, bool nuevo_estado)
         {
             try
             {
                 using (SqlConnection cn = new SqlConnection(_cadena))
                 {
-                    SqlCommand cmd = new SqlCommand("sp_categorias_evento_delete", cn);
+                    SqlCommand cmd = new SqlCommand("sp_categorias_evento_cambiar_estado", cn);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@id_categoria_evento", id_categoria_evento);
+                    cmd.Parameters.AddWithValue("@estado", nuevo_estado);
 
                     cn.Open();
-                    int filas = cmd.ExecuteNonQuery();
-
-                    return filas > 0
-                        ? "Categoría eliminada correctamente"
-                        : "No se encontró la categoría";
+                    cmd.ExecuteNonQuery();
+                    return nuevo_estado ? "Categoría activada" : "Categoría desactivada";
                 }
             }
             catch (Exception ex)
             {
-                return $"Error al eliminar categoría: {ex.Message}";
+                return $"Error al cambiar estado: {ex.Message}";
             }
         }
     }

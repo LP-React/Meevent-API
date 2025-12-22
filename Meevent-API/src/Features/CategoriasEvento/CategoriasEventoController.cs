@@ -14,41 +14,83 @@ namespace Meevent_API.src.Features.CategoriasEvento
             _service = service;
         }
 
-        [HttpGet]
-        public IActionResult Get()
+     
+        [HttpGet("ListarCategorias")]
+        public async Task<ActionResult<CategoriaEventoListResponseDTO>> Get()
         {
-            var data = _service.GetCategoriasEvento();
-            return Ok(data);
+            var response = await _service.ObtenerCategoriasAsync();
+            return Ok(response);
         }
 
-        [HttpGet("{id}")]
-        public IActionResult Get(int id)
+     
+        [HttpGet("BuscarCategoria/{id}")]
+        public async Task<ActionResult<CategoriaEventoOperacionResponseDTO>> Get(int id)
         {
-            var data = _service.GetCategoriaEventoPorId(id);
-            return Ok(data);
+            var categoria = await _service.ObtenerCategoriaPorIdAsync(id);
+
+            if (categoria == null)
+            {
+                return NotFound(new
+                {
+                    Exitoso = false,
+                    Mensaje = "Categoría no encontrada"
+                });
+            }
+
+            return Ok(new CategoriaEventoOperacionResponseDTO
+            {
+                Exitoso = true,
+                Mensaje = "Categoría encontrada",
+                Categoria = new CategoriaEventoDetalleDTO
+                {
+                    IdCategoriaEvento = categoria.IdCategoriaEvento,
+                    NombreCategoria = categoria.NombreCategoria,
+                    SlugCategoria = categoria.SlugCategoria,
+                    Estado = categoria.Estado
+                }
+            });
         }
 
-        
-        [HttpPost]
-        public IActionResult Post([FromBody] CategoriaEventoDTO dto)
+        [HttpPost("RegistrarCategoria")]
+        public async Task<IActionResult> Post([FromBody] CategoriaEventoCrearDTO dto)
         {
-            var mensaje = _service.CrearCategoriaEvento(dto);
-            return Ok(mensaje);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var mensaje = await _service.RegistrarCategoriaAsync(dto);
+
+            return Ok(new
+            {
+                Exitoso = true,
+                Mensaje = mensaje
+            });
         }
 
-        
-        [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] CategoriaEventoDTO dto)
+   
+        [HttpPatch("EditarCategoria/{id}")]
+        public async Task<ActionResult<CategoriaEventoOperacionResponseDTO>> Patch(
+            int id,
+            [FromBody] CategoriaEventoEditarDTO dto)
         {
-            var mensaje = _service.ActualizarCategoriaEvento(id, dto);
-            return Ok(mensaje);
+            var response = await _service.ActualizarCategoriaAsync(id, dto);
+
+            if (!response.Exitoso)
+                return NotFound(response);
+
+            return Ok(response);
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        [HttpPatch("ActivarEstado_Desactivar/{id}")]
+        public async Task<ActionResult<CategoriaCambiarEstadoResponseDTO>> PatchEstado(
+            int id,
+            [FromBody] CategoriaCambiarEstadoDTO dto)
         {
-            var mensaje = _service.EliminarCategoriaEvento(id);
-            return Ok(mensaje);
+            var response = await _service.ActivarDesactivarCategoriaAsync(id, dto.Estado);
+
+            if (!response.Exitoso)
+                return BadRequest(response);
+
+            return Ok(response);
         }
     }
 }

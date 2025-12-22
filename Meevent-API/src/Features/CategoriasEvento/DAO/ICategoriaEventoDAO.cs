@@ -2,11 +2,10 @@
 {
     public interface ICategoriaEventoDAO
     {
-        IEnumerable<CategoriaEventoDTO> GetCategoriasEvento();
-        CategoriaEventoDTO? GetCategoriaEventoPorId(int id_categoria_evento);
-        string CrearCategoriaEvento(CategoriaEventoDTO categoria);
-        string ActualizarCategoriaEvento(int id_categoria_evento, CategoriaEventoDTO categoria);
-        string EliminarCategoriaEvento(int id_categoria_evento);
+        IEnumerable<CategoriaEventoDTO> GetCategorias();
+        IEnumerable<CategoriaEventoDTO> GetCategoriaPorId(int id_categoria_evento);
+        string InsertCategoria(CategoriaEventoCrearDTO reg);
+        string UpdateCategoria(int id_categoria_evento, CategoriaEventoEditarDTO reg);
+        string CambiarEstado(int id_categoria_evento, bool nuevo_estado);
     }
-
 }

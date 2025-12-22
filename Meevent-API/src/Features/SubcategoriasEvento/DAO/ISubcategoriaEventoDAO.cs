@@ -2,11 +2,11 @@
 {
     public interface ISubcategoriaEventoDAO
     {
-        IEnumerable<SubcategoriaEventoDTO> GetSubcategoriasEvento();
-        IEnumerable<SubcategoriaEventoDTO> GetSubcategoriasPorCategoria(int categoria_evento_id);
-        SubcategoriaEventoDTO? GetSubcategoriaEventoPorId(int id_subcategoria_evento);
-        string CrearSubcategoriaEvento(SubcategoriaEventoDTO subcategoria);
-        string ActualizarSubcategoriaEvento(int id_subcategoria_evento, SubcategoriaEventoDTO subcategoria);
-        string EliminarSubcategoriaEvento(int id_subcategoria_evento);
+        IEnumerable<SubcategoriaEventoDTO> GetSubcategorias();
+        IEnumerable<SubcategoriaEventoDTO> GetSubcategoriaPorId(int id_subcategoria_evento);
+        string InsertSubcategoria(SubcategoriaEventoCrearDTO reg);
+        string UpdateSubcategoria(int id_subcategoria_evento, SubcategoriaEventoEditarDTO reg);
+        string CambiarEstado(int id_subcategoria_evento, bool nuevo_estado);
     }
 }
+ 

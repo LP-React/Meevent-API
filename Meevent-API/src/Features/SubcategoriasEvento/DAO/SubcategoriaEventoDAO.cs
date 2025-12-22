@@ -6,19 +6,14 @@ namespace Meevent_API.src.Features.SubcategoriasEvento.DAO
     public class SubcategoriaEventoDAO : ISubcategoriaEventoDAO
     {
         private readonly string _cadena;
-        private readonly IConfiguration _configuration;
 
         public SubcategoriaEventoDAO(IConfiguration configuration)
         {
-            _configuration = configuration;
             _cadena = configuration.GetConnectionString("MeeventDB");
         }
-
-  
-        public IEnumerable<SubcategoriaEventoDTO> GetSubcategoriasEvento()
+        public IEnumerable<SubcategoriaEventoDTO> GetSubcategorias()
         {
             List<SubcategoriaEventoDTO> lista = new();
-
             using (SqlConnection cn = new SqlConnection(_cadena))
             {
                 SqlCommand cmd = new SqlCommand("sp_subcategorias_evento_listar", cn);
@@ -34,29 +29,23 @@ namespace Meevent_API.src.Features.SubcategoriasEvento.DAO
                         NombreSubcategoria = dr.GetString(dr.GetOrdinal("nombre_subcategoria")),
                         SlugSubcategoria = dr.GetString(dr.GetOrdinal("slug_subcategoria")),
                         CategoriaEventoId = dr.GetInt32(dr.GetOrdinal("categoria_evento_id")),
-                        NombreCategoria = dr.IsDBNull(dr.GetOrdinal("nombre_categoria"))
-                            ? ""
-                            : dr.GetString(dr.GetOrdinal("nombre_categoria"))
+                        Estado = dr.GetBoolean(dr.GetOrdinal("estado"))
                     });
                 }
-                dr.Close();
             }
-
             return lista;
         }
 
- 
-        public IEnumerable<SubcategoriaEventoDTO> GetSubcategoriasPorCategoria(int categoria_evento_id)
+        public IEnumerable<SubcategoriaEventoDTO> GetSubcategoriaPorId(int id_subcategoria_evento)
         {
             List<SubcategoriaEventoDTO> lista = new();
-
             using (SqlConnection cn = new SqlConnection(_cadena))
             {
-                SqlCommand cmd = new SqlCommand("sp_subcategorias_evento_listar_por_categoria", cn);
+                SqlCommand cmd = new SqlCommand("sp_subcategorias_evento_buscar", cn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@categoria_evento_id", categoria_evento_id);
-
+                cmd.Parameters.AddWithValue("@id_subcategoria_evento", id_subcategoria_evento);
                 cn.Open();
+
                 SqlDataReader dr = cmd.ExecuteReader();
                 while (dr.Read())
                 {
@@ -65,120 +54,76 @@ namespace Meevent_API.src.Features.SubcategoriasEvento.DAO
                         IdSubcategoriaEvento = dr.GetInt32(dr.GetOrdinal("id_subcategoria_evento")),
                         NombreSubcategoria = dr.GetString(dr.GetOrdinal("nombre_subcategoria")),
                         SlugSubcategoria = dr.GetString(dr.GetOrdinal("slug_subcategoria")),
-                        CategoriaEventoId = dr.GetInt32(dr.GetOrdinal("categoria_evento_id"))
+                        CategoriaEventoId = dr.GetInt32(dr.GetOrdinal("categoria_evento_id")),
+                        Estado = dr.GetBoolean(dr.GetOrdinal("estado"))
                     });
                 }
-                dr.Close();
             }
-
-            return lista;
+            return lista; ;
         }
 
-        public SubcategoriaEventoDTO? GetSubcategoriaEventoPorId(int id_subcategoria_evento)
+        public string InsertSubcategoria(SubcategoriaEventoCrearDTO reg)
         {
-            SubcategoriaEventoDTO? subcategoria = null;
 
-            using (SqlConnection cn = new SqlConnection(_cadena))
-            {
-                SqlCommand cmd = new SqlCommand("sp_subcategorias_evento_buscar", cn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@id_subcategoria_evento", id_subcategoria_evento);
-
-                cn.Open();
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
-                {
-                    subcategoria = new SubcategoriaEventoDTO
-                    {
-                        IdSubcategoriaEvento = dr.GetInt32(dr.GetOrdinal("id_subcategoria_evento")),
-                        NombreSubcategoria = dr.GetString(dr.GetOrdinal("nombre_subcategoria")),
-                        SlugSubcategoria = dr.GetString(dr.GetOrdinal("slug_subcategoria")),
-                        CategoriaEventoId = dr.GetInt32(dr.GetOrdinal("categoria_evento_id"))
-                    };
-                }
-                dr.Close();
-            }
-
-            return subcategoria;
-        }
-
-        public string CrearSubcategoriaEvento(SubcategoriaEventoDTO subcategoria)
-        {
             try
             {
                 using (SqlConnection cn = new SqlConnection(_cadena))
                 {
                     SqlCommand cmd = new SqlCommand("sp_subcategorias_evento_insert", cn);
                     cmd.CommandType = CommandType.StoredProcedure;
-
-                    cmd.Parameters.AddWithValue("@nombre_subcategoria", subcategoria.NombreSubcategoria);
-                    cmd.Parameters.AddWithValue("@slug_subcategoria", subcategoria.SlugSubcategoria);
-                    cmd.Parameters.AddWithValue("@categoria_evento_id", subcategoria.CategoriaEventoId);
+                    cmd.Parameters.AddWithValue("@nombre_subcategoria", reg.NombreSubcategoria);
+                    cmd.Parameters.AddWithValue("@slug_subcategoria", reg.SlugSubcategoria);
+                    cmd.Parameters.AddWithValue("@categoria_evento_id", reg.CategoriaEventoId);
 
                     cn.Open();
                     cmd.ExecuteNonQuery();
-
-                    return "Subcategoría creada correctamente";
+                    return "Subcategoría registrada correctamente";
                 }
             }
-            catch (Exception ex)
-            {
-                return $"Error al crear subcategoría: {ex.Message}";
-            }
+            catch (Exception ex) { return $"Error al crear: {ex.Message}"; }
         }
 
-    
-        public string ActualizarSubcategoriaEvento(int id_subcategoria_evento, SubcategoriaEventoDTO subcategoria)
+        public string UpdateSubcategoria(int id_subcategoria_evento, SubcategoriaEventoEditarDTO reg)
         {
             try
             {
+                var actual = GetSubcategoriaPorId(id_subcategoria_evento).FirstOrDefault();
+                if (actual == null) return "No se encontró la subcategoría para actualizar";
+
                 using (SqlConnection cn = new SqlConnection(_cadena))
                 {
                     SqlCommand cmd = new SqlCommand("sp_subcategorias_evento_update", cn);
                     cmd.CommandType = CommandType.StoredProcedure;
-
                     cmd.Parameters.AddWithValue("@id_subcategoria_evento", id_subcategoria_evento);
-                    cmd.Parameters.AddWithValue("@nombre_subcategoria", subcategoria.NombreSubcategoria);
-                    cmd.Parameters.AddWithValue("@slug_subcategoria", subcategoria.SlugSubcategoria);
-                    cmd.Parameters.AddWithValue("@categoria_evento_id", subcategoria.CategoriaEventoId);
+                    cmd.Parameters.AddWithValue("@nombre_subcategoria", reg.NombreSubcategoria ?? actual.NombreSubcategoria);
+                    cmd.Parameters.AddWithValue("@slug_subcategoria", reg.SlugSubcategoria ?? actual.SlugSubcategoria);
+                    cmd.Parameters.AddWithValue("@categoria_evento_id", reg.CategoriaEventoId ?? actual.CategoriaEventoId);
 
                     cn.Open();
-                    int filas = cmd.ExecuteNonQuery();
-
-                    return filas > 0
-                        ? "Subcategoría actualizada correctamente"
-                        : "No se encontró la subcategoría";
+                    cmd.ExecuteNonQuery();
+                    return "Datos actualizados correctamente";
                 }
             }
-            catch (Exception ex)
-            {
-                return $"Error al actualizar subcategoría: {ex.Message}";
-            }
+            catch (Exception ex) { return $"Error al actualizar: {ex.Message}"; }
         }
 
- 
-        public string EliminarSubcategoriaEvento(int id_subcategoria_evento)
+        public string CambiarEstado(int id_subcategoria_evento, bool nuevo_estado)
         {
             try
             {
                 using (SqlConnection cn = new SqlConnection(_cadena))
                 {
-                    SqlCommand cmd = new SqlCommand("sp_subcategorias_evento_delete", cn);
+                    SqlCommand cmd = new SqlCommand("sp_subcategorias_evento_cambiar_estado", cn);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@id_subcategoria_evento", id_subcategoria_evento);
+                    cmd.Parameters.AddWithValue("@estado", nuevo_estado);
 
                     cn.Open();
-                    int filas = cmd.ExecuteNonQuery();
-
-                    return filas > 0
-                        ? "Subcategoría eliminada correctamente"
-                        : "No se encontró la subcategoría";
+                    cmd.ExecuteNonQuery();
+                    return nuevo_estado ? "Subcategoría activada" : "Subcategoría desactivada";
                 }
             }
-            catch (Exception ex)
-            {
-                return $"Error al eliminar subcategoría: {ex.Message}";
-            }
+            catch (Exception ex) { return $"Error al cambiar estado: {ex.Message}"; }
         }
     }
 }
