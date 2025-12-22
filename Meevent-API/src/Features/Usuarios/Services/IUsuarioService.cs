@@ -11,9 +11,9 @@
         Task<UsuarioDetalleResponseDTO> RegistrarUsuarioAsync(UsuarioRegistroDTO registro);
 
         Task<LoginResponseDTOE> LoginAsync(LoginDTO login);
-        
-        //Task<UsuarioEditarResponseDTO> ActualizarUsuarioAsync(int id_usuario, UsuarioEditarDTO usuario);
-        
+
+        Task<UsuarioDetalleResponseDTO> ActualizarPerfilAsync(UsuarioUpdateDTO dto);
+
         Task<bool> VerificarCorreoExistenteAsync(string correo_electronico);
         
         Task<bool> CiudadExisteAsync(int id_ciudad);

@@ -72,6 +72,58 @@ namespace Meevent_API.src.Features.Usuarios
         public string? descripcion_organizador { get; set; }
     }
 
+    // DTO para la actualización de usuarios
+    public class UsuarioUpdateDTO
+    {
+        public int id_usuario { get; set; }
+        [StringLength(150, ErrorMessage = "El nombre no puede exceder los 150 caracteres")]
+        public string? nombre_completo { get; set; }
+        public int? id_ciudad { get; set; }
+
+        [RegularExpression(@"^\+?\d+$", ErrorMessage = "El número de teléfono solo debe contener números")]
+        [StringLength(20)]
+        public string? numero_telefono { get; set; }
+        public string? imagen_perfil_url { get; set; }
+
+        // Campos de Perfiles
+        public string? nombre_artistico { get; set; }
+        public string? biografia_artista { get; set; }
+        public string? genero_musical { get; set; }
+        public string? nombre_organizador { get; set; }
+        public string? descripcion_organizador { get; set; }
+    }
+
+    public class UsuarioUpdateResponseDTO 
+    {
+        public int id_usuario { get; set; }
+        public string nombre_completo { get; set; } = null!;
+        public string correo_electronico { get; set; } = null!;
+        public string tipo_usuario { get; set; } = null!;
+        public string imagen_perfil_url { get; set; } = null!;
+        public bool cuenta_activa { get; set; }
+
+        // El Hash se queda en el DAO/Service, no se envía al cliente
+        [JsonIgnore]
+        public string contrasena_hash { get; set; } = null!;
+
+        // Perfil Artista
+        public string? nombre_artistico { get; set; }
+        public string? genero_musical { get; set; }
+
+        // Perfil Organizador
+        public string? nombre_organizador { get; set; }
+        public string? descripcion_organizador { get; set; }
+        public PerfilArtistaDTO? PerfilArtista { get; set; }
+        public PerfilOrganizadorDTO? PerfilOrganizador { get; set; }
+    }
+
+    public class UpdateResponseDTO
+    {
+        public bool Exitoso { get; set; }
+        public string Mensaje { get; set; }
+        public UsuarioUpdateResponseDTO UsuarioActualizado { get; set; }
+    }
+
     // DTO para el login de usuarios
     public class LoginDTO
     {

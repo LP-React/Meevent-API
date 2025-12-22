@@ -25,11 +25,6 @@ namespace Meevent_API.src.Features.Usuarios.DAO
             throw new NotImplementedException();
         }
 
-        public string ActualizarUsuario(int id_usuario, UsuarioEditarDTO usuario)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<IEnumerable<UsuarioDetalleDTO>> GetUsuarios()
          {
             var lista = new List<UsuarioDetalleDTO>();
@@ -246,6 +241,53 @@ namespace Meevent_API.src.Features.Usuarios.DAO
             return resultado;
         }
 
+        public async Task<string> ActualizarUsuarioAsync(UsuarioUpdateDTO dto)
+        {
+            try
+            {
+                using (SqlConnection cn = new SqlConnection(_cadena))
+                {
+                    SqlCommand cmd = new SqlCommand("usp_ActualizarUsuarioCompleto", cn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@id_usuario", dto.id_usuario);
+
+                    cmd.Parameters.AddWithValue("@nombre_completo", (object)dto.nombre_completo ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@id_ciudad", (object)dto.id_ciudad ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@numero_telefono", (object)dto.numero_telefono ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@imagen_perfil_url", (object)dto.imagen_perfil_url ?? DBNull.Value);
+
+                    cmd.Parameters.AddWithValue("@nombre_artistico", (object)dto.nombre_artistico ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@biografia_artista", (object)dto.biografia_artista ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@genero_musical", (object)dto.genero_musical ?? DBNull.Value);
+
+                    cmd.Parameters.AddWithValue("@nombre_organizador", (object)dto.nombre_organizador ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@descripcion_organizador", (object)dto.descripcion_organizador ?? DBNull.Value);
+
+                    await cn.OpenAsync();
+                    int filasAfectadas = await cmd.ExecuteNonQueryAsync();
+
+                    if (filasAfectadas > 0)
+                    {
+                        return "OK";
+                    }
+                    else
+                    {
+                        return "No se encontró el usuario o no se realizaron cambios.";
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                // Captura errores específicos de SQL (como violaciones de FK si cambian la ciudad a una inválida)
+                return "Error de Base de Datos: " + ex.Message;
+            }
+            catch (Exception ex)
+            {
+                return "Error: " + ex.Message;
+            }
+        }
+
         public async Task<UsuarioLoginResponseDTO?> ObtenerUsuarioLogin(string correo)
         {
             UsuarioLoginResponseDTO? user = null;
@@ -314,62 +356,6 @@ namespace Meevent_API.src.Features.Usuarios.DAO
             return user;
         }
 
-        /*public string LoginUsuario(LoginDTO login)
-        {
-            var usuario = GetUsuariosPorCorreo(login.correo_electronico).FirstOrDefault();
-            if (usuario == null) return "Correo o contraseña incorrectos";
-
-            if (!BCrypt.Net.BCrypt.Verify(login.contrasena, usuario.ContrasenaHash))
-                return "Correo o contraseña incorrectos";
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var claims = new[] {
-                new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString()),
-                new Claim(ClaimTypes.Email, usuario.CorreoElectronico),
-                new Claim(ClaimTypes.Role, usuario.TipoUsuario)
-            };
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddMinutes(300),
-                signingCredentials: creds
-            );
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }*/
-
-        /*public string ActualizarUsuario(int id_usuario, UsuarioEditarDTO usuario)
-        {
-            using (SqlConnection cn = new SqlConnection(_cadena))
-            {
-                cn.Open();
-                SqlCommand cmdVerificar = new SqlCommand("SELECT cuenta_activa FROM usuarios WHERE id_usuario = @id_usuario", cn);
-                cmdVerificar.Parameters.AddWithValue("@id_usuario", id_usuario);
-                var resultadoVerificacion = cmdVerificar.ExecuteScalar();
-                if (resultadoVerificacion == null) return "Usuario no encontrado";
-                if (!(bool)resultadoVerificacion) return "No se puede editar un usuario con cuenta desactivada";
-
-                var usuarioActual = GetUsuariosPorId(id_usuario).FirstOrDefault();
-                if (usuarioActual == null) return "Usuario no encontrado";
-
-                SqlCommand cmd = new SqlCommand("usp_ActualizarUsuario", cn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@id_usuario", id_usuario);
-                cmd.Parameters.AddWithValue("@nombre_completo", string.IsNullOrEmpty(usuario.nombre_completo) ? usuarioActual.NombreCompleto : usuario.nombre_completo);
-                cmd.Parameters.AddWithValue("@numero_telefono", string.IsNullOrEmpty(usuario.numero_telefono) ? (usuarioActual.NumeroTelefono ?? (object)DBNull.Value) : usuario.numero_telefono);
-                cmd.Parameters.AddWithValue("@imagen_perfil_url", string.IsNullOrEmpty(usuario.imagen_perfil_url) ? (usuarioActual.ImagenPerfilUrl ?? (object)DBNull.Value) : usuario.imagen_perfil_url);
-                cmd.Parameters.AddWithValue("@fecha_nacimiento", usuario.fecha_nacimiento ?? (usuarioActual.FechaNacimiento ?? (object)DBNull.Value));
-                cmd.Parameters.AddWithValue("@email_verificado", usuario.email_verificado ?? usuarioActual.EmailVerificado);
-                cmd.Parameters.AddWithValue("@tipo_usuario", string.IsNullOrEmpty(usuario.tipo_usuario) ? usuarioActual.TipoUsuario : usuario.tipo_usuario.ToLower());
-                cmd.Parameters.AddWithValue("@contrasena_hash", !string.IsNullOrEmpty(usuario.contrasena) ? BCrypt.Net.BCrypt.HashPassword(usuario.contrasena) : usuarioActual.ContrasenaHash);
-                cmd.Parameters.AddWithValue("@id_pais", usuario.id_pais ?? usuarioActual.IdCiudadNavigation.IdPais);
-                cmd.Parameters.AddWithValue("@id_ciudad", usuario.id_ciudad ?? usuarioActual.IdCiudadNavigation.IdCiudad);
-
-                return cmd.ExecuteNonQuery() > 0 ? "Usuario actualizado correctamente" : "No se pudo actualizar el usuario";
-            }
-        }*/
-
         /* public string ActivarDesactivarCuenta(int id_usuario, bool cuenta_activa)
          {
              using (SqlConnection cn = new SqlConnection(_cadena))
@@ -421,6 +407,6 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                 return resultado != null && Convert.ToBoolean(resultado);
             }
         }
-    
+
     }
 }

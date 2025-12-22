@@ -93,65 +93,25 @@ namespace Meevent_API.src.Features.Usuarios
             }
         }
 
-        /*[HttpPatch("editarUsuario/{id}")]
-        public async Task<ActionResult<UsuarioEditarResponseDTO>> EditarUsuario(int id, [FromBody] UsuarioEditarDTO usuario)
+        [HttpPatch("editarUsuario/")]
+        public async Task<ActionResult<UsuarioEditarResponseDTO>> ActualizarPerfil(int id, UsuarioUpdateDTO dto)
         {
-            if (id <= 0)
-                return BadRequest(new { Mensaje = "ID de usuario inválido" });
+            dto.id_usuario = id;
 
-            if (string.IsNullOrEmpty(usuario.nombre_completo) &&
-                string.IsNullOrEmpty(usuario.numero_telefono) &&
-                string.IsNullOrEmpty(usuario.imagen_perfil_url) &&
-                !usuario.fecha_nacimiento.HasValue &&
-                string.IsNullOrEmpty(usuario.tipo_usuario) &&
-                !usuario.email_verificado.HasValue &&
-                string.IsNullOrEmpty(usuario.contrasena) &&
-                !usuario.id_pais.HasValue)
+            if (dto.id_usuario <= 0)
             {
-                return BadRequest(new
-                {
-                    Exitoso = false,
-                    Mensaje = "Debe proporcionar al menos un campo para actualizar"
-                });
+                return BadRequest(new { exitoso = false, mensaje = "ID de usuario no válido." });
             }
 
-            if (!string.IsNullOrEmpty(usuario.contrasena))
-            {
-                if (usuario.contrasena.Length < 8)
-                {
-                    return BadRequest(new
-                    {
-                        Exitoso = false,
-                        Mensaje = "La contraseña debe tener al menos 8 caracteres"
-                    });
-                }
+            var resultado = await _usuarioService.ActualizarPerfilAsync(dto);
 
-                if (!System.Text.RegularExpressions.Regex.IsMatch(usuario.contrasena, @"^(?=.*[A-Z])(?=.*\d).+$"))
-                {
-                    return BadRequest(new
-                    {
-                        Exitoso = false,
-                        Mensaje = "La contraseña debe tener al menos 1 mayúscula y 1 número"
-                    });
-                }
+            if (resultado.Exitoso)
+            {
+                return Ok(resultado);
             }
 
-            var respuesta = await _usuarioService.ActualizarUsuarioAsync(id, usuario);
-
-            if (!respuesta.Exitoso)
-            {
-                if (respuesta.Mensaje.Contains("no encontrado"))
-                    return NotFound(respuesta);
-
-                if (respuesta.Mensaje.Contains("inválido") || respuesta.Mensaje.Contains("no existe"))
-                    return BadRequest(respuesta);
-
-                return StatusCode(500, respuesta);
-            }
-
-            return Ok(respuesta);
+            return BadRequest(resultado);
         }
-        */
 
         [HttpGet("verificarEmail/{correo}")]
         public async Task<ActionResult<bool>> VerificarEmail(string correo)

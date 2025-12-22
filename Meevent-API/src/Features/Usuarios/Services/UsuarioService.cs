@@ -185,96 +185,40 @@ namespace Meevent_API.src.Features.Usuarios.Service
             return response;
         }
 
-        /*public async Task<UsuarioEditarResponseDTO> ActualizarUsuarioAsync(int id_usuario, UsuarioEditarDTO usuario)
+        public async Task<UsuarioDetalleResponseDTO> ActualizarPerfilAsync(UsuarioUpdateDTO dto)
         {
-            try
+            var response = new UsuarioDetalleResponseDTO();
+
+            if (dto.id_ciudad.HasValue)
             {
-                if (string.IsNullOrEmpty(usuario.nombre_completo) &&
-                    string.IsNullOrEmpty(usuario.numero_telefono) &&
-                    string.IsNullOrEmpty(usuario.imagen_perfil_url) &&
-                    !usuario.fecha_nacimiento.HasValue &&
-                    string.IsNullOrEmpty(usuario.tipo_usuario) &&
-                    !usuario.email_verificado.HasValue &&
-                    string.IsNullOrEmpty(usuario.contrasena) &&
-                    !usuario.id_pais.HasValue)
+                bool existeCiudad = await _usuarioDAO.VerificarCiudadExisteAsync(dto.id_ciudad.Value);
+                if (!existeCiudad)
                 {
-                    return new UsuarioEditarResponseDTO
-                    {
-                        Exitoso = false,
-                        Mensaje = "Debe proporcionar al menos un campo para actualizar"
-                    };
+                    response.Exitoso = false;
+                    response.Mensaje = "La ciudad especificada no es válida.";
+                    return response;
                 }
-
-                var usuarioExistente = await ObtenerUsuarioPorIdAsync(id_usuario);
-                if (usuarioExistente == null)
-                {
-                    return new UsuarioEditarResponseDTO
-                    {
-                        Exitoso = false,
-                        Mensaje = "Usuario no encontrado"
-                    };
-                }
-
-                if (!usuarioExistente.cuenta_activa)
-                {
-                    return new UsuarioEditarResponseDTO
-                    {
-                        Exitoso = false,
-                        Mensaje = "No se puede editar un usuario con cuenta desactivada"
-                    };
-                }
-
-                if (!string.IsNullOrEmpty(usuario.tipo_usuario) &&
-                    !new[] { "normal", "artista", "organizador" }.Contains(usuario.tipo_usuario.ToLower()))
-                {
-                    return new UsuarioEditarResponseDTO
-                    {
-                        Exitoso = false,
-                        Mensaje = "Tipo de usuario inválido. Debe ser: normal, artista u organizador"
-                    };
-                }
-
-                if (usuario.id_pais.HasValue)
-                {
-                    bool paisExiste = await VerificarPaisExisteAsync(usuario.id_pais.Value);
-                    if (!paisExiste)
-                    {
-                        return new UsuarioEditarResponseDTO
-                        {
-                            Exitoso = false,
-                            Mensaje = $"El país con ID {usuario.id_pais.Value} no existe"
-                        };
-                    }
-                }
-
-                var resultadoStr = await Task.Run(() => _usuarioDAO.ActualizarUsuario(id_usuario, usuario));
-
-                if (resultadoStr.Contains("correctamente"))
-                {
-                    return new UsuarioEditarResponseDTO
-                    {
-                        Exitoso = true,
-                        Mensaje = resultadoStr,
-                        UsuarioActualizado = await ObtenerUsuarioPorIdAsync(id_usuario)
-                    };
-                }
-
-                return new UsuarioEditarResponseDTO
-                {
-                    Exitoso = false,
-                    Mensaje = resultadoStr
-                };
             }
-            catch (Exception ex)
+
+            string resultado = await _usuarioDAO.ActualizarUsuarioAsync(dto);
+
+            if (resultado == "OK")
             {
-                return new UsuarioEditarResponseDTO
-                {
-                    Exitoso = false,
-                    Mensaje = $"Error inesperado en el servicio: {ex.Message}"
-                };
+                // Obtener el usuario recién actualizado para devolverlo en la respuesta
+                var usuarioActualizado = await _usuarioDAO.GetUsuariosPorId(dto.id_usuario);
+
+                response.Exitoso = true;
+                response.Mensaje = "Perfil actualizado correctamente.";
+                response.Usuario = usuarioActualizado;
             }
+            else
+            {
+                response.Exitoso = false;
+                response.Mensaje = resultado;
+            }
+
+            return response;
         }
-        */
 
         public async Task<bool> VerificarCorreoExistenteAsync(string correo)
         {
