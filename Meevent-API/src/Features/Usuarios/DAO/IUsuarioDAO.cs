@@ -10,7 +10,7 @@ namespace Meevent_API.src.Features.Usuarios.DAO
         Task<string> InsertUsuario(UsuarioRegistroDTO reg);
         Task<UsuarioLoginResponseDTO?> ObtenerUsuarioLogin(string correo);
         string ActualizarUsuario(int id_usuario, UsuarioEditarDTO usuario);
-        Task<bool> VerificarCorreoExistente(string correo_electronico);
+        Task<bool> VerificarCorreoExistenteAsync(string correo_electronico);
         bool VerificarPaisExiste(int id_pais);
         bool VerificarCiudadExiste(int id_ciudad);
         string ActivarDesactivarCuenta(int id_usuario, bool cuenta_activa);

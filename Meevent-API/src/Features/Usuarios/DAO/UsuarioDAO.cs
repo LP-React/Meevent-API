@@ -383,31 +383,31 @@ namespace Meevent_API.src.Features.Usuarios.DAO
              }
          }*/
 
-        /* public bool VerificarCorreoExistente(string correo_electronico)
-         {
-             using (SqlConnection cn = new SqlConnection(_cadena))
-             {
-                 SqlCommand cmd = new SqlCommand("usp_VerificarCorreo", cn);
-                 cmd.CommandType = CommandType.StoredProcedure;
-                 cmd.Parameters.AddWithValue("@correo_electronico", correo_electronico);
-                 cn.Open();
-                 return Convert.ToBoolean(cmd.ExecuteScalar());
-             }
-         }*/
+        public async Task<bool> VerificarCorreoExistenteAsync(string correo_electronico)
+        {
+            using (SqlConnection cn = new SqlConnection(_cadena))
+            {
+                SqlCommand cmd = new SqlCommand("usp_VerificarCorreo", cn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@correo_electronico", correo_electronico);
+                await cn.OpenAsync();
+                var resultado = await cmd.ExecuteScalarAsync();
+                return Convert.ToBoolean(resultado);
+            }
+        }
 
-        /*public bool VerificarPaisExiste(int id_pais)
+        public bool VerificarPaisExiste(int id_pais)
         {
             using (SqlConnection cn = new SqlConnection(_cadena))
             {
                 SqlCommand cmd = new SqlCommand("usp_VerificarPaisExiste", cn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@id_pais", id_pais);
-                cn.Open();
+                cn.OpenAsync();
                 return Convert.ToBoolean(cmd.ExecuteScalar());
             }
         }
-        */
-
+        
         public bool VerificarCiudadExiste(int id_ciudad)
         {
             using (SqlConnection cn = new SqlConnection(_cadena))
@@ -418,21 +418,6 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                 cn.Open();
                 return Convert.ToBoolean(cmd.ExecuteScalar());
             }
-        }
-
-        public bool VerificarCorreoExistente(string correo_electronico)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool VerificarPaisExiste(int id_pais)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<bool> IUsuarioDAO.VerificarCorreoExistente(string correo_electronico)
-        {
-            throw new NotImplementedException();
         }
     }
 }

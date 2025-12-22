@@ -90,8 +90,8 @@ namespace Meevent_API.src.Features.Usuarios.Service
             try
             {
                 // Verificar si el correo ya está registrado
-                var usuarioExistente = await _usuarioDAO.GetUsuariosPorCorreo(reg.correo_electronico);
-                if (usuarioExistente != null)
+                bool yaExiste = await _usuarioDAO.VerificarCorreoExistenteAsync(reg.correo_electronico);
+                if (!yaExiste)
                 {
                     respuesta.Exitoso = false;
                     respuesta.Mensaje = "El correo electrónico ya está registrado.";
@@ -266,8 +266,19 @@ namespace Meevent_API.src.Features.Usuarios.Service
             }
         }
         */
-        public async Task<bool> VerificarCorreoExistenteAsync(string correo) 
-            => await Task.Run(() => _usuarioDAO.VerificarCorreoExistente(correo));
+
+        public async Task<bool> VerificarCorreoExistenteAsync(string correo)
+        {
+            try
+            {
+                return await _usuarioDAO.VerificarCorreoExistenteAsync(correo);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al consultar la disponibilidad del correo electrónico.", ex);
+            }
+        }
+        
         public async Task<bool> VerificarPaisExisteAsync(int id)
             => await Task.Run(() => _usuarioDAO.VerificarPaisExiste(id));
         public async Task<bool> VerificarCiudadExisteAsync(int id) 
