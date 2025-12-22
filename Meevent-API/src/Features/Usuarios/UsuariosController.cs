@@ -156,5 +156,23 @@ namespace Meevent_API.src.Features.Usuarios
                 return BadRequest(respuesta);
             }
         }
+    
+        [HttpPost("cambiar-contrasenia/{id}")]
+        public async Task<IActionResult> CambiarContrasenia(int id, UsuarioCambiarPasswordDTO dto)
+        {
+            if (id <= 0)
+                return BadRequest(new { Mensaje = "ID de usuario inválido" });
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var exito = await _usuarioService.CambiarContraseniaAsync(id, dto);
+            if (exito)
+            {
+                return Ok(new { Mensaje = "Contraseña cambiada exitosamente." });
+            }
+            else
+            {
+                return BadRequest(new { Mensaje = "Error al cambiar la contraseña." });
+            }
+        }
     }
 }

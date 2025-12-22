@@ -75,7 +75,7 @@ namespace Meevent_API.src.Features.Usuarios.Service
 
         public async Task<UsuarioDetalleDTO> ObtenerUsuarioPorCorreoAsync(string correo_electronico)
         {
-            if (string.IsNullOrWhiteSpace(correo_electronico)) 
+            if (string.IsNullOrWhiteSpace(correo_electronico))
                 return null;
 
             var usuario = await Task.Run(() => _usuarioDAO.GetUsuariosPorCorreo(correo_electronico));
@@ -154,7 +154,7 @@ namespace Meevent_API.src.Features.Usuarios.Service
                 }
 
                 // Verificamos si la cuenta está activa
-                if (!usuario.cuenta_activa) 
+                if (!usuario.cuenta_activa)
                 {
                     response.Exitoso = false;
                     response.Mensaje = "Tu cuenta está deshabilitada. Por favor, contacta al correo : ayuda@meevent.com";
@@ -230,7 +230,7 @@ namespace Meevent_API.src.Features.Usuarios.Service
                 throw new Exception("Error al consultar la disponibilidad del correo electrónico.", ex);
             }
         }
-        
+
         public async Task<bool> VerificarPaisExisteAsync(int id)
             => await Task.Run(() => _usuarioDAO.VerificarPaisExiste(id));
         public async Task<bool> CiudadExisteAsync(int id_ciudad)
@@ -260,6 +260,18 @@ namespace Meevent_API.src.Features.Usuarios.Service
             catch (Exception ex)
             {
                 return new UsuarioActivarCuentaResponseDTO { Exitoso = false, Mensaje = $"Error: {ex.Message}" };
+            }
+        }
+
+        public async Task<bool> CambiarContraseniaAsync(int id_usuario, UsuarioCambiarPasswordDTO dto)
+        {
+            try
+            {
+                return await _usuarioDAO.CambiarContraseniaAsync(id_usuario, dto);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al cambiar la contraseña.", ex);
             }
         }
     }

@@ -328,6 +328,7 @@ namespace Meevent_API.src.Features.Usuarios.DAO
 
                     cmd.Parameters.AddWithValue("@nombre_organizador", (object)dto.nombre_organizador ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("@descripcion_organizador", (object)dto.descripcion_organizador ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@telefono_contacto", (object)dto.telefono_contacto ?? DBNull.Value);
 
                     await cn.OpenAsync();
                     int filasAfectadas = await cmd.ExecuteNonQueryAsync();
@@ -473,5 +474,19 @@ namespace Meevent_API.src.Features.Usuarios.DAO
             }
         }
 
+        public async Task<bool> CambiarContraseniaAsync(int id_usuario, UsuarioCambiarPasswordDTO dto)
+        {
+            using (SqlConnection cn = new SqlConnection(_cadena))
+            {
+                SqlCommand cmd = new SqlCommand("usp_Cambiar_contrasenia_usuario", cn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@id_usuario", id_usuario);
+                cmd.Parameters.AddWithValue("@contrasenia", dto.contrasenia);
+
+                await cn.OpenAsync();
+                var resultado = await cmd.ExecuteScalarAsync();
+                return resultado != null && Convert.ToBoolean(resultado);
+            }
+        }
     }
 }

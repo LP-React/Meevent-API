@@ -95,6 +95,11 @@ namespace Meevent_API.src.Features.Usuarios
         public string? telefono_contacto { get; set; }
     }
 
+    public class UsuarioCambiarPasswordDTO 
+    {
+        public string contrasenia;
+    }
+
     public class UsuarioUpdateResponseDTO 
     {
         public int id_usuario { get; set; }

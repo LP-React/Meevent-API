@@ -20,6 +20,6 @@
         
         Task<UsuarioActivarCuentaResponseDTO> ActivarDesactivarCuentaAsync(int id_usuario, bool cuenta_activa);
 
-
+        Task<bool> CambiarContraseniaAsync(int id_usuario, UsuarioCambiarPasswordDTO dto);
     }
 }
