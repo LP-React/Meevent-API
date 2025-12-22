@@ -70,6 +70,7 @@ namespace Meevent_API.src.Features.Usuarios
         // Campos para Organizador (Opcionales)
         public string? nombre_organizador { get; set; }
         public string? descripcion_organizador { get; set; }
+        public string? telefono_contacto { get; set; }
     }
 
     // DTO para la actualización de usuarios
@@ -91,6 +92,7 @@ namespace Meevent_API.src.Features.Usuarios
         public string? genero_musical { get; set; }
         public string? nombre_organizador { get; set; }
         public string? descripcion_organizador { get; set; }
+        public string? telefono_contacto { get; set; }
     }
 
     public class UsuarioUpdateResponseDTO 

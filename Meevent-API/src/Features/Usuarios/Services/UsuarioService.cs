@@ -93,7 +93,7 @@ namespace Meevent_API.src.Features.Usuarios.Service
                 bool yaExiste = await _usuarioDAO.VerificarCorreoExistenteAsync(reg.correo_electronico);
                 if (yaExiste)
                 {
-                    respuesta.Exitoso = yaExiste;
+                    respuesta.Exitoso = false;
                     respuesta.Mensaje = "El correo electrónico ya está registrado.";
                     return respuesta;
                 }

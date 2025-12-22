@@ -104,50 +104,6 @@ namespace Meevent_API.src.Features.Usuarios.DAO
             return lista;
         }
         
-        /*public IEnumerable<Usuario> GetUsuariosPorId(int id_usuario)
-        {
-            List<Usuario> temporal = new List<Usuario>();
-            using (SqlConnection cn = new SqlConnection(_cadena))
-            {
-                SqlCommand cmd = new SqlCommand("usp_UsuarioPorId", cn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@id_usuario", id_usuario);
-                cn.Open();
-                SqlDataReader dr = cmd.ExecuteReader();
-                while (dr.Read())
-                {
-                    temporal.Add(new Usuario
-                    {
-                        IdUsuario = dr.GetInt32(dr.GetOrdinal("id_usuario")),
-                        NombreCompleto = dr.GetString(dr.GetOrdinal("nombre_completo")),
-                        CorreoElectronico = dr.GetString(dr.GetOrdinal("correo_electronico")),
-                        ContrasenaHash = dr.GetString(dr.GetOrdinal("contrasena_hash")),
-                        NumeroTelefono = dr.IsDBNull(dr.GetOrdinal("numero_telefono")) ? null : dr.GetString(dr.GetOrdinal("numero_telefono")),
-                        ImagenPerfilUrl = dr.IsDBNull(dr.GetOrdinal("imagen_perfil_url")) ? null : dr.GetString(dr.GetOrdinal("imagen_perfil_url")),
-                        FechaNacimiento = dr.IsDBNull(dr.GetOrdinal("fecha_nacimiento")) ? null : DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_nacimiento"))),
-                        FechaCreacion = DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_creacion"))),
-                        FechaActualizacion = DateOnly.FromDateTime(dr.GetDateTime(dr.GetOrdinal("fecha_actualizacion"))),
-                        EmailVerificado = dr.GetBoolean(dr.GetOrdinal("email_verificado")),
-                        CuentaActiva = dr.GetBoolean(dr.GetOrdinal("cuenta_activa")),
-                        TipoUsuario = dr.GetString(dr.GetOrdinal("tipo_usuario")),
-                        IdPaisNavigation = new Pais
-                        {
-                            NombrePais = dr.GetString(dr.GetOrdinal("nombre_pais"))
-                        },
-
-                        IdCiudadNavigation = new Ciudad
-                        {
-                            IdCiudad = dr.GetInt32(dr.GetOrdinal("id_ciudad")),
-                            NombreCiudad = dr.GetString(dr.GetOrdinal("nombre_ciudad")),
-                            IdPais = dr.GetInt32(dr.GetOrdinal("id_pais"))
-                        }
-                    });
-                }
-            }
-            return temporal;
-        }
-        */
-        
         public async Task<UsuarioDetalleDTO> GetUsuariosPorCorreo(string correo_electronico)
         {
             using (SqlConnection cn = new SqlConnection(_cadena))
@@ -330,6 +286,7 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                         // Datos específicos de Organizador
                         cmd.Parameters.AddWithValue("@nombre_organizador", (object)reg.nombre_organizador ?? DBNull.Value);
                         cmd.Parameters.AddWithValue("@descripcion_organizador", (object)reg.descripcion_organizador ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@telefono_contacto", (object)reg.telefono_contacto ?? DBNull.Value);
 
                         await cn.OpenAsync();
                         int filasAfectadas = await cmd.ExecuteNonQueryAsync();
