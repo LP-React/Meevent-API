@@ -12,7 +12,7 @@ namespace Meevent_API.src.Features.Locales.DAO
                 Build().GetConnectionString("MeeventDB");
         }
 
-        public async Task<IEnumerable<LocalDTO>> ListarLocalesPorCiudadAsync(int idCiudad)
+        public async Task<IEnumerable<LocalDTO>> ListarLocalesPorCiudadAsync(int? idCiudad)
         {
             var lista = new List<LocalDTO>();
 

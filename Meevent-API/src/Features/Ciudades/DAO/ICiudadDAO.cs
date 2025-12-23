@@ -2,6 +2,6 @@
 {
     public interface ICiudadDAO
     {
-        Task<IEnumerable<CiudadDTO>> ListarCiudadesPorPaisAsync(int idPais);
+        Task<IEnumerable<CiudadDTO>> ListarCiudadesPorPaisAsync(int? idPais);
     }
 }

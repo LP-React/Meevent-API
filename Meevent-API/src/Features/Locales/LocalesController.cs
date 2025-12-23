@@ -18,7 +18,7 @@ namespace Meevent_API.src.Features.Locales
         }
 
         [HttpGet("getLocales")]
-        public async Task<ActionResult<LocalListResponseDTO>> GetLocalesByCiudad(int idCiudad)
+        public async Task<ActionResult<LocalListResponseDTO>> GetLocalesByCiudad(int? idCiudad = null)
         {
             _logger.LogInformation("Consultando locales para la ciudad con ID: {Id}", idCiudad);
 

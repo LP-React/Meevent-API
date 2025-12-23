@@ -2,6 +2,6 @@
 {
     public interface ICiudadService
     {
-        Task<CiudadListResponseDTO> GetCiudadesByPaisAsync(int idPais);
+        Task<CiudadListResponseDTO> GetCiudadesByPaisAsync(int? idPais);
     }
 }

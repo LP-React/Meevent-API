@@ -2,6 +2,6 @@
 {
     public interface ILocalService
     {
-        Task<LocalListResponseDTO> GetLocalesByCiudadAsync(int idCiudad);
+        Task<LocalListResponseDTO> GetLocalesByCiudadAsync(int? idCiudad);
     }
 }

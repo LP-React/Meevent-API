@@ -12,7 +12,7 @@ namespace Meevent_API.src.Features.Ciudades.DAO
                 Build().GetConnectionString("MeeventDB");
         }
 
-        public async Task<IEnumerable<CiudadDTO>> ListarCiudadesPorPaisAsync(int idPais)
+        public async Task<IEnumerable<CiudadDTO>> ListarCiudadesPorPaisAsync(int? idPais)
         {
             var lista = new List<CiudadDTO>();
 

@@ -13,7 +13,7 @@ namespace Meevent_API.src.Features.Locales.Service
             _logger = logger;
         }
 
-        public async Task<LocalListResponseDTO> GetLocalesByCiudadAsync(int idCiudad)
+        public async Task<LocalListResponseDTO> GetLocalesByCiudadAsync(int? idCiudad)
         {
             try
             {

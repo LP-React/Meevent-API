@@ -2,6 +2,6 @@
 {
     public interface ILocalDAO
     {
-        Task<IEnumerable<LocalDTO>> ListarLocalesPorCiudadAsync(int idCiudad);
+        Task<IEnumerable<LocalDTO>> ListarLocalesPorCiudadAsync(int? idCiudad);
     }
 }

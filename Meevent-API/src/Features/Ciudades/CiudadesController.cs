@@ -16,7 +16,7 @@ namespace Meevent_API.src.Features.Ciudades
         }
 
         [HttpGet("getCiudades")]
-        public async Task<ActionResult<CiudadListResponseDTO>> GetByPais(int idPais)
+        public async Task<ActionResult<CiudadListResponseDTO>> GetByPais(int? idPais = null)
         {
             var response = await _ciudadService.GetCiudadesByPaisAsync(idPais);
             return response.Exitoso ? Ok(response) : StatusCode(500, response);

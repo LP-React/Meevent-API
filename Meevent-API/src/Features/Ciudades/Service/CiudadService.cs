@@ -13,7 +13,7 @@ namespace Meevent_API.src.Features.Ciudades.Service
             _logger = logger;
         }
 
-        public async Task<CiudadListResponseDTO> GetCiudadesByPaisAsync(int idPais)
+        public async Task<CiudadListResponseDTO> GetCiudadesByPaisAsync(int? idPais)
         {
             try
             {
