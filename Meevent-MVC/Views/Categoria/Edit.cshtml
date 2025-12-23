@@ -1,0 +1,33 @@
+﻿@model gRpc_Categorias.Categoria
+
+@{
+    ViewData["Title"] = "Editar Categoría";
+}
+
+<div class="container mt-4">
+    <h2 class="text-white">Editar Categoría</h2>
+    <div class="card bg-dark text-white border-secondary shadow p-4">
+        <form asp-action="Edit" method="post">
+            <input type="hidden" name="id" value="@Model.IdCategoria" />
+
+            <input type="hidden" name="estado" value="@(Model.Estado ? "true" : "false")" />
+
+            <div class="mb-3">
+                <label class="form-label">Nombre de Categoría</label>
+                <input type="text" name="nombreCategoria" value="@Model.NombreCategoria"
+                       class="form-control bg-dark text-white border-secondary" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Slug</label>
+                <input type="text" name="slugCategoria" value="@Model.SlugCategoria"
+                       class="form-control bg-dark text-white border-secondary" required />
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary px-4">Actualizar Cambios</button>
+                <a asp-action="Index" class="btn btn-outline-light">Volver</a>
+            </div>
+        </form>
+    </div>
+</div>

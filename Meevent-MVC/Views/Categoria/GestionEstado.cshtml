@@ -1,0 +1,67 @@
+﻿@{
+    ViewData["Title"] = "Gestión de Estado";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card bg-dark text-white border-secondary shadow-lg">
+                <div class="card-header bg-black border-secondary py-3 text-center">
+                    <h4 class="mb-0 text-info"><i class="bi bi-gear-fill me-2"></i>Consola de Activación</h4>
+                </div>
+                <div class="card-body p-4">
+
+                    @if (TempData["Mensaje"] != null)
+                    {
+                        <div class="alert alert-@TempData["Tipo"] border-0 shadow-sm animate__animated animate__fadeIn">
+                            <i class="bi bi-info-circle me-2"></i> @TempData["Mensaje"]
+                        </div>
+                    }
+
+                    <form asp-action="GestionEstado" method="post">
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-muted text-uppercase">ID de la Categoría</label>
+                            <input type="number" name="id" class="form-control form-control-lg bg-dark text-white border-secondary text-center"
+                                   placeholder="Escribe el ID aquí..." required />
+                        </div>
+
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <button type="submit" name="activar" value="true" class="btn btn-success btn-lg w-100 shadow-sm">
+                                    <i class="bi bi-check-lg me-1"></i> Activar
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button type="submit" name="activar" value="false" class="btn btn-danger btn-lg w-100 shadow-sm">
+                                    <i class="bi bi-x-lg me-1"></i> Desactivar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer bg-black border-secondary text-center">
+                    <a asp-action="Index" class="btn btn-link btn-sm text-decoration-none text-muted">
+                        <i class="bi bi-arrow-left"></i> Volver al listado principal
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #121212;
+    }
+
+    .form-control:focus {
+        background-color: #2b2b2b;
+        color: white;
+        border-color: #0dcaf0;
+        box-shadow: none;
+    }
+
+    .animate__animated {
+        --animate-duration: 0.5s;
+    }
+</style>

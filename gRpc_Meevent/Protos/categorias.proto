@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option csharp_namespace = "gRpc_Categorias";
+
+service ServicioCategorias {
+  rpc GetAll (EmptyCat) returns (Categorias);
+  rpc GetById (CategoriaRequest) returns (Categorias);
+}
+
+message EmptyCat {}
+
+message CategoriaRequest {
+  int32 id_categoria = 1;
+}
+
+message Categoria {
+  int32 id_categoria = 1;
+  string nombre_categoria = 2;
+  string slug_categoria = 3;
+  bool estado = 4; 
+}
+
+message Categorias {
+  repeated Categoria items = 1;
+}

@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option csharp_namespace = "gRpc_SubCategorias";
+
+package subcategorias;
+
+service ServicioSubcategorias {
+    rpc GetAll (EmptySub) returns (Subcategorias);
+    rpc GetById (SubcategoriaRequest) returns (Subcategorias);
+}
+
+message EmptySub {}
+
+message SubcategoriaRequest {
+    int32 idSubcategoria = 1;
+}
+
+message Subcategoria {
+    int32 idSubcategoria = 1;
+    string nombreSubcategoria = 2;
+    string slugSubcategoria = 3;
+    int32 idCategoria = 4;
+    bool estado = 5;
+}
+
+message Subcategorias {
+    repeated Subcategoria items = 1;
+}

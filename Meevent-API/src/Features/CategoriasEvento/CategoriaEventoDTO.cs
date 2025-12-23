@@ -32,6 +32,7 @@ namespace Meevent_API.src.Features.CategoriasEvento
     {
         public string? NombreCategoria { get; set; }
         public string? SlugCategoria { get; set; }
+
         public bool? Estado { get; set; }
     }
 

@@ -1,0 +1,66 @@
+﻿@model IEnumerable<gRpc_SubCategorias.Subcategoria>
+@{
+    ViewData["Title"] = "Subcategorías";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-dark rounded shadow-sm border border-secondary">
+        <div>
+            <h2 class="text-white mb-0">Subcategorías de Eventos</h2>
+            <small class="text-muted">Gestión vía gRPC y API REST</small>
+        </div>
+        <a asp-action="Create" class="btn btn-success fw-bold">
+            <i class="bi bi-plus-circle me-1"></i> Nueva Subcategoría
+        </a>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger border-0 shadow-sm">@ViewBag.Error</div>
+    }
+
+    <div class="card bg-dark border-secondary shadow">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover mb-0">
+                <thead class="table-black">
+                    <tr>
+                        <th class="ps-4">ID</th>
+                        <th>Nombre</th>
+                        <th>Slug</th>
+                        <th>Categoría Padre</th>
+                        <th>Estado</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-4 align-middle text-muted">#@item.IdSubcategoria</td>
+                            <td class="align-middle fw-bold">@item.NombreSubcategoria</td>
+                            <td class="align-middle text-info small">/@item.SlugSubcategoria</td>
+                            <td class="align-middle">
+                                <span class="badge bg-secondary text-white-50">ID: @item.IdCategoria</span>
+                            </td>
+                            <td class="align-middle">
+                                @if (item.Estado)
+                                {
+                                    <span class="badge bg-success-subtle text-success border border-success">Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger-subtle text-danger border border-danger">Inactivo</span>
+                                }
+                            </td>
+                            <td class="text-center align-middle">
+                                <a asp-action="Edit" asp-route-id="@item.IdSubcategoria" class="btn btn-outline-warning btn-sm">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
