@@ -17,6 +17,8 @@ using Meevent_API.src.Features.Locales.DAO;
 using Meevent_API.src.Features.Locales.Service;
 using Meevent_API.src.Features.Ciudades.DAO;
 using Meevent_API.src.Features.Ciudades.Service;
+using Meevent_API.src.Features.SeguidoresEvento.DAO;
+using Meevent_API.src.Features.SeguidoresEvento.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,7 +58,7 @@ builder.Services.AddScoped<ICategoriaEventoDAO, CategoriaEventoDAO>();
 builder.Services.AddScoped<ISubcategoriaEventoDAO, SubcategoriaEventoDAO>();
 builder.Services.AddScoped<ILocalDAO, LocalDAO>();
 builder.Services.AddScoped<ICiudadDAO, CiudadDAO>();
-// parte de FRANCO
+builder.Services.AddScoped<ISeguidoresEventoDAO, SeguidoresEventoDAO>();
 builder.Services.AddScoped<IEventoDAO, EventoDAO>();
 // parte de ELTON
 
@@ -69,7 +71,7 @@ builder.Services.AddScoped<ICategoriaEventoService, CategoriaEventoService>();
 builder.Services.AddScoped<ISubcategoriaEventoService, SubcategoriaEventoService>();
 builder.Services.AddScoped<ILocalService, LocalService>();
 builder.Services.AddScoped<ICiudadService, CiudadService>();
-// parte de FRANCO
+builder.Services.AddScoped<ISeguidoresService, SeguidoresService>();
 builder.Services.AddScoped<IEventoService, EventoService>();
 
 // parte de ELTON
