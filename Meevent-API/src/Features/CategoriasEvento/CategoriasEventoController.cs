@@ -16,7 +16,7 @@ namespace Meevent_API.src.Features.CategoriasEvento
 
      
         [HttpGet("ListarCategorias")]
-        public async Task<ActionResult<CategoriaEventoListResponseDTO>> Get()
+        public async Task<IActionResult> Get()
         {
             var response = await _service.ObtenerCategoriasAsync();
             return Ok(response);
@@ -24,7 +24,7 @@ namespace Meevent_API.src.Features.CategoriasEvento
 
      
         [HttpGet("BuscarCategoria/{id}")]
-        public async Task<ActionResult<CategoriaEventoOperacionResponseDTO>> Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
             var categoria = await _service.ObtenerCategoriaPorIdAsync(id);
 
@@ -68,7 +68,7 @@ namespace Meevent_API.src.Features.CategoriasEvento
 
    
         [HttpPatch("EditarCategoria/{id}")]
-        public async Task<ActionResult<CategoriaEventoOperacionResponseDTO>> Patch(
+        public async Task<IActionResult> Patch(
             int id,
             [FromBody] CategoriaEventoEditarDTO dto)
         {
@@ -81,7 +81,7 @@ namespace Meevent_API.src.Features.CategoriasEvento
         }
 
         [HttpPatch("ActivarEstado_Desactivar/{id}")]
-        public async Task<ActionResult<CategoriaCambiarEstadoResponseDTO>> PatchEstado(
+        public async Task<IActionResult> PatchEstado(
             int id,
             [FromBody] CategoriaCambiarEstadoDTO dto)
         {

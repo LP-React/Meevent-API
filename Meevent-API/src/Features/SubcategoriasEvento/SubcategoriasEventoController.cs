@@ -15,7 +15,7 @@ namespace Meevent_API.src.Features.SubcategoriasEvento
         }
 
         [HttpGet("ListarSubCategorias")]
-        public async Task<ActionResult<SubcategoriaEventoListResponseDTO>> Get()
+        public async Task<IActionResult> Get()
         {
             var response = await _service.ObtenerSubcategoriasAsync();
             return Ok(response);
@@ -56,7 +56,7 @@ namespace Meevent_API.src.Features.SubcategoriasEvento
         }
 
         [HttpPatch("EditarSubCategoria/{id}")]
-        public async Task<ActionResult<SubcategoriaEventoOperacionResponseDTO>> Patch(int id, [FromBody] SubcategoriaEventoEditarDTO dto)
+        public async Task<IActionResult> Patch(int id, [FromBody] SubcategoriaEventoEditarDTO dto)
         {
             var response = await _service.ActualizarSubcategoriaAsync(id, dto);
 
@@ -66,7 +66,7 @@ namespace Meevent_API.src.Features.SubcategoriasEvento
         }
 
         [HttpPatch("ActivarEstado_Desctivar/{id}")]
-        public async Task<ActionResult<SubcategoriaCambiarEstadoResponseDTO>> PatchEstado(int id, [FromBody] SubcategoriaCambiarEstadoDTO dto)
+        public async Task<IActionResult> PatchEstado(int id, [FromBody] SubcategoriaCambiarEstadoDTO dto)
         {
             var response = await _service.ActivarDesactivarSubcategoriaAsync(id, dto.Estado);
 
