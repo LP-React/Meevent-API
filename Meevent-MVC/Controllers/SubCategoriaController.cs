@@ -21,12 +21,19 @@ namespace Meevent_MVC.Controllers
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? buscarId)
         {
             try
             {
                 var response = await _subClient.GetAllAsync(new EmptySub());
-                return View(response.Items);
+                var lista = response.Items.AsEnumerable();
+
+                if (buscarId.HasValue)
+                {
+                    lista = lista.Where(s => s.IdSubcategoria == buscarId.Value);
+                }
+
+                return View(lista.ToList());
             }
             catch (Exception)
             {
@@ -137,13 +144,6 @@ namespace Meevent_MVC.Controllers
             return View();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> ReactivarDirecto(int id)
-        {
-            var client = _httpClientFactory.CreateClient("MeeventApi");
-            await client.PatchAsJsonAsync($"api/SubcategoriasEvento/ActivarEstado_Desctivar/{id}", new { estado = true });
-            return RedirectToAction(nameof(Index));
-        }
     }
 
     public class SubcategoriaOperacionResponseDTO

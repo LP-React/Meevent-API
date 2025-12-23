@@ -15,12 +15,19 @@ namespace Meevent_MVC.Controllers
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? buscarId)
         {
             try
             {
                 var response = await _grpcClient.GetAllAsync(new EmptyCat());
-                return View(response.Items);
+                var lista = response.Items.AsEnumerable();
+
+                if (buscarId.HasValue)
+                {
+                    lista = lista.Where(c => c.IdCategoria == buscarId.Value);
+                }
+
+                return View(lista.ToList());
             }
             catch (Exception)
             {
@@ -28,6 +35,7 @@ namespace Meevent_MVC.Controllers
                 return View(new List<Categoria>());
             }
         }
+
 
         public IActionResult Create() => View();
 
@@ -80,19 +88,6 @@ namespace Meevent_MVC.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpPost]
-        public async Task<IActionResult> ReactivarDirecto(int id)
-        {
-            var client = _httpClientFactory.CreateClient("MeeventApi");
-            var response = await client.PatchAsJsonAsync($"api/CategoriasEvento/ActivarEstado_Desactivar/{id}", new { estado = true });
-
-            if (response.IsSuccessStatusCode)
-                TempData["Success"] = $"Categoría #{id} reactivada correctamente.";
-            else
-                TempData["Error"] = "No se pudo encontrar o activar el ID.";
-
-            return RedirectToAction(nameof(Index));
-        }
 
         [HttpGet]
         public IActionResult GestionEstado() => View();

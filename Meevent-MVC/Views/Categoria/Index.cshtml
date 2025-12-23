@@ -14,13 +14,20 @@
 
     <div class="row mb-4">
         <div class="col-md-6">
-            <form asp-action="ReactivarDirecto" method="post" class="input-group shadow-sm">
+            <form asp-action="Index" method="get" class="input-group shadow-sm">
                 <span class="input-group-text bg-dark border-secondary text-muted">
-                    <i class="bi bi-magic"></i>
+                    <i class="bi bi-search"></i>
                 </span>
-                <input type="number" name="id" class="form-control bg-dark text-white border-secondary"
-                       placeholder="Ingresa ID para reactivar categoría..." required />
-                <button class="btn btn-primary px-4" type="submit">Reactivar</button>
+                <input type="number" name="buscarId" class="form-control bg-dark text-white border-secondary"
+                       placeholder="Buscar por ID exacto..." value="@Context.Request.Query["buscarId"]" />
+                <button class="btn btn-info px-4" type="submit">Buscar</button>
+
+                @if (!string.IsNullOrEmpty(Context.Request.Query["buscarId"]))
+                {
+                    <a asp-action="Index" class="btn btn-outline-secondary border-secondary text-white">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                }
             </form>
         </div>
     </div>
@@ -54,13 +61,22 @@
                                 <td>@item.NombreCategoria</td>
                                 <td><code class="text-warning">/@item.SlugCategoria</code></td>
                                 <td>
-                                    <span class="badge bg-success text-white rounded-pill px-3">
-                                        <i class="bi bi-check-circle-fill me-1"></i> ACTIVO
-                                    </span>
+                                    @if (item.Estado)
+                                    {
+                                        <span class="badge bg-success text-white rounded-pill px-3">
+                                            <i class="bi bi-check-circle-fill me-1"></i> ACTIVO
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger text-white rounded-pill px-3">
+                                            <i class="bi bi-x-circle-fill me-1"></i> INACTIVO
+                                        </span>
+                                    }
                                 </td>
                                 <td class="text-center">
                                     <a asp-action="Edit" asp-route-id="@item.IdCategoria"
-                                       class="btn btn-sm btn-outline-light border-secondary px-4">
+                                       class="btn btn-sm btn-outline-warning px-4">
                                         <i class="bi bi-pencil me-1"></i> Editar
                                     </a>
                                 </td>
@@ -72,7 +88,7 @@
                         <tr>
                             <td colspan="5" class="text-center py-5 text-muted">
                                 <i class="bi bi-inbox fs-2 d-block mb-2"></i>
-                                No hay registros activos disponibles.
+                                No se encontraron registros con los criterios de búsqueda.
                             </td>
                         </tr>
                     }
