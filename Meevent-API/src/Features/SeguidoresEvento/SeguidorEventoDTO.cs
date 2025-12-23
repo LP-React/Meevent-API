@@ -1,4 +1,6 @@
-﻿namespace Meevent_API.src.Features.SeguidoresEvento
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Meevent_API.src.Features.SeguidoresEvento
 {
     public class EventoSeguidoDTO
     {
@@ -33,6 +35,8 @@
         public int IdCategoria { get; set; }
         public string NombreCategoria { get; set; } = string.Empty;
         public string? CategoriaIcono { get; set; }
+        public string Categoria_slug { get; set; }
+        public string Subcategoria_slug { get; set; }
 
         // Datos del Local y Ubicación
         public int IdLocal { get; set; }
@@ -50,5 +54,26 @@
         public string Mensaje { get; set; } = string.Empty;
         public int TotalResultados { get; set; }
         public List<EventoSeguidoDTO> Eventos { get; set; } = new List<EventoSeguidoDTO>();
+    }
+
+    public class SeguimientoCreateDTO
+    {
+        [Required]
+        public int UsuarioId { get; set; }
+        [Required]
+        public int EventoId { get; set; }
+    }
+
+    public class SeguimientoResponseDTO
+    {
+        public bool Exitoso { get; set; }
+        public string Mensaje { get; set; } = string.Empty;
+        public EventoSeguidoDTO? Evento { get; set; }
+    }
+
+    public class BaseResponseDTO
+    {
+        public bool Exitoso { get; set; }
+        public string Mensaje { get; set; } = string.Empty;
     }
 }

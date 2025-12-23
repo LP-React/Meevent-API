@@ -51,6 +51,37 @@ namespace Meevent_API.src.Features.SeguidoresEvento.Service
             }
         }
 
+        public async Task<SeguimientoResponseDTO> SeguirEventoAsync(int usuarioId, int eventoId)
+        {
+            try
+            {
+                var evento = await _seguimientoDAO.InsertarYObtenerSeguimientoAsync(usuarioId, eventoId);
+
+                if (evento == null)
+                {
+                    return new SeguimientoResponseDTO
+                    {
+                        Exitoso = false,
+                        Mensaje = "El usuario ya sigue este evento o el evento no está disponible."
+                    };
+                }
+
+                AsignarEstadoCliente(evento);
+
+                return new SeguimientoResponseDTO
+                {
+                    Exitoso = true,
+                    Mensaje = "Evento seguido correctamente.",
+                    Evento = evento 
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al seguir evento");
+                return new SeguimientoResponseDTO { Exitoso = false, Mensaje = ex.Message };
+            }
+        }
+
         private void AsignarEstadoCliente(EventoSeguidoDTO evento)
         {
             DateTime fechaInicio;
@@ -77,6 +108,29 @@ namespace Meevent_API.src.Features.SeguidoresEvento.Service
             {
                 evento.EstadoEvento = "finalizado";
             }
+        }
+
+        public async Task<BaseResponseDTO> DejarDeSeguirEventoAsync(int usuarioId, int eventoId)
+        {
+            try
+            {
+                bool eliminado = await _seguimientoDAO.EliminarSeguimientoAsync(usuarioId, eventoId);
+
+                if (eliminado)
+                {
+                    return new BaseResponseDTO { Exitoso = true, Mensaje = "Ya no sigues este evento." };
+                }
+                else
+                {
+                    return new BaseResponseDTO { Exitoso = false, Mensaje = "No estabas siguiendo este evento." };
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al dejar de seguir evento");
+                return new BaseResponseDTO { Exitoso = false, Mensaje = "Error: " + ex.Message };
+            }
+        
         }
     }
 }

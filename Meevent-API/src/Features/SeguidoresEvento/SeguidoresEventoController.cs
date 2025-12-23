@@ -36,5 +36,31 @@ namespace Meevent_API.src.Features.SeguidoresEvento
 
             return Ok(response);
         }
+
+        [HttpPost("seguir-evento")]
+        public async Task<ActionResult<SeguimientoResponseDTO>> PostSeguimiento(int idUsuario,int idEvento)
+        {
+
+            var resultado = await _seguimientoService.SeguirEventoAsync(idUsuario, idEvento);
+
+            if (!resultado.Exitoso)
+            {
+                return BadRequest(resultado);
+            }
+            return CreatedAtAction(nameof(PostSeguimiento), new { id = resultado.Evento?.IdSeguidorEvento }, resultado);
+        }
+
+        [HttpDelete("dejar-de-seguir")]
+        public async Task<ActionResult<BaseResponseDTO>> DeleteSeguimiento([FromQuery] int usuarioId, [FromQuery] int eventoId)
+        {
+            var resultado = await _seguimientoService.DejarDeSeguirEventoAsync(usuarioId, eventoId);
+
+            if (!resultado.Exitoso)
+            {
+                return NotFound(resultado); // 404 si no existía el seguimiento
+            }
+
+            return Ok(resultado);
+        }
     }
 }
