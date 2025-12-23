@@ -3,9 +3,13 @@
 public class CiudadDTO
 {
     public int IdCiudad { get; set; }
-    public string NombreCiudad { get; set; }
-    public int IdPais { get; set; }
+    public string NombreCiudad { get; set; } = string.Empty;
+}
 
-    public PaisJDTO? jsonPais { get; set; }
-
+public class CiudadListResponseDTO
+{
+    public bool Exitoso { get; set; }
+    public string Mensaje { get; set; } = string.Empty;
+    public int TotalCiudades { get; set; }
+    public List<CiudadDTO> Ciudades { get; set; } = new List<CiudadDTO>();
 }

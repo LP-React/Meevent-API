@@ -13,6 +13,10 @@ using Meevent_API.src.Features.SubcategoriasEvento.DAO;
 using Meevent_API.src.Features.SubcategoriasEvento.Services;
 using Meevent_API.src.Features.Usuarios.DAO;
 using Meevent_API.src.Features.Usuarios.Service;
+using Meevent_API.src.Features.Locales.DAO;
+using Meevent_API.src.Features.Locales.Service;
+using Meevent_API.src.Features.Ciudades.DAO;
+using Meevent_API.src.Features.Ciudades.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,8 +54,8 @@ builder.Services.AddScoped<IPerfilOrganizadorDAO, PerfilOrganizadorDAO>();
 builder.Services.AddScoped<IPerfilArtistaDAO, PerfilArtistaDAO>();
 builder.Services.AddScoped<ICategoriaEventoDAO, CategoriaEventoDAO>();
 builder.Services.AddScoped<ISubcategoriaEventoDAO, SubcategoriaEventoDAO>();
-
-
+builder.Services.AddScoped<ILocalDAO, LocalDAO>();
+builder.Services.AddScoped<ICiudadDAO, CiudadDAO>();
 // parte de FRANCO
 builder.Services.AddScoped<IEventoDAO, EventoDAO>();
 // parte de ELTON
@@ -63,8 +67,8 @@ builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IPerfilOrganizadorService, PerfilOrganizadorService>();
 builder.Services.AddScoped<ICategoriaEventoService, CategoriaEventoService>();
 builder.Services.AddScoped<ISubcategoriaEventoService, SubcategoriaEventoService>();
-
-
+builder.Services.AddScoped<ILocalService, LocalService>();
+builder.Services.AddScoped<ICiudadService, CiudadService>();
 // parte de FRANCO
 builder.Services.AddScoped<IEventoService, EventoService>();
 
