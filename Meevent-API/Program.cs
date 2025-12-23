@@ -1,12 +1,16 @@
 ﻿using Meevent_API.src.Features.Eventos.DAO;
 using Meevent_API.src.Features.Eventos.Services;
-﻿using gRcp_Paises;
+using gRcp_Paises;
+using Meevent_API.src.Features.CategoriasEvento.DAO;
+using Meevent_API.src.Features.CategoriasEvento.Services;
 using Meevent_API.src.Features.Paises.Services;
 using Meevent_API.src.Features.Paises.Services.Interfaces;
 using Meevent_API.src.Features.PerfilesArtistas.DAO;
 using Meevent_API.src.Features.PerfilesOrganizador.DAO;
 using Meevent_API.src.Features.PerfilesOrganizadores.DAO;
 using Meevent_API.src.Features.PerfilesOrganizadores.Services;
+using Meevent_API.src.Features.SubcategoriasEvento.DAO;
+using Meevent_API.src.Features.SubcategoriasEvento.Services;
 using Meevent_API.src.Features.Usuarios.DAO;
 using Meevent_API.src.Features.Usuarios.Service;
 
@@ -40,9 +44,14 @@ builder.Services.AddSwaggerGen();
 
 // ===== INYECCIÓN DE DEPENDENCIAS =====
 // ---- Registrar DAOs ----
+
 builder.Services.AddScoped<IUsuarioDAO, UsuarioDAO>();
 builder.Services.AddScoped<IPerfilOrganizadorDAO, PerfilOrganizadorDAO>();
 builder.Services.AddScoped<IPerfilArtistaDAO, PerfilArtistaDAO>();
+builder.Services.AddScoped<ICategoriaEventoDAO, CategoriaEventoDAO>();
+builder.Services.AddScoped<ISubcategoriaEventoDAO, SubcategoriaEventoDAO>();
+
+
 // parte de FRANCO
 builder.Services.AddScoped<IEventoDAO, EventoDAO>();
 // parte de ELTON
@@ -52,6 +61,10 @@ builder.Services.AddScoped<IEventoDAO, EventoDAO>();
 builder.Services.AddScoped<IPaisService, PaisService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IPerfilOrganizadorService, PerfilOrganizadorService>();
+builder.Services.AddScoped<ICategoriaEventoService, CategoriaEventoService>();
+builder.Services.AddScoped<ISubcategoriaEventoService, SubcategoriaEventoService>();
+
+
 // parte de FRANCO
 builder.Services.AddScoped<IEventoService, EventoService>();
 
