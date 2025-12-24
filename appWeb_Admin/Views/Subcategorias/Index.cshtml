@@ -4,13 +4,25 @@
     ViewData["Title"] = "Listado de Subcategorías";
 }
 
-@if (TempData["MensajeOk"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["MensajeOk"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
+<div class="container mt-3">
+    @* Alerta de Éxito *@
+    @if (TempData["MensajeOk"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["MensajeOk"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @* Alerta de Error (Aquí es donde saldrá lo de la categoría padre inactiva) *@
+    @if (TempData["MensajeError"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-octagon-fill me-2"></i> @TempData["MensajeError"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+</div>
 
 <div class="container mt-4">
     <h2>Listado de Subcategorías de Eventos</h2>
@@ -89,15 +101,29 @@
                             <td>
                                 <span class="badge bg-info text-dark">@item.NombreCategoria</span>
                             </td>
-                            <td>
-                                @if (item.EstaActivo)
-                                {
-                                    <span class="badge bg-success">Activo</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-danger">Inactivo</span>
-                                }
+                            <td class="text-center">
+                                <form asp-action="CambiarEstado"
+                                      method="post"
+                                      class="d-flex flex-column align-items-center gap-1">
+
+                                    <input type="hidden" name="id" value="@item.IdSubcategoriaEvento" />
+
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               role="switch"
+                                               name="estado"
+                                               value="true"
+                                               @(item.EstaActivo ? "checked" : "")
+                                               onchange="this.form.submit()" />
+
+                                        <input type="hidden" name="estado" value="false" />
+                                    </div>
+
+                                    <span class="small badge @(item.EstaActivo ? "bg-success" : "bg-secondary")">
+                                        @(item.EstaActivo ? "Activo" : "Inactivo")
+                                    </span>
+                                </form>
                             </td>
                             <td>
                                 <a asp-action="Editar" asp-route-id="@item.IdSubcategoriaEvento" class="btn btn-warning btn-sm">Editar</a>

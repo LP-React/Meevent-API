@@ -208,5 +208,35 @@ namespace appWeb_Admin.Controllers
                 return View(model);
             }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CambiarEstado(int id, bool estado)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var dto = new { estado = estado };
+            var content = new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json");
+
+            var response = await client.PatchAsync($"https://localhost:7292/api/SubcategoriasEvento/ActivarEstado_Desctivar/{id}", content);
+            var body = await response.Content.ReadAsStringAsync();
+
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["MensajeOk"] = "Estado actualizado correctamente.";
+            }
+            else
+            {
+                try
+                {
+                    var jsonDoc = JObject.Parse(body);
+                    TempData["MensajeError"] = jsonDoc["mensaje"]?.ToString() ?? "No se pudo cambiar el estado.";
+                }
+                catch
+                {
+                    TempData["MensajeError"] = "Error de comunicación con la API.";
+                }
+            }
+
+            return RedirectToAction("Index");
+        }
     }
 }
