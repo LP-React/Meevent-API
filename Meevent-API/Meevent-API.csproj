@@ -8,6 +8,7 @@
   </PropertyGroup>
 
 	<ItemGroup>
+		<Protobuf Include="..\gRpc_Meevent\Protos\categorias.proto" GrpcServices="Client" />
 		<Protobuf Include="Protos\paises.proto" GrpcServices="Client" />
 	</ItemGroup>
 

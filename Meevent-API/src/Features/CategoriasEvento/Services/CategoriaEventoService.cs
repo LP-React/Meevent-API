@@ -1,14 +1,18 @@
 ﻿using Meevent_API.src.Features.CategoriasEvento.DAO;
+using Microsoft.Data.SqlClient;
+using gRpc_Meevent.Protos;
 
 namespace Meevent_API.src.Features.CategoriasEvento.Services
 {
     public class CategoriaEventoService : ICategoriaEventoService
     {
+        private ServiceCategoria.ServiceCategoriaClient _client;
         private readonly ICategoriaEventoDAO _dao;
 
-        public CategoriaEventoService(ICategoriaEventoDAO dao)
+        public CategoriaEventoService(ICategoriaEventoDAO dao, ServiceCategoria.ServiceCategoriaClient client)
         {
             _dao = dao;
+            _client = client;
         }
 
         public async Task<CategoriaEventoListResponseDTO> ObtenerCategoriasAsync()
@@ -45,11 +49,11 @@ namespace Meevent_API.src.Features.CategoriasEvento.Services
             return await Task.Run(() => _dao.InsertCategoria(registro));
         }
 
-        public async Task<CategoriaEventoOperacionResponseDTO> ActualizarCategoriaAsync(
-    int idCategoriaEvento,
-    CategoriaEventoEditarDTO dto)
+        public async Task<CategoriaEventoOperacionResponseDTO> ActualizarCategoriaAsync(int idCategoriaEvento, CategoriaEventoEditarDTO dto)
         {
-            var categoriaActual = (await Task.Run(() =>_dao.GetCategoriaPorId(idCategoriaEvento))).FirstOrDefault();
+            var categoriaActual = (await Task.Run(() =>
+                _dao.GetCategoriaPorId(idCategoriaEvento)
+            )).FirstOrDefault();
 
             if (categoriaActual == null)
             {
@@ -60,14 +64,11 @@ namespace Meevent_API.src.Features.CategoriasEvento.Services
                 };
             }
 
-            var categorias = await Task.Run(() =>
-                _dao.GetCategorias() // solo para validar duplicados
-            );
+            var respuestaGrpc = await _client.GetAllAsync(new Empty());
 
-            bool nombreExiste = categorias.Any(c =>
+            bool nombreExiste = respuestaGrpc.Items.Any(c =>
                 c.IdCategoriaEvento != idCategoriaEvento &&
-                c.NombreCategoria.Trim()
-                    .Equals(dto.NombreCategoria.Trim(), StringComparison.OrdinalIgnoreCase)
+                c.NombreCategoria.Trim().Equals(dto.NombreCategoria.Trim(), StringComparison.OrdinalIgnoreCase)
             );
 
             if (nombreExiste)
@@ -93,26 +94,12 @@ namespace Meevent_API.src.Features.CategoriasEvento.Services
                 _dao.UpdateCategoria(idCategoriaEvento, dto)
             );
 
-            var categoriaActualizada = await ObtenerCategoriaPorIdAsync(idCategoriaEvento);
-
             return new CategoriaEventoOperacionResponseDTO
             {
-                Exitoso = !resultado.Contains("Error") && categoriaActualizada != null,
-                Mensaje = resultado,
-                Categoria = categoriaActualizada != null
-                    ? new CategoriaEventoDetalleDTO
-                    {
-                        IdCategoriaEvento = categoriaActualizada.IdCategoriaEvento,
-                        NombreCategoria = categoriaActualizada.NombreCategoria,
-                        SlugCategoria = categoriaActualizada.SlugCategoria,
-                        Estado = categoriaActualizada.Estado
-                    }
-                    : null
+                Exitoso = !resultado.StartsWith("Error"),
+                Mensaje = resultado
             };
         }
-
-
-
 
         public async Task<CategoriaCambiarEstadoResponseDTO> ActivarDesactivarCategoriaAsync(
             int id_categoria_evento,

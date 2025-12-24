@@ -19,6 +19,7 @@ using Meevent_API.src.Features.Ciudades.DAO;
 using Meevent_API.src.Features.Ciudades.Service;
 using Meevent_API.src.Features.SeguidoresEvento.DAO;
 using Meevent_API.src.Features.SeguidoresEvento.Service;
+using gRpc_Meevent.Protos;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +37,11 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddGrpcClient<ServicioPaises.ServicioPaisesClient>(o =>
+{
+    o.Address = new Uri("https://localhost:7111");
+});
+
+builder.Services.AddGrpcClient<ServiceCategoria.ServiceCategoriaClient>(o =>
 {
     o.Address = new Uri("https://localhost:7111");
 });
