@@ -1,12 +1,21 @@
-﻿using Grpc.Net.Client;
+﻿using appWeb_Admin.Models;
+using Grpc.Net.Client;
 using gRpc_Meevent.Protos;
+using Humanizer;
 using Microsoft.AspNetCore.Mvc;
-using appWeb_Admin.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Text;
 namespace appWeb_Admin.Controllers
 {
     public class CategoriasEventoController : Controller
     {
         private ServiceCategoria.ServiceCategoriaClient _client;
+        private readonly IHttpClientFactory _httpClientFactory;
+        public CategoriasEventoController(IHttpClientFactory httpClientFactory)
+        {
+            _httpClientFactory = httpClientFactory;
+        }
 
         public async Task<IActionResult> Index()
         {
@@ -28,5 +37,47 @@ namespace appWeb_Admin.Controllers
             }
             return View(temporal);
         }
+
+        [HttpGet]
+        public IActionResult Crear()
+        {
+            return View();
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> Crear(CategoriaEventoModel reg)
+        {
+            if (!ModelState.IsValid)
+                return View(reg);
+
+            var client = _httpClientFactory.CreateClient();
+            var json = JsonConvert.SerializeObject(reg);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await client.PostAsync(
+                "https://localhost:7292/api/categorias/RegistrarCategoria",
+                content
+            );
+
+            var body = await response.Content.ReadAsStringAsync();
+
+            string? mensajeApi;
+
+            try
+            {
+                var jsonDoc = JObject.Parse(body);
+                mensajeApi = jsonDoc["mensaje"]?.ToString();
+            }
+            catch
+            {
+                mensajeApi = body.Replace("\"", "");
+            }
+
+            ViewBag.Mensaje = mensajeApi;
+            return View(reg);
+
+        }
+
     }
 }
