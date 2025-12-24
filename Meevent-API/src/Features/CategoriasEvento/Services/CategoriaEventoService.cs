@@ -1,6 +1,7 @@
-﻿using Meevent_API.src.Features.CategoriasEvento.DAO;
+﻿using gRpc_Meevent.Protos;
+using Meevent_API.src.Core.Entities;
+using Meevent_API.src.Features.CategoriasEvento.DAO;
 using Microsoft.Data.SqlClient;
-using gRpc_Meevent.Protos;
 
 namespace Meevent_API.src.Features.CategoriasEvento.Services
 {
@@ -36,9 +37,11 @@ namespace Meevent_API.src.Features.CategoriasEvento.Services
 
         public async Task<string> RegistrarCategoriaAsync(CategoriaEventoCrearDTO registro)
         {
-            var categoriasExistentes = await Task.Run(() => _dao.GetCategorias());
-            bool nombreExiste = categoriasExistentes.Any(c =>
-            c.NombreCategoria.Trim().Equals(registro.NombreCategoria.Trim(), StringComparison.OrdinalIgnoreCase));
+            var respuestaGrpc = await _client.GetAllAsync(new Empty());
+
+            bool nombreExiste = respuestaGrpc.Items.Any(c =>
+                c.NombreCategoria.Trim().Equals(registro.NombreCategoria.Trim(), StringComparison.OrdinalIgnoreCase)
+            );
 
             if (nombreExiste)
             {
