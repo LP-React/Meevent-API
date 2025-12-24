@@ -116,5 +116,75 @@ namespace appWeb_Admin.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Editar(int id)
+        {
+            var canal = GrpcChannel.ForAddress("https://localhost:7111");
+            var client = new ServiceCategoria.ServiceCategoriaClient(canal);
+
+            var request = new CategoriaRequest
+            {
+                IdCategoriaEvento = id
+            };
+
+            var response = await client.GetByIdAsync(request);
+
+            if (response.Items.Count == 0)
+                return NotFound();
+
+            var categoria = response.Items.First();
+
+            var model = new CategoriaEventoModel
+            {
+                IdCategoriaEvento = categoria.IdCategoriaEvento,
+                NombreCategoria = categoria.NombreCategoria,
+                EstaActivo = categoria.Estado
+            };
+
+            return View(model);
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> Editar(CategoriaEventoModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var dto = new
+            {
+                nombreCategoria = model.NombreCategoria
+            };
+
+            var client = _httpClientFactory.CreateClient();
+            var json = JsonConvert.SerializeObject(dto);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var request = new HttpRequestMessage(
+                HttpMethod.Patch,
+                $"https://localhost:7292/api/categorias/EditarCategoria/{model.IdCategoriaEvento}"
+            )
+            {
+                Content = content
+            };
+
+            var response = await client.SendAsync(request);
+            var body = await response.Content.ReadAsStringAsync();
+
+            var jsonResp = JObject.Parse(body);
+            bool exitoso = jsonResp["exitoso"]?.Value<bool>() ?? false;
+            string mensaje = jsonResp["mensaje"]?.ToString();
+
+            if (response.IsSuccessStatusCode && exitoso)
+            {
+                ViewBag.MensajeOk = mensaje;
+                return View(model); 
+            }
+
+            ViewBag.MensajeError = mensaje ?? "No se pudo actualizar la categoría.";
+            return View(model);
+        }
+
     }
 }

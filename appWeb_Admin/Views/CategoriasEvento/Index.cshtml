@@ -27,6 +27,7 @@
                     <tr>
                         <th style="width: 70px;">ID</th>
                         <th>Categoría</th>
+                        <th>Acciones</th>
                         <th style="width: 160px;" class="text-center">Estado</th>
                     </tr>
                 </thead>
@@ -49,6 +50,16 @@
 
                                 <td class="fw-semibold">
                                     @item.NombreCategoria
+                                </td>
+
+                                <td>
+                                    <a asp-controller="CategoriasEvento"
+                                       asp-action="Editar"
+                                       asp-route-id="@item.IdCategoriaEvento"
+                                       class="btn btn-warning btn-sm">
+                                        Editar
+                                    </a>
+
                                 </td>
 
                                 <td class="text-center">
