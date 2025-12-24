@@ -20,6 +20,9 @@
     <Protobuf Include="..\gRpc_Meevent\Protos\paises.proto" GrpcServices="Client">
       <Link>Protos\paises.proto</Link>
     </Protobuf>
+    <Protobuf Include="..\gRpc_Meevent\Protos\subcategoria.proto" GrpcServices="Client">
+      <Link>Protos\subcategoria.proto</Link>
+    </Protobuf>
   </ItemGroup>
 
 </Project>

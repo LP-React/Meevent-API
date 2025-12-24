@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+option csharp_namespace = "gRpc_Meevent.Protos";
+
+service ServiceSubcategoria {
+  rpc GetAll (EmptySubCategoria) returns (SubcategoriaResponse);
+  rpc GetById (SubcategoriaRequest) returns (SubcategoriaResponse);
+  rpc GetFiltrado (SubcategoriaFiltroRequest) returns (SubcategoriaResponse);
+}
+message EmptySubCategoria {}
+
+message SubcategoriaRequest {
+  int32 id_subcategoria_evento = 1;
+}
+
+message SubcategoriaFiltroRequest {
+  optional string nombre = 1;
+  optional bool estado = 2;
+  optional int32 id_categoria = 3;
+}
+
+message SubcategoriaEvento {
+  int32 id_subcategoria_evento = 1;
+  string nombre_subcategoria = 2;
+  string slug_subcategoria = 3;
+  int32 categoria_evento_id = 4;
+  string nombre_categoria = 5;
+  bool estado = 6;
+}
+
+message SubcategoriaResponse {
+  repeated SubcategoriaEvento items = 1;
+}

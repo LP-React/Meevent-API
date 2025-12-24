@@ -10,6 +10,7 @@
     <Protobuf Include="Protos\greet.proto" GrpcServices="Server" />
 	<Protobuf Include="Protos\paises.proto" GrpcServices="Server" />
 	<Protobuf Include="Protos\categorias.proto" GrpcServices="Server" />
+	  <Protobuf Include="Protos\subcategoria.proto" GrpcServices="Server" />
   </ItemGroup>
 
   <ItemGroup>
