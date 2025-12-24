@@ -17,16 +17,27 @@ namespace appWeb_Admin.Controllers
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<IActionResult> Index()
+        [HttpGet]
+        public async Task<IActionResult> Index(string nombre, bool? estado)
         {
             var canal = GrpcChannel.ForAddress("https://localhost:7111");
             _client = new ServiceCategoria.ServiceCategoriaClient(canal);
 
-            var request = new Empty();
-            var mensaje = await _client.GetAllAsync(request);
+            // Creamos la solicitud de filtro
+            var request = new FiltroRequest
+            {
+                Nombre = nombre ?? "", 
+            };
+
+            if (estado.HasValue)
+            {
+                request.Estado = estado.Value;
+            }
+
+            var mensaje = await _client.GetFiltradoAsync(request);
 
             List<CategoriaEventoModel> temporal = new List<CategoriaEventoModel>();
-            foreach(var categoria in mensaje.Items)
+            foreach (var categoria in mensaje.Items)
             {
                 temporal.Add(new CategoriaEventoModel
                 {
@@ -35,6 +46,10 @@ namespace appWeb_Admin.Controllers
                     EstaActivo = categoria.Estado
                 });
             }
+
+            ViewBag.FiltroNombre = nombre;
+            ViewBag.FiltroEstado = estado;
+
             return View(temporal);
         }
 
@@ -43,7 +58,6 @@ namespace appWeb_Admin.Controllers
         {
             return View();
         }
-
 
         [HttpPost]
         public async Task<IActionResult> Crear(CategoriaEventoModel reg)
@@ -143,8 +157,6 @@ namespace appWeb_Admin.Controllers
 
             return View(model);
         }
-
-
 
         [HttpPost]
         public async Task<IActionResult> Editar(CategoriaEventoModel model)

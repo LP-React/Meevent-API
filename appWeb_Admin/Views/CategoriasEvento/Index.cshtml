@@ -6,7 +6,33 @@
 
 <div class="container py-4">
 
-    <!-- Header -->
+    <!-- FILTRO -->
+    <form asp-action="Index" method="get" class="mb-4">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Nombre de Categoría</label>
+                <input type="text" name="nombre" value="@ViewBag.FiltroNombre" class="form-control" placeholder="Buscar..." />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Estado</label>
+                <select name="estado" class="form-select">
+                    <option value="">-- Todos --</option>
+                    <option value="true" selected="@(ViewBag.FiltroEstado == true)">Activos</option>
+                    <option value="false" selected="@(ViewBag.FiltroEstado == false)">Inactivos</option>
+                </select>
+            </div>
+            <div class="col-md-5 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search"></i> Filtrar
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    Limpiar
+                </a>
+            </div>
+        </div>
+    </form>
+
+    <!-- HEADER + CREAR -->
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
             <h4 class="fw-semibold mb-0">Categorías de eventos</h4>
@@ -18,7 +44,7 @@
         </a>
     </div>
 
-    <!-- Card -->
+    <!-- TABLA -->
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
 
@@ -27,7 +53,7 @@
                     <tr>
                         <th style="width: 70px;">ID</th>
                         <th>Categoría</th>
-                        <th>Acciones</th>
+                        <th style="width: 120px;">Acciones</th>
                         <th style="width: 160px;" class="text-center">Estado</th>
                     </tr>
                 </thead>
@@ -36,7 +62,7 @@
                     @if (!Model.Any())
                     {
                         <tr>
-                            <td colspan="3" class="text-center text-muted py-4">
+                            <td colspan="4" class="text-center text-muted py-4">
                                 No hay categorías registradas
                             </td>
                         </tr>
@@ -47,25 +73,23 @@
                         {
                             <tr>
                                 <td class="text-muted">@item.IdCategoriaEvento</td>
+                                <td class="fw-semibold">@item.NombreCategoria</td>
 
-                                <td class="fw-semibold">
-                                    @item.NombreCategoria
-                                </td>
-
+                                <!-- Acciones -->
                                 <td>
                                     <a asp-controller="CategoriasEvento"
                                        asp-action="Editar"
                                        asp-route-id="@item.IdCategoriaEvento"
-                                       class="btn btn-warning btn-sm">
+                                       class="btn btn-warning btn-sm w-100 mb-1">
                                         Editar
                                     </a>
-
                                 </td>
 
+                                <!-- Estado -->
                                 <td class="text-center">
                                     <form asp-action="CambiarEstado"
                                           method="post"
-                                          class="d-inline-flex flex-column align-items-center gap-1">
+                                          class="d-flex flex-column align-items-center gap-1">
 
                                         <input type="hidden" name="id" value="@item.IdCategoriaEvento" />
 
@@ -79,7 +103,7 @@
                                                    onchange="this.form.submit()" />
                                         </div>
 
-                                        <span class="badge @(item.EstaActivo ? "bg-success" : "bg-secondary")">
+                                        <span class="small badge @(item.EstaActivo ? "bg-success" : "bg-secondary")">
                                             @(item.EstaActivo ? "Activo" : "Inactivo")
                                         </span>
                                     </form>

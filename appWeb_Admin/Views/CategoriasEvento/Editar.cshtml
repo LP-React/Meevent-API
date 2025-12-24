@@ -1,35 +1,120 @@
-﻿@model CategoriaEventoModel
+﻿@model IEnumerable<appWeb_Admin.Models.CategoriaEventoModel>
 
-<h3>Editar Categoría</h3>
-
-<form asp-action="Editar" method="post">
-    <input type="hidden" asp-for="IdCategoriaEvento" />
-
-    <div class="mb-3">
-        <label class="form-label">Nombre</label>
-        <input asp-for="NombreCategoria" class="form-control" />
-        <span asp-validation-for="NombreCategoria" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">
-        Guardar cambios
-    </button>
-
-    <a asp-action="Index" class="btn btn-secondary">
-        Cancelar
-    </a>
-
-    @if (ViewBag.MensajeError != null)
-    {
-        <div class="alert alert-danger mt-3">
-            @ViewBag.MensajeError
-        </div>
-    }
-</form>
-
-@if (ViewBag.MensajeOk != null)
-{
-    <div class="alert alert-success">
-        @ViewBag.MensajeOk
-    </div>
+@{
+    ViewData["Title"] = "Categorías";
 }
+
+<div class="container py-4">
+
+    <!-- FILTRO -->
+    <form asp-action="Index" method="get" class="mb-4">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Nombre de Categoría</label>
+                <input type="text" name="nombre" value="@ViewBag.FiltroNombre" class="form-control" placeholder="Buscar..." />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Estado</label>
+                <select name="estado" class="form-select">
+                    <option value="">-- Todos --</option>
+                    <option value="true" selected="@(ViewBag.FiltroEstado == true)">Activos</option>
+                    <option value="false" selected="@(ViewBag.FiltroEstado == false)">Inactivos</option>
+                </select>
+            </div>
+            <div class="col-md-5 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search"></i> Filtrar
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    Limpiar
+                </a>
+            </div>
+        </div>
+    </form>
+
+    <!-- HEADER + CREAR -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="fw-semibold mb-0">Categorías de eventos</h4>
+            <small class="text-muted">Administración de categorías</small>
+        </div>
+
+        <a asp-action="Crear" class="btn btn-primary">
+            + Crear categoría
+        </a>
+    </div>
+
+    <!-- TABLA -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 70px;">ID</th>
+                        <th>Categoría</th>
+                        <th style="width: 120px;">Acciones</th>
+                        <th style="width: 160px;" class="text-center">Estado</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">
+                                No hay categorías registradas
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="text-muted">@item.IdCategoriaEvento</td>
+                                <td class="fw-semibold">@item.NombreCategoria</td>
+
+                                <!-- Acciones -->
+                                <td>
+                                    <a asp-controller="CategoriasEvento"
+                                       asp-action="Editar"
+                                       asp-route-id="@item.IdCategoriaEvento"
+                                       class="btn btn-warning btn-sm w-100 mb-1">
+                                        Editar
+                                    </a>
+                                </td>
+
+                                <!-- Estado -->
+                                <td class="text-center">
+                                    <form asp-action="CambiarEstado"
+                                          method="post"
+                                          class="d-flex flex-column align-items-center gap-1">
+
+                                        <input type="hidden" name="id" value="@item.IdCategoriaEvento" />
+
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input"
+                                                   type="checkbox"
+                                                   role="switch"
+                                                   name="estado"
+                                                   value="true"
+                                                   @(item.EstaActivo ? "checked" : "")
+                                                   onchange="this.form.submit()" />
+                                        </div>
+
+                                        <span class="small badge @(item.EstaActivo ? "bg-success" : "bg-secondary")">
+                                            @(item.EstaActivo ? "Activo" : "Inactivo")
+                                        </span>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+</div>

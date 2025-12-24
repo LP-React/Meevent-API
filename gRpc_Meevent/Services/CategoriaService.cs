@@ -15,15 +15,19 @@ namespace gRpc_Meevent.Services
         }
 
         string cadena = "server=.;database=MeeventDB; trusted_connection=true; MultipleActiveResultSets=true; TrustServerCertificate=true";
-    
-        List<CategoriaEvento> Lista()
+
+        List<CategoriaEvento> Lista(string nombre = null, bool? estado = null)
         {
             List<CategoriaEvento> temporal = new List<CategoriaEvento>();
             using (SqlConnection cn = new SqlConnection(cadena))
             {
                 cn.Open();
-                SqlCommand cmd = new SqlCommand("usp_ListarCategoriasEvento", cn);
+                SqlCommand cmd = new SqlCommand("usp_ListarCategoriasEventoFiltrado_grpc", cn);
                 cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@Nombre", string.IsNullOrWhiteSpace(nombre) ? DBNull.Value : nombre);
+                cmd.Parameters.AddWithValue("@Estado", (object)estado ?? DBNull.Value);
+
                 SqlDataReader dr = cmd.ExecuteReader();
                 while (dr.Read())
                 {
@@ -31,14 +35,13 @@ namespace gRpc_Meevent.Services
                     {
                         IdCategoriaEvento = dr.GetInt32(0),
                         NombreCategoria = dr.GetString(1),
-                        Estado = dr.GetBoolean(4),
-
+                        Estado = dr.GetBoolean(3)
                     });
                 }
             }
             return temporal;
         }
-    
+
         public override Task<CategoriaResponse> GetAll(Empty request, ServerCallContext context)
         {
             CategoriaResponse response = new CategoriaResponse();
@@ -63,6 +66,16 @@ namespace gRpc_Meevent.Services
 
             return Task.FromResult(categoria);
         }
-    
+
+        public override Task<CategoriaResponse> GetFiltrado(FiltroRequest request, ServerCallContext context)
+        {
+            CategoriaResponse response = new CategoriaResponse();
+
+            var listaFiltrada = Lista(request.Nombre, request.HasEstado ? request.Estado : null);
+
+            response.Items.AddRange(listaFiltrada);
+
+            return Task.FromResult(response);
+        }
     }
 }
