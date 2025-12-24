@@ -61,7 +61,6 @@ namespace Meevent_API.src.Features.CategoriasEvento
 
             return Ok(new
             {
-                Exitoso = true,
                 Mensaje = mensaje
             });
         }
