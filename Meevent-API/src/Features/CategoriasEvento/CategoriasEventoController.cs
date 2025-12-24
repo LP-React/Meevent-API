@@ -65,16 +65,14 @@ namespace Meevent_API.src.Features.CategoriasEvento
             });
         }
 
-   
+
         [HttpPatch("EditarCategoria/{id}")]
-        public async Task<IActionResult> Patch(
-            int id,
-            [FromBody] CategoriaEventoEditarDTO dto)
+        public async Task<IActionResult> Patch(int id, [FromBody] CategoriaEventoEditarDTO dto)
         {
             var response = await _service.ActualizarCategoriaAsync(id, dto);
 
             if (!response.Exitoso)
-                return NotFound(response);
+                return BadRequest(response);
 
             return Ok(response);
         }

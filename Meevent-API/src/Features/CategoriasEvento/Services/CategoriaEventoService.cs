@@ -46,13 +46,53 @@ namespace Meevent_API.src.Features.CategoriasEvento.Services
         }
 
         public async Task<CategoriaEventoOperacionResponseDTO> ActualizarCategoriaAsync(
-            int id_categoria_evento,
-            CategoriaEventoEditarDTO categoria)
+    int idCategoriaEvento,
+    CategoriaEventoEditarDTO dto)
         {
-            string resultado = await Task.Run(() =>
-                _dao.UpdateCategoria(id_categoria_evento, categoria));
+            var categorias = await Task.Run(() => _dao.GetCategorias());
 
-            var categoriaActualizada = await ObtenerCategoriaPorIdAsync(id_categoria_evento);
+            var categoriaActual = categorias
+                .FirstOrDefault(c => c.IdCategoriaEvento == idCategoriaEvento);
+
+            if (categoriaActual == null)
+            {
+                return new CategoriaEventoOperacionResponseDTO
+                {
+                    Exitoso = false,
+                    Mensaje = "Error: La categoría no existe."
+                };
+            }
+
+            bool nombreExiste = categorias.Any(c =>
+                c.IdCategoriaEvento != idCategoriaEvento &&
+                c.NombreCategoria.Trim()
+                    .Equals(dto.NombreCategoria.Trim(), StringComparison.OrdinalIgnoreCase)
+            );
+
+            if (nombreExiste)
+            {
+                return new CategoriaEventoOperacionResponseDTO
+                {
+                    Exitoso = false,
+                    Mensaje = "Error: El nombre de la categoría ya está registrado."
+                };
+            }
+
+            if (!categoriaActual.NombreCategoria.Trim()
+                .Equals(dto.NombreCategoria.Trim(), StringComparison.OrdinalIgnoreCase))
+            {
+                dto.SlugCategoria = GenerarSlug(dto.NombreCategoria);
+            }
+            else
+            {
+                dto.SlugCategoria = categoriaActual.SlugCategoria;
+            }
+
+            var resultado = await Task.Run(() =>
+                _dao.UpdateCategoria(idCategoriaEvento, dto)
+            );
+
+            var categoriaActualizada = await ObtenerCategoriaPorIdAsync(idCategoriaEvento);
 
             return new CategoriaEventoOperacionResponseDTO
             {
@@ -69,6 +109,8 @@ namespace Meevent_API.src.Features.CategoriasEvento.Services
                     : null
             };
         }
+
+
 
         public async Task<CategoriaCambiarEstadoResponseDTO> ActivarDesactivarCategoriaAsync(
             int id_categoria_evento,
