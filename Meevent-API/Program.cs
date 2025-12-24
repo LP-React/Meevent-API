@@ -46,6 +46,11 @@ builder.Services.AddGrpcClient<ServiceCategoria.ServiceCategoriaClient>(o =>
     o.Address = new Uri("https://localhost:7111");
 });
 
+builder.Services.AddGrpcClient<ServiceSubcategoria.ServiceSubcategoriaClient>(o =>
+{
+    o.Address = new Uri("https://localhost:7111");
+});
+
 // Add services to the container.
 
 builder.Services.AddControllers();

@@ -9,6 +9,9 @@
 
 	<ItemGroup>
 		<Protobuf Include="..\gRpc_Meevent\Protos\categorias.proto" GrpcServices="Client" />
+		<Protobuf Include="..\gRpc_Meevent\Protos\subcategoria.proto" GrpcServices="Client">
+		  <Link>Protos\subcategoria.proto</Link>
+		</Protobuf>
 		<Protobuf Include="Protos\paises.proto" GrpcServices="Client" />
 	</ItemGroup>
 

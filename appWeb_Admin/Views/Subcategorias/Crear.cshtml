@@ -1,0 +1,66 @@
+﻿@model SubcategoriaModel
+
+@{
+    ViewData["Title"] = "Nueva Subcategoría";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            @if (ViewBag.MensajeError != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Atención:</strong> @ViewBag.MensajeError
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Registrar Nueva Subcategoría</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Crear" method="post">
+
+                        @* 2. Campo: Nombre de Subcategoría *@
+                        <div class="mb-3">
+                            <label asp-for="NombreSubcategoria" class="form-label font-weight-bold">Nombre</label>
+                            <input asp-for="NombreSubcategoria" class="form-control" placeholder="Ej. Rock, Teatro, Charlas..." />
+                            <span asp-validation-for="NombreSubcategoria" class="text-danger"></span>
+                        </div>
+
+                        @* 3. Campo: Combo de Categorías (Activas) *@
+                        <div class="mb-4">
+                            <label asp-for="IdCategoriaEvento" class="form-label font-weight-bold">Categoría Padre</label>
+                            <select asp-for="IdCategoriaEvento" class="form-select"
+                                    asp-items="@(new SelectList(ViewBag.Categorias, "IdCategoriaEvento", "NombreCategoria"))">
+                                <option value="">-- Seleccione una categoría --</option>
+                            </select>
+                            <span asp-validation-for="IdCategoriaEvento" class="text-danger"></span>
+                        </div>
+
+                        <hr />
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-save"></i> Guardar Subcategoría
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @* Scripts para validación en el cliente sin recargar la página *@
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

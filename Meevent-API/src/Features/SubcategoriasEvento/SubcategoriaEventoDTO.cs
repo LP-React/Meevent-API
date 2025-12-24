@@ -24,8 +24,7 @@ namespace Meevent_API.src.Features.SubcategoriasEvento
         [Required(ErrorMessage = "El nombre de la subcategoría es obligatorio")]
         public string NombreSubcategoria { get; set; }
 
-        [Required(ErrorMessage = "El slug es obligatorio")]
-        public string SlugSubcategoria { get; set; }
+        public string? SlugSubcategoria { get; set; }
 
         [Required(ErrorMessage = "El ID de la categoría padre es obligatorio")]
         public int CategoriaEventoId { get; set; }

@@ -49,10 +49,15 @@ namespace Meevent_API.src.Features.SubcategoriasEvento
         [HttpPost("RegistrarSubCategoria")]
         public async Task<IActionResult> Post([FromBody] SubcategoriaEventoCrearDTO dto)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var mensaje = await _service.RegistrarSubcategoriaAsync(dto);
-            return Ok(new { Exitoso = true, Mensaje = mensaje });
+
+            return Ok(new
+            {
+                Mensaje = mensaje
+            });
         }
 
         [HttpPatch("EditarSubCategoria/{id}")]

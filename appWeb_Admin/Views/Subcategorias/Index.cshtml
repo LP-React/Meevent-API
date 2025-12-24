@@ -4,6 +4,14 @@
     ViewData["Title"] = "Listado de Subcategorías";
 }
 
+@if (TempData["MensajeOk"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["MensajeOk"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 <div class="container mt-4">
     <h2>Listado de Subcategorías de Eventos</h2>
     <hr />
@@ -48,13 +56,23 @@
         </div>
     </form>
 
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="fw-semibold mb-0">Categorías de eventos</h4>
+            <small class="text-muted">Administración de categorías</small>
+        </div>
+
+        <a asp-action="Crear" class="btn btn-primary">
+            + Crear sub-categoría
+        </a>
+    </div>
+
     <div class="table-responsive">
         <table class="table table-striped table-hover">
             <thead class="table-dark">
                 <tr>
                     <th>ID</th>
                     <th>Subcategoría</th>
-                    <th>Slug</th>
                     <th>Categoría Padre</th>
                     <th>Estado</th>
                     <th>Acciones</th>
@@ -68,7 +86,6 @@
                         <tr>
                             <td>@item.IdSubcategoriaEvento</td>
                             <td>@item.NombreSubcategoria</td>
-                            <td><small class="text-muted">@item.SlugSubcategoria</small></td>
                             <td>
                                 <span class="badge bg-info text-dark">@item.NombreCategoria</span>
                             </td>
