@@ -49,10 +49,7 @@ namespace Meevent_API.src.Features.CategoriasEvento.Services
     int idCategoriaEvento,
     CategoriaEventoEditarDTO dto)
         {
-            var categorias = await Task.Run(() => _dao.GetCategorias());
-
-            var categoriaActual = categorias
-                .FirstOrDefault(c => c.IdCategoriaEvento == idCategoriaEvento);
+            var categoriaActual = (await Task.Run(() =>_dao.GetCategoriaPorId(idCategoriaEvento))).FirstOrDefault();
 
             if (categoriaActual == null)
             {
@@ -62,6 +59,10 @@ namespace Meevent_API.src.Features.CategoriasEvento.Services
                     Mensaje = "Error: La categoría no existe."
                 };
             }
+
+            var categorias = await Task.Run(() =>
+                _dao.GetCategorias() // solo para validar duplicados
+            );
 
             bool nombreExiste = categorias.Any(c =>
                 c.IdCategoriaEvento != idCategoriaEvento &&
@@ -109,6 +110,7 @@ namespace Meevent_API.src.Features.CategoriasEvento.Services
                     : null
             };
         }
+
 
 
 
