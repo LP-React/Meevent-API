@@ -32,6 +32,16 @@ namespace Meevent_API.src.Features.CategoriasEvento.Services
 
         public async Task<string> RegistrarCategoriaAsync(CategoriaEventoCrearDTO registro)
         {
+            var categoriasExistentes = await Task.Run(() => _dao.GetCategorias());
+            bool nombreExiste = categoriasExistentes.Any(c =>
+            c.NombreCategoria.Trim().Equals(registro.NombreCategoria.Trim(), StringComparison.OrdinalIgnoreCase));
+
+            if (nombreExiste)
+            {
+                return "Error: El nombre de la categoría ya está registrado.";
+            }
+
+            registro.SlugCategoria = GenerarSlug(registro.NombreCategoria);
             return await Task.Run(() => _dao.InsertCategoria(registro));
         }
 
@@ -73,6 +83,16 @@ namespace Meevent_API.src.Features.CategoriasEvento.Services
                 Mensaje = resultado,
                 Estado = estado
             };
+        }
+
+        private string GenerarSlug(string nombre)   
+        {
+            if (string.IsNullOrWhiteSpace(nombre)) return string.Empty;
+            string slug = nombre.ToLowerInvariant().Trim();
+            slug = System.Text.RegularExpressions.Regex.Replace(slug, @"[^a-z0-9\s-]", "");
+            slug = System.Text.RegularExpressions.Regex.Replace(slug, @"\s+", "-").Trim();
+
+            return slug;
         }
     }
 }

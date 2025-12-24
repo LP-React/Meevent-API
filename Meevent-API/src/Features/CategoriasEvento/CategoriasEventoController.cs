@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Meevent_API.src.Features.CategoriasEvento
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/categorias")]
     public class CategoriasEventoController : ControllerBase
     {
         private readonly ICategoriaEventoService _service;

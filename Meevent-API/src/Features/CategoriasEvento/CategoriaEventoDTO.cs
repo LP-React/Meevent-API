@@ -23,9 +23,7 @@ namespace Meevent_API.src.Features.CategoriasEvento
     {
         [Required(ErrorMessage = "El nombre de la categoría es obligatorio")]
         public string NombreCategoria { get; set; }
-
-        [Required(ErrorMessage = "El slug es obligatorio")]
-        public string SlugCategoria { get; set; }
+        public string? SlugCategoria { get; set; }
     }
 
     public class CategoriaEventoEditarDTO
