@@ -79,5 +79,42 @@ namespace appWeb_Admin.Controllers
 
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CambiarEstado(int id, bool estado)
+        {
+            var client = _httpClientFactory.CreateClient();
+
+            var payload = new
+            {
+                estado = estado
+            };
+
+            var json = JsonConvert.SerializeObject(payload);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await client.PatchAsync(
+                $"https://localhost:7292/api/categorias/ActivarEstado_Desactivar/{id}",
+                content
+            );
+
+            var body = await response.Content.ReadAsStringAsync();
+
+            string mensaje;
+
+            try
+            {
+                var jsonDoc = JObject.Parse(body);
+                mensaje = jsonDoc["mensaje"]?.ToString();
+            }
+            catch
+            {
+                mensaje = "Operación realizada.";
+            }
+
+            TempData["MensajeFeedback"] = mensaje;
+
+            return RedirectToAction("Index");
+        }
+
     }
 }
