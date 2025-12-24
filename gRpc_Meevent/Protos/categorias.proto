@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option csharp_namespace = "gRpc_Meevent.Protos";
+
+service ServiceCategoria {
+  rpc GetAll (Empty) returns (CategoriaResponse);
+  rpc GetById (CategoriaRequest) returns (CategoriaResponse);
+}
+
+message Empty {}
+
+message CategoriaRequest {
+  int32 id_categoria_evento = 1;
+}
+
+message CategoriaEvento {
+  int32 id_categoria_evento = 1;
+  string nombre_categoria = 2;
+  bool estado = 3;
+}
+
+message CategoriaResponse {
+  repeated CategoriaEvento items = 1;
+}

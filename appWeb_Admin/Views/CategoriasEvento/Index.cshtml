@@ -1,0 +1,27 @@
+﻿@model IEnumerable<appWeb_Admin.Models.CategoriaEventoModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Lista de categorias</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Categoría</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.IdCategoriaEvento</td>
+                <td>@item.NombreCategoria</td>
+                <td>@item.EstaActivo</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
