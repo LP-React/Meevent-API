@@ -1,25 +1,39 @@
-﻿@model appWeb_Admin.Models.UsuarioModel
+﻿@model appWeb_Admin.Models.UsuarioDetalleModel
 
 @{
     ViewData["Title"] = "Detalle de Usuario";
 }
 
-<h2 class="mb-3">Detalle de Usuario</h2>
+<h2 class="mb-4">Detalle de Usuario</h2>
 
-<div class="card">
+<div class="card mb-3">
+    <div class="card-header fw-bold">
+        Información General
+    </div>
     <div class="card-body">
-        <dl class="row">
+        <dl class="row mb-0">
             <dt class="col-sm-3">ID</dt>
             <dd class="col-sm-9">@Model.IdUsuario</dd>
 
             <dt class="col-sm-3">Nombre completo</dt>
             <dd class="col-sm-9">@Model.NombreCompleto</dd>
 
-            <dt class="col-sm-3">Correo electrónico</dt>
+            <dt class="col-sm-3">Correo</dt>
             <dd class="col-sm-9">@Model.CorreoElectronico</dd>
 
             <dt class="col-sm-3">Teléfono</dt>
-            <dd class="col-sm-9">@Model.NumeroTelefono</dd>
+            <dd class="col-sm-9">
+                @(!string.IsNullOrWhiteSpace(Model.NumeroTelefono)
+                                ? Model.NumeroTelefono
+                                : "—")
+                </dd>
+
+            <dt class="col-sm-3">Tipo de usuario</dt>
+            <dd class="col-sm-9">
+                <span class="badge bg-info text-dark">
+                    @Model.TipoUsuario
+                </span>
+            </dd>
 
             <dt class="col-sm-3">Estado</dt>
             <dd class="col-sm-9">
@@ -33,12 +47,64 @@
                 }
             </dd>
 
-            <dt class="col-sm-3">Tipo de usuario</dt>
-            <dd class="col-sm-9">@Model.TipoUsuario</dd>
+            <dt class="col-sm-3">Email verificado</dt>
+            <dd class="col-sm-9">
+                @if (Model.EmailVerificado)
+                {
+                    <span class="badge bg-success">Sí</span>
+                }
+                else
+                {
+                    <span class="badge bg-warning text-dark">No</span>
+                }
+            </dd>
         </dl>
-
-        <a asp-action="Index" class="btn btn-secondary">
-            Volver
-        </a>
     </div>
 </div>
+
+<div class="card mb-3">
+    <div class="card-header fw-bold">
+        Ubicación
+    </div>
+    <div class="card-body">
+        <p class="mb-0">
+            @Model.Ciudad, @Model.Pais
+        </p>
+    </div>
+</div>
+
+@if (Model.PerfilOrganizador != null)
+{
+    <div class="card mb-3">
+        <div class="card-header fw-bold">
+            Perfil de Organizador
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-4">Nombre</dt>
+                <dd class="col-sm-8">@Model.PerfilOrganizador.NombreOrganizador</dd>
+
+                <dt class="col-sm-4">Teléfono</dt>
+                <dd class="col-sm-8">@Model.PerfilOrganizador.TelefonoContacto</dd>
+
+                <dt class="col-sm-4">Sitio Web</dt>
+                <dd class="col-sm-8">
+                    @if (!string.IsNullOrEmpty(Model.PerfilOrganizador.SitioWeb))
+                    {
+                        <a href="@Model.PerfilOrganizador.SitioWeb" target="_blank">
+                            @Model.PerfilOrganizador.SitioWeb
+                        </a>
+                    }
+                    else
+                    {
+                        <span>—</span>
+                    }
+                </dd>
+            </dl>
+        </div>
+    </div>
+}
+
+<a asp-action="Index" class="btn btn-secondary">
+    Volver al listado
+</a>
