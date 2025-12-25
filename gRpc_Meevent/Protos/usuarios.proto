@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+option csharp_namespace = "gRpc_Meevent.Protos.Usuario";
+
+service ServiceUsuario {
+	rpc GetAll (EmptyUsuario) returns (Usuarios);
+	rpc GetById (UsuarioRequest) returns (Usuarios);
+	rpc GetByFiltro (UsuarioFiltroRequest) returns (Usuarios);
+}
+
+message EmptyUsuario {}
+
+message UsuarioRequest
+{
+	int32 idUsuario = 1;
+}
+
+message UsuarioFiltroRequest
+{
+	string nombre = 1;
+	bool estado = 2;
+	bool usarEstado = 3;
+	string tipo = 4;
+}
+
+message Usuario
+{
+	int32 idUsuario = 1;
+	string nombreCompleto = 2;
+	string correoElectronico = 3;
+	string numeroTelefono = 4;
+	bool cuentaActiva = 5;
+	string tipoUsuario = 6;
+}
+
+message Usuarios
+{
+	repeated Usuario items = 1;
+}
