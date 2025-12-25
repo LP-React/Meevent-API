@@ -9,7 +9,6 @@ namespace Meevent_API.src.Features.Eventos.DAO
         Task<string> insertEventoAsync(Evento reg);
         Task<string> updateEventoAsync(Evento reg);
 
-        // Otros métodos relacionados con eventos pueden ser añadidos aquí
         Task<IEnumerable<EventoCompletoDTO>> ListarEventosCompletosAsync(
             int? idOrganizador,
             int? idSubCategoria,
@@ -20,5 +19,11 @@ namespace Meevent_API.src.Features.Eventos.DAO
             string? fchDesde,
             string? fchHasta);
 
+        Task<bool> ValidarEventosAlMismoTiempoAsync(
+            int perfilOrganizador,
+            int idEvento,
+            DateTime fchInicio,
+            DateTime fchFin
+        );
     }
 }

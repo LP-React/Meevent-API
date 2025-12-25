@@ -92,6 +92,42 @@ namespace Meevent_API.src.Features.Eventos.Services
         {
             try
             {
+                string slugGenerado = GenerarSlug(dto.TituloEvento);
+                var response = await ListarEventosCompletosAsync(null, null, null, null, null, null, null, null);
+
+                if (!response.Exitoso || response.Eventos == null)
+                {
+                    return new EventoCompletoResponseDTO
+                    {
+                        Exitoso = false,
+                        Mensaje = "No se pudo validar el nombre del evento."
+                    };
+                }
+
+                bool nombreDuplicado = response.Eventos.Any(e => e.Organizador.IdPerfilOrganizador == dto.PerfilOrganizadorId &&
+                e.SlugEvento == slugGenerado);
+
+                if (nombreDuplicado)
+                {
+                    return new EventoCompletoResponseDTO
+                    {
+                        Exitoso = false,
+                        Mensaje = "Ya existe un evento con ese nombre para este organizador."
+                    };
+                }
+
+                bool hayCruce = await _eventoDAO.ValidarEventosAlMismoTiempoAsync(dto.PerfilOrganizadorId,0,dto.FechaInicio,dto.FechaFin);
+
+                if (hayCruce)
+                {
+                    return new EventoCompletoResponseDTO
+                    {
+                        Exitoso = false,
+                        Mensaje = "El organizador ya tiene un evento en ese rango de fecha y hora."
+                    };
+                }
+
+
                 if (dto.FechaFin <= dto.FechaInicio)
                 {
                     return new EventoCompletoResponseDTO { 
@@ -108,8 +144,6 @@ namespace Meevent_API.src.Features.Eventos.Services
                         Mensaje = "La fecha de inicio no puede ser posterior a la fecha actual."
                     };
                 }
-
-                    string slugGenerado = GenerarSlug(dto.TituloEvento);
 
                 var entidad = new Evento
                 {
@@ -156,6 +190,39 @@ namespace Meevent_API.src.Features.Eventos.Services
         {
             try
             {
+                string slugNuevo = GenerarSlug(dto.TituloEvento);
+
+                var response = await ListarEventosCompletosAsync(null, null, null, null, null, null, null, null);
+
+                bool nombreDuplicado = response.Eventos.Any(e =>
+                    e.Organizador.IdPerfilOrganizador == dto.PerfilOrganizadorId &&
+                    e.SlugEvento == slugNuevo &&
+                    e.IdEvento != idEvento
+                );
+
+                if (nombreDuplicado)
+                {
+                    return new EventoCompletoResponseDTO
+                    {
+                        Exitoso = false,
+                        Mensaje = "Otro evento del organizador ya usa ese nombre."
+                    };
+                }
+
+
+                bool hayCruce = await _eventoDAO.ValidarEventosAlMismoTiempoAsync( dto.PerfilOrganizadorId,idEvento,dto.FechaInicio,dto.FechaFin
+);
+
+                if (hayCruce)
+                {
+                    return new EventoCompletoResponseDTO
+                    {
+                        Exitoso = false,
+                        Mensaje = "El organizador ya tiene otro evento programado en ese horario."
+                    };
+                }
+
+
                 if (dto.FechaFin <= dto.FechaInicio)
                 {
                     return new EventoCompletoResponseDTO
@@ -173,8 +240,6 @@ namespace Meevent_API.src.Features.Eventos.Services
                         Mensaje = "La fecha de inicio no puede ser posterior a la fecha actual."
                     };
                 }
-
-                string slugNuevo = GenerarSlug(dto.TituloEvento);
 
                 var entidad = new Evento
                 {

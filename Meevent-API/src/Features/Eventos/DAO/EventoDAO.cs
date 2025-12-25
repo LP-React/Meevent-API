@@ -192,6 +192,32 @@ namespace Meevent_API.src.Features.Eventos.DAO
             return listaEventos;
         }
 
+        public async Task<bool> ValidarEventosAlMismoTiempoAsync(int perfilOrganizador,int idEvento,DateTime fchInicio, DateTime fchFin)
+        {
+            using var cn = new SqlConnection(_cadenaConexion);
+            using var cmd = new SqlCommand("sp_existe_evento_solapado", cn);
+
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.Add("@perfil_organizador_id", SqlDbType.Int)
+                .Value = perfilOrganizador;
+
+            cmd.Parameters.Add("@fecha_inicio", SqlDbType.DateTimeOffset)
+                .Value = new DateTimeOffset(fchInicio);
+
+            cmd.Parameters.Add("@fecha_fin", SqlDbType.DateTimeOffset)
+                .Value = new DateTimeOffset(fchFin);
+
+            cmd.Parameters.Add("@id_evento_excluir", SqlDbType.Int)
+                .Value = idEvento > 0 ? idEvento : DBNull.Value;
+
+            await cn.OpenAsync();
+
+            int existe = Convert.ToInt32(await cmd.ExecuteScalarAsync());
+
+            return existe == 1;
+        }
+
         // Método privado para mapear el SqlDataReader a EventoCompletoDTO
         private EventoCompletoDTO MapearEventoCompleto(SqlDataReader dr)
         {

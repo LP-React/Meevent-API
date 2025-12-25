@@ -61,6 +61,7 @@ namespace Meevent_API.src.Features.Eventos
         public string ImagenPortadaUrl { get; set; }
         public int SubcategoriaEventoId { get; set; }
         public int LocalId { get; set; }
+        public int PerfilOrganizadorId { get; set; }
     }
 
     // DTOs relacionados
