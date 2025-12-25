@@ -261,25 +261,29 @@ namespace Meevent_API.src.Features.Usuarios.Service
             }
         }
 
-        public Task<bool> ActualizarPasswordServiceAsync(int id_usuario, UsuarioCambiarPasswordDTO dto)
+        public async Task<bool> ActualizarPasswordServiceAsync(int id_usuario, UsuarioCambiarPasswordDTO dto)
         {
-            throw new NotImplementedException();
+            if (dto.contraseniaActual == dto.nuevaContrasenia)
+            {
+                throw new Exception("La nueva contraseña no puede ser igual a la actual.");
+            }
+
+            string hashAlmacenado = await _usuarioDAO.ObtenerHashPorIdAsync(id_usuario);
+
+            if (string.IsNullOrEmpty(hashAlmacenado))
+            {
+                throw new Exception("Usuario no encontrado.");
+            }
+
+            bool passwordCorrecta = BCrypt.Net.BCrypt.Verify(dto.contraseniaActual, hashAlmacenado);
+
+            if (!passwordCorrecta)
+            {
+                throw new Exception("La contraseña actual es incorrecta.");
+            }
+
+            string nuevoHash = BCrypt.Net.BCrypt.HashPassword(dto.nuevaContrasenia);
+            return await _usuarioDAO.CambiarContraseniaAsync(id_usuario, nuevoHash);
         }
-
-        /*public async Task<bool> ActualizarPasswordServiceAsync(int id_usuario, UsuarioCambiarPasswordDTO dto)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(dto.contrasenia)) return false;
-
-                string hash = BCrypt.Net.BCrypt.HashPassword(dto.contrasenia);
-
-                return await _usuarioDAO.CambiarContraseniaAsync(id_usuario, hash);
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }*/
     }
 }

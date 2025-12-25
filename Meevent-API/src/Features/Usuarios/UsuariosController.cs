@@ -157,19 +157,39 @@ namespace Meevent_API.src.Features.Usuarios
             }
         }
 
-        [HttpPut("cambiar-password/{id}")]
+        [HttpPatch("cambiar-password/{id}")]
         public async Task<IActionResult> CambiarPassword(int id, [FromBody] UsuarioCambiarPasswordDTO dto)
         {
-            if (dto == null) return BadRequest("Datos inválidos");
-
-            bool exito = await _usuarioService.ActualizarPasswordServiceAsync(id, dto);
-
-            if (exito)
+            if (!ModelState.IsValid)
             {
-                return Ok(new { mensaje = "La contraseña ha sido actualizada correctamente." });
+                return BadRequest(ModelState);
             }
 
-            return BadRequest(new { mensaje = "No se pudo realizar el cambio. Verifique que el usuario exista." });
+            if (dto == null) return BadRequest(new { mensaje = "Datos insuficientes." });
+
+            if (string.IsNullOrWhiteSpace(dto.contraseniaActual) || string.IsNullOrWhiteSpace(dto.nuevaContrasenia))
+            {
+                return BadRequest(new { mensaje = "Ambas contraseñas son obligatorias." });
+            }
+
+            try
+            {
+                bool actualizado = await _usuarioService.ActualizarPasswordServiceAsync(id, dto);
+
+                if (actualizado)
+                {
+                    return Ok(new { mensaje = "Contraseña actualizada con éxito." });
+                }
+                else
+                {
+                    return NotFound(new { mensaje = "El usuario no pudo ser encontrado en el sistema." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
         }
+    
     }
 }

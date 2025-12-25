@@ -14,6 +14,8 @@ namespace Meevent_API.src.Features.Usuarios.DAO
         bool VerificarPaisExiste(int id_pais);
         Task<bool> VerificarCiudadExisteAsync(int id_ciudad);
         string ActivarDesactivarCuenta(int id_usuario, bool cuenta_activa);
-        Task<bool> CambiarContraseniaAsync(int id_usuario, UsuarioCambiarPasswordDTO dto);
+        Task<bool> CambiarContraseniaAsync(int id_usuario, string passwordHash);
+
+        Task<string> ObtenerHashPorIdAsync(int id_usuario);
     }
 }

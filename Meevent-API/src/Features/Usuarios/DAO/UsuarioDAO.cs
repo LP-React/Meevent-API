@@ -495,18 +495,32 @@ namespace Meevent_API.src.Features.Usuarios.DAO
             }
         }
 
-        public async Task<bool> CambiarContraseniaAsync(int id_usuario, UsuarioCambiarPasswordDTO dto)
+        public async Task<bool> CambiarContraseniaAsync(int id_usuario, string nuevoHash)
         {
             using (SqlConnection cn = new SqlConnection(_cadena))
             {
                 SqlCommand cmd = new SqlCommand("usp_Cambiar_contrasenia_usuario", cn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@id_usuario", id_usuario);
-                cmd.Parameters.AddWithValue("@contrasenia", dto.contrasenia);
+                cmd.Parameters.AddWithValue("@contrasenia", nuevoHash);
 
                 await cn.OpenAsync();
                 var resultado = await cmd.ExecuteScalarAsync();
                 return resultado != null && Convert.ToBoolean(resultado);
+            }
+        }
+
+        public async Task<string> ObtenerHashPorIdAsync(int id_usuario)
+        {
+            using (SqlConnection cn = new SqlConnection(_cadena))
+            {
+                SqlCommand cmd = new SqlCommand("usp_Obtener_Hash_Usuario", cn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@id_usuario", id_usuario);
+
+                await cn.OpenAsync();
+                var resultado = await cmd.ExecuteScalarAsync();
+                return resultado?.ToString();
             }
         }
     }

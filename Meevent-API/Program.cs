@@ -1,25 +1,26 @@
-﻿using Meevent_API.src.Features.Eventos.DAO;
-using Meevent_API.src.Features.Eventos.Services;
-using gRcp_Paises;
+﻿using gRcp_Paises;
+using gRpc_Meevent.Protos;
 using Meevent_API.src.Features.CategoriasEvento.DAO;
 using Meevent_API.src.Features.CategoriasEvento.Services;
+using Meevent_API.src.Features.Ciudades.DAO;
+using Meevent_API.src.Features.Ciudades.Service;
+using Meevent_API.src.Features.Eventos.DAO;
+using Meevent_API.src.Features.Eventos.Services;
+using Meevent_API.src.Features.Locales.DAO;
+using Meevent_API.src.Features.Locales.Service;
 using Meevent_API.src.Features.Paises.Services;
 using Meevent_API.src.Features.Paises.Services.Interfaces;
 using Meevent_API.src.Features.PerfilesArtistas.DAO;
 using Meevent_API.src.Features.PerfilesOrganizador.DAO;
 using Meevent_API.src.Features.PerfilesOrganizadores.DAO;
 using Meevent_API.src.Features.PerfilesOrganizadores.Services;
+using Meevent_API.src.Features.SeguidoresEvento.DAO;
+using Meevent_API.src.Features.SeguidoresEvento.Service;
 using Meevent_API.src.Features.SubcategoriasEvento.DAO;
 using Meevent_API.src.Features.SubcategoriasEvento.Services;
 using Meevent_API.src.Features.Usuarios.DAO;
 using Meevent_API.src.Features.Usuarios.Service;
-using Meevent_API.src.Features.Locales.DAO;
-using Meevent_API.src.Features.Locales.Service;
-using Meevent_API.src.Features.Ciudades.DAO;
-using Meevent_API.src.Features.Ciudades.Service;
-using Meevent_API.src.Features.SeguidoresEvento.DAO;
-using Meevent_API.src.Features.SeguidoresEvento.Service;
-using gRpc_Meevent.Protos;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,20 @@ builder.Services.AddCors(options =>
                 .AllowAnyHeader();
         });
 });
+
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var msg = context.ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage)
+                .FirstOrDefault();
+
+            return new BadRequestObjectResult(new { mensaje = msg });
+        };
+    });
 
 builder.Services.AddGrpcClient<ServicioPaises.ServicioPaisesClient>(o =>
 {

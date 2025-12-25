@@ -98,7 +98,12 @@ namespace Meevent_API.src.Features.Usuarios
 
     public class UsuarioCambiarPasswordDTO
     {
-        public string contrasenia;
+        [Required(ErrorMessage = "La contraseña actual es obligatoria")]
+        public string contraseniaActual { get; set; }
+        [Required(ErrorMessage = "Este campo es obligatorio")]
+        [MinLength(8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres")]
+        [RegularExpression(@"^(?=.*[A-Z])(?=.*\d).+$", ErrorMessage = "La contraseña debe tener al menos una mayúscula y un número")]
+        public string nuevaContrasenia { get; set; }
     }
 
     public class UsuarioUpdateResponseDTO
