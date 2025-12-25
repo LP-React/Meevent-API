@@ -85,6 +85,7 @@ namespace Meevent_API.src.Features.Usuarios
         [StringLength(20)]
         public string? numero_telefono { get; set; }
         public string? imagen_perfil_url { get; set; }
+        public string? fecha_nacimiento { get; set; }
 
         // Campos de Perfiles
         public string? nombre_artistico { get; set; }
@@ -237,7 +238,7 @@ namespace Meevent_API.src.Features.Usuarios
         public string correo_electronico { get; set; } = null!;
         public string? numero_telefono { get; set; }
         public string? imagen_perfil_url { get; set; }
-        public DateTime? fecha_nacimiento { get; set; }
+        public string? fecha_nacimiento { get; set; }
         public bool email_verificado { get; set; }
         public bool cuenta_activa { get; set; }
         [JsonIgnore]

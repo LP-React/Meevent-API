@@ -5,7 +5,7 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddHttpClient("MeeventApi", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7292");
+    client.BaseAddress = new Uri("http://localhost:5077");
 });
 
 var app = builder.Build();

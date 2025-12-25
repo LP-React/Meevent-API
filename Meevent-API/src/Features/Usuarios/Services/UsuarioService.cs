@@ -206,7 +206,6 @@ namespace Meevent_API.src.Features.Usuarios.Service
             if (resultado == "OK")
             {
                 var usuario = await _usuarioDAO.GetUsuariosPorId(dto.id_usuario);
-
                 response.Exitoso = true;
                 response.Mensaje = "Perfil actualizado correctamente.";
                 response.UsuarioActualizado = usuario;

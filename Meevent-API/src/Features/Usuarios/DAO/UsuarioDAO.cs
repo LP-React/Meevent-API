@@ -45,7 +45,7 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                                 correo_electronico = dr.GetString(3),
                                 numero_telefono = dr.IsDBNull(4) ? null : dr.GetString(4),
                                 imagen_perfil_url = dr.IsDBNull(5) ? null : dr.GetString(5),
-                                fecha_nacimiento = dr.IsDBNull(6) ? (DateTime?)null : dr.GetDateTime(6),
+                                fecha_nacimiento = dr.IsDBNull(6) ? null : dr.GetDateTime(6).ToString("yyyy-MM-dd"),
                                 email_verificado = dr.GetBoolean(7),
                                 cuenta_activa = dr.GetBoolean(8),
                                 contrasena_hash = dr.GetString(34),
@@ -123,7 +123,7 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                             correo_electronico = dr.GetString(3),
                             numero_telefono = dr.IsDBNull(4) ? null : dr.GetString(4),
                             imagen_perfil_url = dr.IsDBNull(5) ? null : dr.GetString(5),
-                            fecha_nacimiento = dr.IsDBNull(6) ? (DateTime?)null : dr.GetDateTime(6),
+                            fecha_nacimiento = dr.IsDBNull(6) ? null : dr.GetDateTime(6).ToString("yyyy-MM-dd"),
                             email_verificado = dr.GetBoolean(7),
                             cuenta_activa = dr.GetBoolean(8),
                             contrasena_hash = dr.GetString(33),
@@ -201,7 +201,7 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                             correo_electronico = dr.GetString(3),
                             numero_telefono = dr.IsDBNull(4) ? null : dr.GetString(4),
                             imagen_perfil_url = dr.IsDBNull(5) ? null : dr.GetString(5),
-                            fecha_nacimiento = dr.IsDBNull(6) ? (DateTime?)null : dr.GetDateTime(6),
+                            fecha_nacimiento = dr.IsDBNull(6) ? null : dr.GetDateTime(6).ToString("yyyy-MM-dd"),
                             email_verificado = dr.GetBoolean(7),
                             cuenta_activa = dr.GetBoolean(8),
                             contrasena_hash = dr.GetString(34),
@@ -325,6 +325,13 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                     cmd.Parameters.AddWithValue("@id_ciudad", (object)dto.id_ciudad ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("@numero_telefono", (object)dto.numero_telefono ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("@imagen_perfil_url", (object)dto.imagen_perfil_url ?? DBNull.Value);
+                    DateTime? fechaConvertida = null;
+                    if (!string.IsNullOrEmpty(dto.fecha_nacimiento))
+                    {
+                        fechaConvertida = DateTime.Parse(dto.fecha_nacimiento);
+                    }
+
+                    cmd.Parameters.AddWithValue("@fch_nacimiento", (object)fechaConvertida ?? DBNull.Value);
 
                     cmd.Parameters.AddWithValue("@nombre_artistico", (object)dto.nombre_artistico ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("@biografia_artista", (object)dto.biografia_artista ?? DBNull.Value);
@@ -380,7 +387,7 @@ namespace Meevent_API.src.Features.Usuarios.DAO
                                 correo_electronico = dr.GetString(3),
                                 numero_telefono = dr.IsDBNull(4) ? null : dr.GetString(4),
                                 imagen_perfil_url = dr.IsDBNull(5) ? null : dr.GetString(5),
-                                fecha_nacimiento = dr.IsDBNull(6) ? (DateTime?)null : dr.GetDateTime(6),
+                                fecha_nacimiento = dr.IsDBNull(6) ? null : dr.GetDateTime(6).ToString("yyyy-MM-dd"),
                                 email_verificado = dr.GetBoolean(7),
                                 cuenta_activa = dr.GetBoolean(8),
                                 contrasena_hash = dr.GetString(34),
