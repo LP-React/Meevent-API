@@ -1,0 +1,44 @@
+﻿@model appWeb_Admin.Models.UsuarioModel
+
+@{
+    ViewData["Title"] = "Detalle de Usuario";
+}
+
+<h2 class="mb-3">Detalle de Usuario</h2>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">ID</dt>
+            <dd class="col-sm-9">@Model.IdUsuario</dd>
+
+            <dt class="col-sm-3">Nombre completo</dt>
+            <dd class="col-sm-9">@Model.NombreCompleto</dd>
+
+            <dt class="col-sm-3">Correo electrónico</dt>
+            <dd class="col-sm-9">@Model.CorreoElectronico</dd>
+
+            <dt class="col-sm-3">Teléfono</dt>
+            <dd class="col-sm-9">@Model.NumeroTelefono</dd>
+
+            <dt class="col-sm-3">Estado</dt>
+            <dd class="col-sm-9">
+                @if (Model.CuentaActiva)
+                {
+                    <span class="badge bg-success">Activo</span>
+                }
+                else
+                {
+                    <span class="badge bg-danger">Inactivo</span>
+                }
+            </dd>
+
+            <dt class="col-sm-3">Tipo de usuario</dt>
+            <dd class="col-sm-9">@Model.TipoUsuario</dd>
+        </dl>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Volver
+        </a>
+    </div>
+</div>

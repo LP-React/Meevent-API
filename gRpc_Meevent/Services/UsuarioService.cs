@@ -33,8 +33,8 @@ namespace gRpc_Meevent.Services
                     {
                         IdUsuario = dr.GetInt32(0),
                         NombreCompleto = dr.GetString(1),
-                        CorreoElectronico = dr.GetString(2),                   
-                        NumeroTelefono = dr.GetString(3),
+                        CorreoElectronico = dr.GetString(2),
+                        NumeroTelefono = dr.IsDBNull(3) ? "" : dr.GetString(3),
                         CuentaActiva = dr.GetBoolean(4),
                         TipoUsuario = dr.GetString(5)
                     });

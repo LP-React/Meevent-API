@@ -1,0 +1,103 @@
+﻿@model IEnumerable<appWeb_Admin.Models.UsuarioModel>
+
+@{
+    ViewData["Title"] = "Usuarios";
+}
+
+<h2 class="mb-3">Listado de Usuarios</h2>
+
+<form method="get" class="row g-3 mb-3">
+    <div class="col-md-4">
+        <label class="form-label">Nombre</label>
+        <input type="text"
+               name="nombre"
+               value="@ViewBag.FiltroNombre"
+               class="form-control"
+               placeholder="Buscar por nombre" />
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label">Estado</label>
+        <select name="estado" class="form-select">
+            <option value="">-- Todos --</option>
+            <option value="true" selected="@(ViewBag.FiltroEstado?.ToString() == "True")">
+                Activo
+            </option>
+            <option value="false" selected="@(ViewBag.FiltroEstado?.ToString() == "False")">
+                Inactivo
+            </option>
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label">Tipo</label>
+        <select name="tipo" class="form-select">
+            <option value="">-- Todos --</option>
+            <option value="normal" selected="@(ViewBag.FiltroTipo == "normal")">Normal</option>
+            <option value="artista" selected="@(ViewBag.FiltroTipo == "artista")">Artista</option>
+            <option value="organizador" selected="@(ViewBag.FiltroTipo == "organizador")">
+                Organizador
+            </option>
+        </select>
+    </div>
+
+    <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">
+            Filtrar
+        </button>
+    </div>
+</form>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Teléfono</th>
+            <th>Estado</th>
+            <th>Tipo</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="7" class="text-center">
+                    No se encontraron usuarios.
+                </td>
+            </tr>
+        }
+        else
+        {
+            foreach (var u in Model)
+            {
+                <tr>
+                    <td>@u.IdUsuario</td>
+                    <td>@u.NombreCompleto</td>
+                    <td>@u.CorreoElectronico</td>
+                    <td>@u.NumeroTelefono</td>
+                    <td>
+                        @if (u.CuentaActiva)
+                        {
+                            <span class="badge bg-success">Activo</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Inactivo</span>
+                        }
+                    </td>
+                    <td>@u.TipoUsuario</td>
+                    <td>
+                        <a asp-action="Detalles"
+                           asp-route-id="@u.IdUsuario"
+                           class="btn btn-sm btn-primary">
+                            Ver detalle
+                        </a>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
