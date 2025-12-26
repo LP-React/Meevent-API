@@ -13,44 +13,47 @@ namespace Meevent_API.src.Features.Eventos.DAO
                 Build().GetConnectionString("MeeventDB");
         }
 
-        public async Task<string> insertEventoAsync(Evento reg)
+        public async Task<bool> InsertEventoAsync(Evento reg)
         {
-            try
+            using SqlConnection cn = new SqlConnection(_cadenaConexion);
+            using SqlCommand cmd = new SqlCommand("usp_InsertarEvento", cn)
             {
-                using (SqlConnection cn = new SqlConnection(_cadenaConexion))
-                {
-                    SqlCommand cmd = new SqlCommand("usp_InsertarEvento", cn);
-                    cmd.CommandType = CommandType.StoredProcedure;
+                CommandType = CommandType.StoredProcedure
+            };
 
-                    cmd.Parameters.AddWithValue("@titulo_evento", reg.TituloEvento);
-                    cmd.Parameters.AddWithValue("@slug_evento", reg.SlugEvento);
-                    cmd.Parameters.AddWithValue("@descripcion_evento", reg.DescripcionEvento);
-                    cmd.Parameters.AddWithValue("@descripcion_corta", (object)reg.DescripcionCorta ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@fecha_inicio", DateTime.Parse(reg.FechaInicio));
-                    cmd.Parameters.AddWithValue("@fecha_fin", DateTime.Parse(reg.FechaFin));
-                    cmd.Parameters.AddWithValue("@zona_horaria", reg.ZonaHoraria);
-                    cmd.Parameters.AddWithValue("@estado_evento", reg.EstadoEvento);
-                    cmd.Parameters.AddWithValue("@capacidad_evento", reg.CapacidadEvento);
-                    cmd.Parameters.AddWithValue("@evento_gratuito", reg.EventoGratuito);
-                    cmd.Parameters.AddWithValue("@evento_online", reg.EventoOnline);
-                    cmd.Parameters.AddWithValue("@imagen_portada_url", (object)reg.ImagenPortadaUrl ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@perfil_organizador_id", reg.PerfilOrganizadorId);
-                    cmd.Parameters.AddWithValue("@subcategoria_evento_id", reg.SubcategoriaEventoId);
-                    cmd.Parameters.AddWithValue("@local_id", reg.LocalId);
+            cmd.Parameters.Add("@titulo_evento", SqlDbType.NVarChar, 250).Value = reg.TituloEvento;
+            cmd.Parameters.Add("@slug_evento", SqlDbType.NVarChar, 250).Value = reg.SlugEvento;
+            cmd.Parameters.Add("@descripcion_evento", SqlDbType.NVarChar).Value = reg.DescripcionEvento;
+            cmd.Parameters.Add("@descripcion_corta", SqlDbType.NVarChar, 500).Value =
+                (object?)reg.DescripcionCorta ?? DBNull.Value;
 
-                    await cn.OpenAsync();
-                    int filasAffected = await cmd.ExecuteNonQueryAsync();
+            cmd.Parameters.Add("@fecha_inicio", SqlDbType.DateTimeOffset)
+                .Value = DateTimeOffset.Parse(reg.FechaInicio);
 
-                    return filasAffected > 0
-                        ? "Registro insertado correctamente en la base de datos."
-                        : "No se pudo insertar el registro, verifique los datos.";
-                }
-            }
-            catch (Exception ex)
-            {
-                return $"Error inesperado: {ex.Message}";
-            }
+            cmd.Parameters.Add("@fecha_fin", SqlDbType.DateTimeOffset)
+                .Value = DateTimeOffset.Parse(reg.FechaFin);
+
+            cmd.Parameters.Add("@zona_horaria", SqlDbType.NVarChar, 50).Value = reg.ZonaHoraria;
+            cmd.Parameters.Add("@estado_evento", SqlDbType.NVarChar, 20).Value = reg.EstadoEvento;
+            cmd.Parameters.Add("@capacidad_evento", SqlDbType.Int).Value = reg.CapacidadEvento;
+            cmd.Parameters.Add("@evento_gratuito", SqlDbType.Bit).Value = reg.EventoGratuito;
+            cmd.Parameters.Add("@evento_online", SqlDbType.Bit).Value = reg.EventoOnline;
+
+            cmd.Parameters.Add("@imagen_portada_url", SqlDbType.NVarChar, 500).Value =
+                (object?)reg.ImagenPortadaUrl ?? DBNull.Value;
+
+            cmd.Parameters.Add("@perfil_organizador_id", SqlDbType.Int).Value = reg.PerfilOrganizadorId;
+            cmd.Parameters.Add("@subcategoria_evento_id", SqlDbType.Int).Value = reg.SubcategoriaEventoId;
+
+            cmd.Parameters.Add("@local_id", SqlDbType.Int).Value =
+                reg.EventoOnline ? DBNull.Value : reg.LocalId!;
+
+            await cn.OpenAsync();
+            await cmd.ExecuteNonQueryAsync();
+
+            return true; ;
         }
+
 
         public async Task<string> updateEventoAsync(Evento reg)
         {
