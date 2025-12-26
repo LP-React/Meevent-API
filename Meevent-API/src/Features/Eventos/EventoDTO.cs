@@ -40,7 +40,7 @@ namespace Meevent_API.src.Features.Eventos
         [Required]
         public int SubcategoriaEventoId { get; set; }
 
-        public int LocalId { get; set; }
+        public int? LocalId { get; set; }
     }
 
     // DTO para actualizar un evento existente

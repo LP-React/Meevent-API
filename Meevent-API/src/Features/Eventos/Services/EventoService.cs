@@ -201,79 +201,87 @@ namespace Meevent_API.src.Features.Eventos.Services
         // ACTUALIZAR EVENTO
         public async Task<EventoCompletoResponseDTO> UpdateEventoAsync(int idEvento, EventoActualizarDTO dto)
         {
+            if (dto == null)
+                return Fail("Datos de entrada inválidos.");
+
+            if (idEvento <= 0)
+                return Fail("Evento inválido.");
+
+            if (string.IsNullOrWhiteSpace(dto.TituloEvento))
+                return Fail("El título del evento es obligatorio.");
+
+            if (string.IsNullOrWhiteSpace(dto.DescripcionEvento))
+                return Fail("La descripción del evento es obligatoria.");
+
+            if (dto.CapacidadEvento <= 0)
+                return Fail("La capacidad del evento debe ser mayor a cero.");
+
+            // Regla online / presencial
+            if (dto.EventoOnline && dto.LocalId > 0)
+                return Fail("Un evento online no debe tener un local asignado.");
+
+            if (!dto.EventoOnline && dto.LocalId <= 0)
+                return Fail("Un evento presencial debe tener un local válido.");
+
+            if (dto.FechaFin <= dto.FechaInicio)
+                return Fail("La fecha de finalización debe ser posterior a la de inicio.");
+
+            if (dto.FechaInicio < DateTime.Now)
+                return Fail("La fecha de inicio no puede ser anterior a la fecha actual.");
+
+            string slugNuevo = GenerarSlug(dto.TituloEvento);
+
+            // Validar duplicado (excluyendo el mismo evento)
+            var eventosResp = await ListarEventosCompletosAsync(null, null, null, null, null, null, null, null);
+            if (!eventosResp.Exitoso || eventosResp.Eventos == null)
+                return Fail("No se pudo validar el nombre del evento.");
+
+            bool duplicado = eventosResp.Eventos.Any(e =>
+                e.Organizador.IdPerfilOrganizador == dto.PerfilOrganizadorId &&
+                e.SlugEvento == slugNuevo &&
+                e.IdEvento != idEvento
+            );
+
+            if (duplicado)
+                return Fail("Otro evento del organizador ya usa ese nombre.");
+
+            // Validar cruce de horarios (excluyendo este evento)
+            bool hayCruce = await _eventoDAO.ValidarEventosAlMismoTiempoAsync(
+                dto.PerfilOrganizadorId,
+                idEvento,
+                dto.FechaInicio,
+                dto.FechaFin
+            );
+
+            if (hayCruce)
+                return Fail("El organizador ya tiene otro evento en ese rango de fecha y hora.");
+
+            // Mapear entidad
+            var entidad = new Evento
+            {
+                IdEvento = idEvento,
+                TituloEvento = dto.TituloEvento.Trim(),
+                SlugEvento = slugNuevo,
+                DescripcionEvento = dto.DescripcionEvento,
+                DescripcionCorta = dto.DescripcionCorta,
+                FechaInicio = dto.FechaInicio.ToString("yyyy-MM-ddTHH:mm:sszzz"),
+                FechaFin = dto.FechaFin.ToString("yyyy-MM-ddTHH:mm:sszzz"),
+                ZonaHoraria = dto.ZonaHoraria,
+                EstadoEvento = dto.EstadoEvento,
+                CapacidadEvento = dto.CapacidadEvento,
+                EventoGratuito = dto.EventoGratuito,
+                EventoOnline = dto.EventoOnline,
+                ImagenPortadaUrl = dto.ImagenPortadaUrl,
+                SubcategoriaEventoId = dto.SubcategoriaEventoId,
+                LocalId = dto.EventoOnline ? 0 : dto.LocalId
+            };
+
             try
             {
-                string slugNuevo = GenerarSlug(dto.TituloEvento);
-
-                var response = await ListarEventosCompletosAsync(null, null, null, null, null, null, null, null);
-
-                bool nombreDuplicado = response.Eventos.Any(e =>
-                    e.Organizador.IdPerfilOrganizador == dto.PerfilOrganizadorId &&
-                    e.SlugEvento == slugNuevo &&
-                    e.IdEvento != idEvento
-                );
-
-                if (nombreDuplicado)
-                {
-                    return new EventoCompletoResponseDTO
-                    {
-                        Exitoso = false,
-                        Mensaje = "Otro evento del organizador ya usa ese nombre."
-                    };
-                }
-
-
-                bool hayCruce = await _eventoDAO.ValidarEventosAlMismoTiempoAsync( dto.PerfilOrganizadorId,idEvento,dto.FechaInicio,dto.FechaFin
-);
-
-                if (hayCruce)
-                {
-                    return new EventoCompletoResponseDTO
-                    {
-                        Exitoso = false,
-                        Mensaje = "El organizador ya tiene otro evento programado en ese horario."
-                    };
-                }
-
-
-                if (dto.FechaFin <= dto.FechaInicio)
-                {
-                    return new EventoCompletoResponseDTO
-                    {
-                        Exitoso = false,
-                        Mensaje = "La fecha de finalización debe ser posterior a la de inicio."
-                    };
-                }
-
-                if (dto.FechaInicio <= DateTime.Now)
-                {
-                    return new EventoCompletoResponseDTO
-                    {
-                        Exitoso = false,
-                        Mensaje = "La fecha de inicio no puede ser posterior a la fecha actual."
-                    };
-                }
-
-                var entidad = new Evento
-                {
-                    IdEvento = idEvento,
-                    TituloEvento = dto.TituloEvento,
-                    SlugEvento = slugNuevo,
-                    DescripcionEvento = dto.DescripcionEvento,
-                    DescripcionCorta = dto.DescripcionCorta,
-                    FechaInicio = dto.FechaInicio.ToString("yyyy-MM-ddTHH:mm:sszzz"),
-                    FechaFin = dto.FechaFin.ToString("yyyy-MM-ddTHH:mm:sszzz"),
-                    ZonaHoraria = dto.ZonaHoraria,
-                    EstadoEvento = dto.EstadoEvento,
-                    CapacidadEvento = dto.CapacidadEvento,
-                    EventoGratuito = dto.EventoGratuito,
-                    EventoOnline = dto.EventoOnline,
-                    ImagenPortadaUrl = dto.ImagenPortadaUrl,
-                    SubcategoriaEventoId = dto.SubcategoriaEventoId,
-                    LocalId = dto.LocalId
-                };
-
                 string resultado = await _eventoDAO.updateEventoAsync(entidad);
+
+                if (string.IsNullOrWhiteSpace(resultado))
+                    return Fail("No se pudo actualizar el evento.");
 
                 return new EventoCompletoResponseDTO
                 {
@@ -286,15 +294,17 @@ namespace Meevent_API.src.Features.Eventos.Services
                     }
                 };
             }
+            catch (SqlException ex) when (ex.Number == 50001)
+            {
+                return Fail(ex.Message);
+            }
             catch (Exception ex)
             {
-                return new EventoCompletoResponseDTO
-                {
-                    Exitoso = false,
-                    Mensaje = "Ocurrió un error interno: " + ex.Message
-                };
+                return Fail("Error interno: " + ex.Message);
             }
+
         }
+
 
         public async Task<EventosCompletosListResponseDTO> ListarEventosCompletosAsync(
             int? idOrganizador,

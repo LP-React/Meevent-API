@@ -19,6 +19,6 @@
         public string FechaActualizacion { get; set; }
         public int PerfilOrganizadorId { get; set; }
         public int SubcategoriaEventoId { get; set; }
-        public int LocalId { get; set; }
+        public int? LocalId { get; set; }
     }
 }
