@@ -8,8 +8,11 @@ builder.Services.AddHttpClient("MeeventApi", client =>
     client.BaseAddress = new Uri("http://localhost:5077");
 });
 
+builder.Services.AddSession(); // Agregar servicio
+
 var app = builder.Build();
 
+app.UseSession(); // Habilitar middleware
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -27,6 +30,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Account}/{action=Login}/{id?}");
 
 app.Run();
