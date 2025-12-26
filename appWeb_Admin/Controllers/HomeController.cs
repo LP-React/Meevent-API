@@ -6,15 +6,34 @@ namespace appWeb_Admin.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IHttpClientFactory httpClientFactory)
         {
-            _logger = logger;
+            _httpClientFactory = httpClientFactory;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var client = _httpClientFactory.CreateClient();
+
+            // Consumir API de Categorías
+            var categoriasResp = await client
+                .GetFromJsonAsync<ListarCategoriasResponse>(
+                    "http://localhost:5077/api/categorias/ListarCategorias"
+                );
+            // Subcategorías
+            var subcategoriasResp = await client
+                .GetFromJsonAsync<SubcategoriasResponse>("http://localhost:5077/api/SubcategoriasEvento/ListarSubCategorias");
+
+            // Eventos
+            var eventosResp = await client
+                .GetFromJsonAsync<EventosResponse>("http://localhost:5077/api/eventos/getEventos?estadoEvento=publicado");
+            ViewBag.EventosActivos = eventosResp?.TotalEventos ?? 0;
+
+            ViewBag.TotalSubcategorias = subcategoriasResp?.TotalSubCategoriasEvento ?? 0;
+            ViewBag.TotalCategorias = categoriasResp?.TotalCategoriasEvento ?? 0;
+
             return View();
         }
 
