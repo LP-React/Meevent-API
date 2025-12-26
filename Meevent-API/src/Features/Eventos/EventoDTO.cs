@@ -40,7 +40,6 @@ namespace Meevent_API.src.Features.Eventos
         [Required]
         public int SubcategoriaEventoId { get; set; }
 
-        [Required]
         public int LocalId { get; set; }
     }
 
