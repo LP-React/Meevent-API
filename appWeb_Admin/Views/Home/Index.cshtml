@@ -1,8 +1,416 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- HEADER DE BIENVENIDA -->
+<div class="welcome-section mb-4">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h2 class="fw-bold mb-2">
+                <i class="bi bi-hand-wave text-warning me-2"></i>
+                Bienvenido al Panel de Administración
+            </h2>
+            <p class="text-muted mb-0">Aquí encontrarás un resumen de las actividades y estadísticas principales del sistema</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="badge bg-success bg-opacity-10 text-success px-3 py-2">
+                <i class="bi bi-circle-fill" style="font-size: 0.5rem;"></i>
+                Sistema Activo
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- TARJETAS DE ESTADÍSTICAS -->
+<div class="row g-4 mb-4">
+    <!-- Categorías -->
+    <div class="col-md-6 col-xl-3">
+        <div class="card stat-card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <p class="text-muted mb-1 small">Total Categorías</p>
+                        <h3 class="fw-bold mb-0">24</h3>
+                    </div>
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-bookmark-fill"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-success bg-opacity-10 text-success me-2">
+                        <i class="bi bi-arrow-up"></i> 12%
+                    </span>
+                    <small class="text-muted">vs mes anterior</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subcategorías -->
+    <div class="col-md-6 col-xl-3">
+        <div class="card stat-card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <p class="text-muted mb-1 small">Total Subcategorías</p>
+                        <h3 class="fw-bold mb-0">68</h3>
+                    </div>
+                    <div class="stat-icon bg-info bg-opacity-10 text-info">
+                        <i class="bi bi-tags-fill"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-success bg-opacity-10 text-success me-2">
+                        <i class="bi bi-arrow-up"></i> 8%
+                    </span>
+                    <small class="text-muted">vs mes anterior</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Usuarios -->
+    <div class="col-md-6 col-xl-3">
+        <div class="card stat-card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <p class="text-muted mb-1 small">Total Usuarios</p>
+                        <h3 class="fw-bold mb-0">156</h3>
+                    </div>
+                    <div class="stat-icon bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-people"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-success bg-opacity-10 text-success me-2">
+                        <i class="bi bi-arrow-up"></i> 24%
+                    </span>
+                    <small class="text-muted">vs mes anterior</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Eventos Activos -->
+    <div class="col-md-6 col-xl-3">
+        <div class="card stat-card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <p class="text-muted mb-1 small">Eventos Activos</p>
+                        <h3 class="fw-bold mb-0">42</h3>
+                    </div>
+                    <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                        <i class="bi bi-calendar-event"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-warning bg-opacity-10 text-warning me-2">
+                        <i class="bi bi-dash"></i> 3%
+                    </span>
+                    <small class="text-muted">vs mes anterior</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SECCIÓN DE ACCESOS RÁPIDOS Y ACTIVIDAD -->
+<div class="row g-4 mb-4">
+    <!-- Accesos Rápidos -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-bottom">
+                <h5 class="mb-0 fw-semibold">
+                    <i class="bi bi-lightning-fill text-primary me-2"></i>
+                    Accesos Rápidos
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <a asp-controller="CategoriasEvento" asp-action="Crear" class="quick-action-card text-decoration-none">
+                            <div class="d-flex align-items-center p-3 rounded">
+                                <div class="quick-icon bg-primary bg-opacity-10 text-primary me-3">
+                                    <i class="bi bi-plus-circle"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-semibold text-dark">Nueva Categoría</h6>
+                                    <small class="text-muted">Crear categoría de evento</small>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a asp-controller="Subcategorias" asp-action="Crear" class="quick-action-card text-decoration-none">
+                            <div class="d-flex align-items-center p-3 rounded">
+                                <div class="quick-icon bg-info bg-opacity-10 text-info me-3">
+                                    <i class="bi bi-plus-circle"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-semibold text-dark">Nueva Subcategoría</h6>
+                                    <small class="text-muted">Crear subcategoría</small>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a asp-controller="Usuarios" asp-action="Index" class="quick-action-card text-decoration-none">
+                            <div class="d-flex align-items-center p-3 rounded">
+                                <div class="quick-icon bg-success bg-opacity-10 text-success me-3">
+                                    <i class="bi bi-people"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-semibold text-dark">Lista Usuarios</h6>
+                                    <small class="text-muted">Ver todos los usuarios</small>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a asp-controller="CategoriasEvento" asp-action="Index" class="quick-action-card text-decoration-none">
+                            <div class="d-flex align-items-center p-3 rounded">
+                                <div class="quick-icon bg-warning bg-opacity-10 text-warning me-3">
+                                    <i class="bi bi-list-ul"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-semibold text-dark">Ver Categorías</h6>
+                                    <small class="text-muted">Administrar categorías</small>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actividad Reciente -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-bottom">
+                <h5 class="mb-0 fw-semibold">
+                    <i class="bi bi-clock-history text-primary me-2"></i>
+                    Actividad Reciente
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon bg-success bg-opacity-10 text-success">
+                            <i class="bi bi-plus-circle"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p class="mb-0 small fw-semibold">Nueva categoría creada</p>
+                            <small class="text-muted">Hace 2 horas</small>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="bi bi-pencil"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p class="mb-0 small fw-semibold">Subcategoría actualizada</p>
+                            <small class="text-muted">Hace 5 horas</small>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon bg-info bg-opacity-10 text-info">
+                            <i class="bi bi-person-check"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p class="mb-0 small fw-semibold">Usuario registrado</p>
+                            <small class="text-muted">Hace 1 día</small>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon bg-warning bg-opacity-10 text-warning">
+                            <i class="bi bi-toggle-on"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p class="mb-0 small fw-semibold">Estado modificado</p>
+                            <small class="text-muted">Hace 2 días</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- GRÁFICO Y ESTADO DEL SISTEMA -->
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-bottom">
+                <h5 class="mb-0 fw-semibold">
+                    <i class="bi bi-bar-chart-fill text-primary me-2"></i>
+                    Resumen Mensual
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-placeholder text-center py-5">
+                    <i class="bi bi-graph-up display-1 text-muted opacity-25"></i>
+                    <p class="text-muted mt-3 mb-0">Gráfico de estadísticas mensuales</p>
+                    <small class="text-muted">Integración pendiente con datos reales</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-bottom">
+                <h5 class="mb-0 fw-semibold">
+                    <i class="bi bi-info-circle text-primary me-2"></i>
+                    Estado del Sistema
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="system-status">
+                    <div class="status-item mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small fw-semibold">Base de Datos</span>
+                            <span class="badge bg-success">Operativo</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-success" style="width: 95%"></div>
+                        </div>
+                    </div>
+                    <div class="status-item mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small fw-semibold">Servidor</span>
+                            <span class="badge bg-success">Activo</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-success" style="width: 88%"></div>
+                        </div>
+                    </div>
+                    <div class="status-item mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small fw-semibold">Almacenamiento</span>
+                            <span class="badge bg-warning">Medio</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-warning" style="width: 65%"></div>
+                        </div>
+                    </div>
+                    <div class="status-item">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small fw-semibold">Rendimiento</span>
+                            <span class="badge bg-success">Óptimo</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-success" style="width: 92%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .welcome-section {
+        padding: 20px 0;
+    }
+
+    .stat-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1) !important;
+    }
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .quick-action-card {
+        display: block;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .quick-action-card:hover {
+        border-color: #4f46e5;
+        background-color: #f8f9fa;
+        transform: translateX(5px);
+    }
+
+    .quick-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+    }
+
+    .activity-list {
+        max-height: 350px;
+        overflow-y: auto;
+    }
+
+    .activity-item {
+        display: flex;
+        align-items: start;
+        padding: 15px 20px;
+        border-bottom: 1px solid #e2e8f0;
+        transition: background 0.2s;
+    }
+
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+
+    .activity-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        flex-shrink: 0;
+    }
+
+    .activity-content {
+        flex: 1;
+    }
+
+    .chart-placeholder {
+        min-height: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 10px;
+    }
+
+    .system-status .status-item .progress {
+        border-radius: 10px;
+        background-color: #e9ecef;
+    }
+
+    .system-status .status-item .progress-bar {
+        border-radius: 10px;
+    }
+</style>
