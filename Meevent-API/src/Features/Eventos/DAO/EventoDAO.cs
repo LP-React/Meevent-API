@@ -170,14 +170,14 @@ namespace Meevent_API.src.Features.Eventos.DAO
                 using (SqlCommand cmd = new SqlCommand("usp_ListarEventos", cn))
 
                 {
-                    cmd.Parameters.AddWithValue("@idOrganizador", idOrganizador);
-                    cmd.Parameters.AddWithValue("@idSubCategoria", idSubCategoria);
-                    cmd.Parameters.AddWithValue("@idLocal", idLocal);
-                    cmd.Parameters.AddWithValue("@eventoGratuito", eventoGratuito);
-                    cmd.Parameters.AddWithValue("@eventoOnline", eventoOnline);
-                    cmd.Parameters.AddWithValue("@estadoEvento", estadoEvento);
-                    cmd.Parameters.AddWithValue("@fechaDesde", fchDesde);
-                    cmd.Parameters.AddWithValue("@fechaHasta", fchHasta);
+                    cmd.Parameters.AddWithValue("@idOrganizador", (object?)idOrganizador ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@idSubCategoria", (object?)idSubCategoria ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@idLocal", (object?)idLocal ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@eventoGratuito", (object?)eventoGratuito ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@eventoOnline", (object?)eventoOnline ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@estadoEvento", (object?)estadoEvento ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@fechaDesde", string.IsNullOrEmpty(fchDesde) ? DBNull.Value : DateTime.Parse(fchDesde));
+                    cmd.Parameters.AddWithValue("@fechaHasta", string.IsNullOrEmpty(fchHasta) ? DBNull.Value : DateTime.Parse(fchHasta));
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     await cn.OpenAsync();
@@ -224,75 +224,81 @@ namespace Meevent_API.src.Features.Eventos.DAO
         // Método privado para mapear el SqlDataReader a EventoCompletoDTO
         private EventoCompletoDTO MapearEventoCompleto(SqlDataReader dr)
         {
-            return new EventoCompletoDTO
+            var evento = new EventoCompletoDTO
             {
-                // Datos básicos del evento
-                IdEvento = dr.GetInt32(0),
-                TituloEvento = dr.GetString(1),
-                SlugEvento = dr.GetString(2),
-                DescripcionEvento = dr.GetString(3),
-                DescripcionCorta = dr.IsDBNull(4) ? null : dr.GetString(4),
-                FechaInicio = dr.GetDateTimeOffset(5).DateTime.ToString("yyyy-MM-ddTHH:mm:ss"),
-                FechaFin = dr.GetDateTimeOffset(6).DateTime.ToString("yyyy-MM-ddTHH:mm:ss"),
-                ZonaHoraria = dr.GetString(7),
-                EstadoEvento = dr.GetString(8),
-                CapacidadEvento = dr.GetInt32(9),
-                EventoGratuito = dr.GetBoolean(10),
-                EventoOnline = dr.GetBoolean(11),
-                ImagenPortadaUrl = dr.IsDBNull(12) ? null : dr.GetString(12),
-                FechaCreacion = dr.GetDateTime(13),
-                FechaActualizacion = dr.GetDateTime(14),
+                IdEvento = dr.GetInt32(dr.GetOrdinal("id_evento")),
+                TituloEvento = dr.GetString(dr.GetOrdinal("titulo_evento")),
+                SlugEvento = dr.GetString(dr.GetOrdinal("slug_evento")),
+                DescripcionEvento = dr.GetString(dr.GetOrdinal("descripcion_evento")),
+                DescripcionCorta = dr.IsDBNull(dr.GetOrdinal("descripcion_corta")) ? null : dr.GetString(dr.GetOrdinal("descripcion_corta")),
 
-                // Organizador completo
+                FechaInicio = dr.GetDateTimeOffset(dr.GetOrdinal("fecha_inicio")).DateTime.ToString("yyyy-MM-ddTHH:mm:ss"),
+                FechaFin = dr.GetDateTimeOffset(dr.GetOrdinal("fecha_fin")).DateTime.ToString("yyyy-MM-ddTHH:mm:ss"),
+
+                ZonaHoraria = dr.GetString(dr.GetOrdinal("zona_horaria")),
+                EstadoEvento = dr.GetString(dr.GetOrdinal("estado_evento")),
+                CapacidadEvento = dr.GetInt32(dr.GetOrdinal("capacidad_evento")),
+                EventoGratuito = dr.GetBoolean(dr.GetOrdinal("evento_gratuito")),
+                EventoOnline = dr.GetBoolean(dr.GetOrdinal("evento_online")),
+                ImagenPortadaUrl = dr.IsDBNull(dr.GetOrdinal("imagen_portada_url")) ? null : dr.GetString(dr.GetOrdinal("imagen_portada_url")),
+                FechaCreacion = dr.GetDateTime(dr.GetOrdinal("fecha_creacion")),
+                FechaActualizacion = dr.GetDateTime(dr.GetOrdinal("fecha_actualizacion")),
+
                 Organizador = new OrganizadorDTO
                 {
-                    IdPerfilOrganizador = dr.GetInt32(15),
-                    NombreOrganizador = dr.GetString(16),
-                    DescripcionOrganizador = dr.GetString(17),
-                    SitioWeb = dr.IsDBNull(18) ? null : dr.GetString(18),
-                    LogoUrl = dr.IsDBNull(19) ? null : dr.GetString(19),
-                    FacebookUrl = dr.IsDBNull(20) ? null : dr.GetString(20),
-                    InstagramUrl = dr.IsDBNull(21) ? null : dr.GetString(21),
-                    TiktokUrl = dr.IsDBNull(22) ? null : dr.GetString(22),
-                    TwitterUrl = dr.IsDBNull(23) ? null : dr.GetString(23),
-                    DireccionOrganizador = dr.IsDBNull(24) ? null : dr.GetString(24),
-                    TelefonoContacto = dr.IsDBNull(25) ? null : dr.GetString(25)
+                    IdPerfilOrganizador = dr.GetInt32(dr.GetOrdinal("id_perfil_organizador")),
+                    NombreOrganizador = dr.GetString(dr.GetOrdinal("nombre_organizador")),
+                    DescripcionOrganizador = dr.GetString(dr.GetOrdinal("descripcion_organizador")),
+                    SitioWeb = dr.IsDBNull(dr.GetOrdinal("organizador_sitio_web")) ? null : dr.GetString(dr.GetOrdinal("organizador_sitio_web")),
+                    LogoUrl = dr.IsDBNull(dr.GetOrdinal("logo_url")) ? null : dr.GetString(dr.GetOrdinal("logo_url")),
+                    FacebookUrl = dr.IsDBNull(dr.GetOrdinal("organizador_facebook")) ? null : dr.GetString(dr.GetOrdinal("organizador_facebook")),
+                    InstagramUrl = dr.IsDBNull(dr.GetOrdinal("organizador_instagram")) ? null : dr.GetString(dr.GetOrdinal("organizador_instagram")),
+                    TiktokUrl = dr.IsDBNull(dr.GetOrdinal("organizador_tiktok")) ? null : dr.GetString(dr.GetOrdinal("organizador_tiktok")),
+                    TwitterUrl = dr.IsDBNull(dr.GetOrdinal("organizador_twitter")) ? null : dr.GetString(dr.GetOrdinal("organizador_twitter")),
+                    DireccionOrganizador = dr.IsDBNull(dr.GetOrdinal("direccion_organizador")) ? null : dr.GetString(dr.GetOrdinal("direccion_organizador")),
+                    TelefonoContacto = dr.IsDBNull(dr.GetOrdinal("organizador_telefono")) ? null : dr.GetString(dr.GetOrdinal("organizador_telefono"))
                 },
 
-                // Subcategoría con categoría anidada
                 Subcategoria = new SubcategoriaEventoDTO
                 {
-                    IdSubcategoriaEvento = dr.GetInt32(26),
-                    NombreSubcategoria = dr.GetString(27),
-                    SlugSubcategoria = dr.GetString(28),
+                    IdSubcategoriaEvento = dr.GetInt32(dr.GetOrdinal("id_subcategoria_evento")),
+                    NombreSubcategoria = dr.GetString(dr.GetOrdinal("nombre_subcategoria")),
+                    SlugSubcategoria = dr.GetString(dr.GetOrdinal("slug_subcategoria")),
                     Categoria = new CategoriaEventoDTO
                     {
-                        IdCategoriaEvento = dr.GetInt32(29),
-                        NombreCategoria = dr.GetString(30),
-                        SlugCategoria = dr.GetString(31),
-                        IconoUrl = dr.IsDBNull(32) ? null : dr.GetString(32)
+                        IdCategoriaEvento = dr.GetInt32(dr.GetOrdinal("id_categoria_evento")),
+                        NombreCategoria = dr.GetString(dr.GetOrdinal("nombre_categoria")),
+                        SlugCategoria = dr.GetString(dr.GetOrdinal("slug_categoria")),
+                        IconoUrl = dr.IsDBNull(dr.GetOrdinal("categoria_icono")) ? null : dr.GetString(dr.GetOrdinal("categoria_icono"))
                     }
-                },
-
-                Ubicacion = new UbicacionDTO
-                {
-                    // Local
-                    IdLocal = dr.GetInt32(33),
-                    NombreLocal = dr.GetString(34),
-                    CapacidadLocal = dr.GetInt32(35),
-                    DireccionLocal = dr.IsDBNull(36) ? string.Empty : dr.GetString(36),
-                    // Ciudad
-                    IdCiudad = dr.GetInt32(37),
-                    NombreCiudad = dr.GetString(38),
-                    // Pais
-                    IdPais = dr.GetInt32(39),
-                    NombrePais = dr.GetString(40),
-                    CodigoISO = dr.GetString(41),
-
-                    Latitud = dr.GetDecimal(42),
-                    Longitud = dr.GetDecimal(43)
                 }
             };
+
+            if (!dr.IsDBNull(dr.GetOrdinal("id_local")))
+            {
+                evento.Ubicacion = new UbicacionDTO
+                {
+                    IdLocal = dr.GetInt32(dr.GetOrdinal("id_local")),
+                    NombreLocal = dr.GetString(dr.GetOrdinal("nombre_local")),
+                    CapacidadLocal = dr.IsDBNull(dr.GetOrdinal("capacidad_local")) ? null : dr.GetInt32(dr.GetOrdinal("capacidad_local")),
+                    DireccionLocal = dr.IsDBNull(dr.GetOrdinal("direccion_local")) ? null : dr.GetString(dr.GetOrdinal("direccion_local")),
+
+                    IdCiudad = dr.IsDBNull(dr.GetOrdinal("id_ciudad")) ? null : dr.GetInt32(dr.GetOrdinal("id_ciudad")),
+                    NombreCiudad = dr.IsDBNull(dr.GetOrdinal("nombre_ciudad")) ? null : dr.GetString(dr.GetOrdinal("nombre_ciudad")),
+
+                    IdPais = dr.IsDBNull(dr.GetOrdinal("id_pais")) ? null : dr.GetInt32(dr.GetOrdinal("id_pais")),
+                    NombrePais = dr.IsDBNull(dr.GetOrdinal("nombre_pais")) ? null : dr.GetString(dr.GetOrdinal("nombre_pais")),
+                    CodigoISO = dr.IsDBNull(dr.GetOrdinal("codigo_iso")) ? null : dr.GetString(dr.GetOrdinal("codigo_iso")),
+
+                    Latitud = dr.IsDBNull(dr.GetOrdinal("latitud")) ? null : dr.GetDecimal(dr.GetOrdinal("latitud")),
+                    Longitud = dr.IsDBNull(dr.GetOrdinal("longitud")) ? null : dr.GetDecimal(dr.GetOrdinal("longitud"))
+                };
+            }
+            else
+            {
+                evento.Ubicacion = null;
+            }
+            return evento;
         }
 
     }

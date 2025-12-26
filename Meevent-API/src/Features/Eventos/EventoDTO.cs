@@ -97,20 +97,20 @@ namespace Meevent_API.src.Features.Eventos
 
     public class UbicacionDTO 
     {
-        public int IdPais { get; set; }
-        public string NombrePais { get; set; }
-        public string CodigoISO { get; set; }
+        public int? IdPais { get; set; }
+        public string? NombrePais { get; set; }
+        public string? CodigoISO { get; set; }
 
-        public int IdCiudad { get; set; }
-        public string NombreCiudad { get; set; }
+        public int? IdCiudad { get; set; }
+        public string? NombreCiudad { get; set; }
 
-        public int IdLocal { get; set; }
-        public string NombreLocal { get; set; }
-        public int CapacidadLocal { get; set; }
-        public string DireccionLocal { get; set; }
+        public int? IdLocal { get; set; }
+        public string? NombreLocal { get; set; }
+        public int? CapacidadLocal { get; set; }
+        public string? DireccionLocal { get; set; }
 
-        public decimal Latitud { get; set; }
-        public decimal Longitud { get; set; }
+        public decimal? Latitud { get; set; }
+        public decimal? Longitud { get; set; }
     }
 
     // DTO completo del evento con objetos relacionados
