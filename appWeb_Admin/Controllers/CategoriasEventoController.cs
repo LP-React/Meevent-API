@@ -70,7 +70,7 @@ namespace appWeb_Admin.Controllers
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await client.PostAsync(
-                "http://localhost:5077/api/categorias/RegistrarCategoria",
+                "http://localhost:8080/api/categorias/RegistrarCategoria",
                 content
             );
 
@@ -107,7 +107,7 @@ namespace appWeb_Admin.Controllers
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await client.PatchAsync(
-                $"http://localhost:5077/api/categorias/ActivarEstado_Desactivar/{id}",
+                $"http://localhost:8080/api/categorias/ActivarEstado_Desactivar/{id}",
                 content
             );
 
@@ -175,7 +175,7 @@ namespace appWeb_Admin.Controllers
 
             var request = new HttpRequestMessage(
                 HttpMethod.Patch,
-                $"http://localhost:5077/api/categorias/EditarCategoria/{model.IdCategoriaEvento}"
+                $"http://localhost:8080/api/categorias/EditarCategoria/{model.IdCategoriaEvento}"
             )
             {
                 Content = content

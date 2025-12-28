@@ -71,7 +71,7 @@ namespace appWeb_Admin.Controllers
             var client = _httpClientFactory.CreateClient();
 
             var response = await client.GetAsync(
-                $"http://localhost:5077/api/Usuarios/buscar/{id}"
+                $"http://localhost:8080/api/Usuarios/buscar/{id}"
             );
 
             if (!response.IsSuccessStatusCode)
@@ -132,7 +132,7 @@ namespace appWeb_Admin.Controllers
 
             var request = new HttpRequestMessage(
                 HttpMethod.Patch,
-                $"http://localhost:5077/api/Usuarios/activarCuenta/{id}"
+                $"http://localhost:8080/api/Usuarios/activarCuenta/{id}"
             )
             {
                 Content = content

@@ -21,7 +21,7 @@ namespace appWeb_Admin.Controllers
         private async Task CargarCategoriasActivas()
         {
             var client = _httpClientFactory.CreateClient();
-            var response = await client.GetAsync("http://localhost:5077/api/categorias/ListarCategorias");
+            var response = await client.GetAsync("http://localhost:8080/api/categorias/ListarCategorias");
 
             if (response.IsSuccessStatusCode)
             {
@@ -120,7 +120,7 @@ namespace appWeb_Admin.Controllers
             var client = _httpClientFactory.CreateClient();
             var content = new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json");
 
-            var response = await client.PostAsync("http://localhost:5077/api/SubcategoriasEvento/RegistrarSubCategoria", content);
+            var response = await client.PostAsync("http://localhost:8080/api/SubcategoriasEvento/RegistrarSubCategoria", content);
             var body = await response.Content.ReadAsStringAsync();
 
             // Parseamos la respuesta siempre para saber qué dijo la API
@@ -187,7 +187,7 @@ namespace appWeb_Admin.Controllers
             var content = new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json");
 
             var response = await client.PatchAsync(
-                $"http://localhost:5077/api/SubcategoriasEvento/EditarSubCategoria/{model.IdSubcategoriaEvento}",
+                $"http://localhost:8080/api/SubcategoriasEvento/EditarSubCategoria/{model.IdSubcategoriaEvento}",
                 content);
 
             var body = await response.Content.ReadAsStringAsync();
@@ -216,7 +216,7 @@ namespace appWeb_Admin.Controllers
             var dto = new { estado = estado };
             var content = new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json");
 
-            var response = await client.PatchAsync($"http://localhost:5077/api/SubcategoriasEvento/ActivarEstado_Desctivar/{id}", content);
+            var response = await client.PatchAsync($"http://localhost:8080/api/SubcategoriasEvento/ActivarEstado_Desctivar/{id}", content);
             var body = await response.Content.ReadAsStringAsync();
 
             if (response.IsSuccessStatusCode)
